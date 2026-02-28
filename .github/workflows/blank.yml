@@ -7,8 +7,6 @@ on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
     branches: [ "main" ]
-    paths-ignore:
-      - "ci_logs/**"
   pull_request:
     branches: [ "main" ]
 
@@ -30,28 +28,3 @@ jobs:
       # Runs a single command using the runners shell
       - name: Run CI
         run: make ci
-
-      - name: Commit and push logs
-        run: |
-          git config --global user.name "ci-bot"
-          git config --global user.email "ci-bot@users.noreply.github.com"
-
-          # Save logs temporarily
-          mkdir -p /tmp/ci_logs_backup
-          cp -r ci_logs/* /tmp/ci_logs_backup/ || true
-
-          # Switch to new orphan branch (no history)
-          git checkout --orphan CI_Logs
-
-          # Remove everything
-          git rm -rf . || true
-
-          # Restore logs
-          mkdir -p ci_logs
-          cp -r /tmp/ci_logs_backup/* ci_logs/ || true
-
-          git add ci_logs/
-          git commit -m "Update CI logs"
-
-          # Force push (overwrite branch each run)
-          git push origin CI_Logs --force
