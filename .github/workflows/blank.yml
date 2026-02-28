@@ -47,7 +47,7 @@ jobs:
           git rm -rf . || true
 
           # Restore logs
-          mkdir ci_logs
+          mkdir -p ci_logs
           cp -r /tmp/ci_logs_backup/* ci_logs/ || true
 
           git add ci_logs/
