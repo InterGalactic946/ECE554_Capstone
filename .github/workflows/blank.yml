@@ -36,9 +36,22 @@ jobs:
           git config --global user.name "ci-bot"
           git config --global user.email "ci-bot@users.noreply.github.com"
 
+          # Save logs temporarily
+          mkdir -p /tmp/ci_logs_backup
+          cp -r ci_logs/* /tmp/ci_logs_backup/ || true
+
+          # Switch to new orphan branch (no history)
+          git checkout --orphan CI_Logs
+
+          # Remove everything
+          git rm -rf . || true
+
+          # Restore logs
+          mkdir ci_logs
+          cp -r /tmp/ci_logs_backup/* ci_logs/ || true
+
           git add ci_logs/
+          git commit -m "Update CI logs"
 
-          # Only commit if there are changes
-          git diff --cached --quiet || git commit -m "CI: update logs"
-
-          git push
+          # Force push (overwrite branch each run)
+          git push origin CI_Logs --force
