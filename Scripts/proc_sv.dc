@@ -1,0 +1,105 @@
+###################################
+# Read in the verilog files first #
+###################################
+read_file -format sverilog { \
+  ../designs/proc.v \
+  ../designs/ALU.sv \
+  ../designs/Branch_Control.sv \
+  ../designs/Cache_Control.sv \
+  ../designs/Cache.sv \
+  ../designs/CLA_4bit.sv \
+  ../designs/ControlUnit.sv \
+  ../designs/DataArray.sv \
+  ../designs/Decode.sv \
+  ../designs/DynamicBranchPredictor.sv \
+  ../designs/EX_MEM_pipe_reg.sv \
+  ../designs/Execute.sv \
+  ../designs/Fetch.sv \
+  ../designs/ForwardingUnit.sv \
+  ../designs/HazardDetectionUnit.sv \
+  ../designs/ID_EX_pipe_reg.sv \
+  ../designs/IF_ID_pipe_reg.sv \
+  ../designs/MEM_WB_pipe_reg.sv \
+  ../designs/memory_system.sv \
+  ../designs/MetaDataArray.sv \
+  ../designs/PSA_16bit.sv \
+  ../designs/RegisterFile.sv \
+  ../designs/Shifter.sv \
+  }
+
+###################################
+# Set Current Design to top level #
+###################################
+set current_design proc
+link
+# set_max_area 5000
+
+###########################################
+# Define clock and set don't mess with it #
+###########################################
+# clk with frequency of 10 MHz
+create_clock -name "clk" -period 100 -waveform { 0 50 } { clk }
+set_false_path -from [get_ports rst]
+set compile_delete_unloaded_sequential_cells false
+set compile_seqmap_propagate_constants false
+set_dont_touch_network [find port clk]
+# Set clk uncertainty (skew)
+set_clock_uncertainty 0.15 clk
+
+#########################################
+# Set input delay & drive on all inputs #
+#########################################
+set prim_inputs [remove_from_collection [all_inputs] [find port clk]]
+set_input_delay -clock clk 0.4 $prim_inputs
+set_driving_cell -lib_cell NAND2X2_LVT -library saed32lvt_tt0p85v25c $prim_inputs
+set_max_fanout 16 [get_cells -hier *]
+set_max_fanout 16 [current_design]
+# rst goes to many places so don't touch
+set_dont_touch_network [find port rst]
+
+##########################################
+# Set output delay & load on all outputs #
+##########################################
+set_output_delay -clock clk 0.5 [all_outputs]
+set_load 0.1 [all_outputs]
+
+#############################################################
+# Wire load model allows it to estimate internal parasitics #
+#############################################################
+set_wire_load_model -name 16000 -library saed32lvt_tt0p85v25c
+
+######################################################
+# Max transition time is important for Hot-E reasons #
+######################################################
+set_max_transition 0.1 [current_design]
+
+########################################
+# Now actually synthesize for 1st time #
+########################################
+compile -map_effort medium
+check_design
+
+# Unflatten design now that its compiled
+set_flatten true
+uniquify -force
+ungroup -all -flatten
+# force hold time to be met for all flops
+set_fix_hold clk
+
+# Compile again with higher effort
+compile -map_effort high
+check_design
+
+####################################################
+# Take a look at max & min timings as well as area #
+####################################################
+report_timing -delay min > ../outputs/proc_min_delay.syn.txt
+report_timing -delay max > ../outputs/proc_max_delay.syn.txt
+report_power > ../outputs/proc_power.syn.txt
+report_area > ../outputs/proc_area.syn.txt
+
+########################################################
+# Write out resulting synthesized netlist and SDC file #
+########################################################
+write -format verilog proc -output ../designs/proc.vg
+write_sdc ../../Scripts/proc.sdc
