@@ -53,7 +53,7 @@ A custom out-of-order RISC-V processor serves as the system control plane: it co
 
 ---
 
-# **Makefile for Synthesis, Simulation, Logs, and File Collection**
+# **Makefile for Simulation, Logs, and File Collection**
 
 This Makefile is designed to streamline the process of managing synthesis, running simulations, viewing logs, and collecting design/test files. Below are the available targets and their respective usage instructions.
 
