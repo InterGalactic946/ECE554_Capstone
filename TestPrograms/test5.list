@@ -1,0 +1,71 @@
+    ////////////////////////////////////////////////////////
+    // Initialize Registers                                 //
+    ////////////////////////////////////////////////////////
+    LLB R1, 0x05      // R1 = 0x0005
+    LLB R2, 0x03      // R2 = 0x0003
+    LLB R3, 0x5C      // R3 = 0x005C
+    LLB R4, 0x01      // R4 = 0x0001
+    LLB R6, 0x8A      // R6 = 0x008A (Memory address)
+
+    ////////////////////////////////////////////////////////
+    // Back-to-Back ADD Instructions (Forwarding Test)      //
+    ////////////////////////////////////////////////////////
+    ADD R1, R1, R2    // R1 = R1 + R2 (0x0005 + 0x0003 = 0x0008)
+    ADD R1, R1, R3    // R1 = R1 + R3 (0x0008 + 0x005C= 0x0064)
+    ADD R1, R1, R4    // R1 = R1 + R4 (0x0064+ 0x0001 = 0x0065)
+
+    ////////////////////////////////////////////////////////
+    // Data Hazard Test (Forwarding)                        //
+    ////////////////////////////////////////////////////////
+    ADD R7, R1, R2    // R7 = R1 + R2 (0x0065 + 0x0003 = 0x0068)
+    SUB R4, R7, R1    // R4 = R7 - R1 (0x0068 - 0x0065 = 0x0003)
+    XOR R5, R4, R2    // R5 = R4 ^ R2 (0x0003 ^ 0x0003 = 0x0000)
+
+    ////////////////////////////////////////////////////////
+    // Load-Use Hazard                                      //
+    ////////////////////////////////////////////////////////
+    SW R3, R6, 0      // Store R3 (0x005C) at memory[0x008A]
+    LW R7, R6, 0      // Load R7 from memory[0x008A] (expected: 0x005C)
+    ADD R8, R7, R1    // R8 = R7 + R1 (0x005C + 0x0065 = 0x00C1)
+
+    ////////////////////////////////////////////////////////
+    // Branching Hazard (Control Hazard)                    //
+    ////////////////////////////////////////////////////////
+    SUB R9, R1, R2    // R9 = R1 - R2 (0x0065 - 0x0003 = 0x0062)
+    B 001, BRANCH1    // Branch if Equal (Z = 1) → should not branch
+
+    // This section should execute if the branch was not taken
+    ADD R10, R1, R9   // R10 = R1 + R9 (0x0065 + 0x0062 = 0x00C7)
+
+BRANCH1:
+    SUB R11, R1, R1   // R11 = R1 - R1 (0x0000)
+    B 011, END        // Branch if Less Than (N = 1) → should not branch
+
+    ////////////////////////////////////////////////////////
+    // Forwarding with Branches                             //
+    ////////////////////////////////////////////////////////
+    ADD R12, R4, R5   // R12 = R4 + R5 (0x0003 + 0x0000 = 0x0003)
+    B 000, BRANCH2    // Branch if Not Equal (Z = 0) → should branch
+
+    // Unreachable if branch taken
+    ADD R13, R12, R1  // Shouldn't execute
+
+BRANCH2:
+    ADD R14, R12, R2  // R14 = R12 + R2 (0x0003 + 0x0003 = 0x0006)
+
+    ////////////////////////////////////////////////////////
+    // Memory-to-Memory Forwarding (LW followed by SW)       //
+    ////////////////////////////////////////////////////////
+    LW R12, R6, 0     // Load R12 from memory[0x008A] (expected: 0x005C)
+    SW R12, R8, 0     // Store R12 [0X005C] at memory[0x00C0] (address from R8)
+
+
+    ////////////////////////////////////////////////////////
+    // Store Stall with Data Dependency                     //
+    ////////////////////////////////////////////////////////
+    LW R7, R6, 0     // Load R7 from memory[0x008A] (expected: 0x005C)
+    SW R12, R7, 0    // Store R11 (0x005C) at memory[0x005C] (address from R7)
+
+END:
+    PCS R15           // Store PC in R15 to verify correctness
+    HLT               // Halt execution
