@@ -48,17 +48,6 @@ def parse_arguments():
         help="Test execution mode: 0=Command-line, 1=Save waves, 2=GUI, 3=View saved waves."
     )
 
-    """   
-    # Flag indicating the directory to run the testbench.
-        parser.add_argument( "-t", "--type", type=str, help=argparse.SUPPRESS)
-
-        # Argument to know if the current process is a child process or a parent process.
-        parser.add_argument("--child", action="store_true", help=argparse.SUPPRESS)
-
-        # Flag indicating to run all tasks in every directory.
-        parser.add_argument("-e", "--every", action="store_true", help="Run all tasks in every directory.")
-    """
-
     # Flag to indicate whether to run all tasks in the directory.
     parser.add_argument("-a", "--all", action="store_true", help="Run a specifc task for all files in a single directory.")
 
