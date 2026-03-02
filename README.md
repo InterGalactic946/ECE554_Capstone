@@ -16,7 +16,7 @@ A custom out-of-order RISC-V processor serves as the system control plane: it co
 /ECE5554_Capstone
 ├── RISC-V/                    # Directory containing files for a 5-stage in-order RISC-V CPU with dynamic branch prediction and caches
 │   ├── designs/               # Directory containing pre-synthesis design files
-│   ├── output/              # Directory containing package files for the design or testbenches (optional)
+│   ├── output/                # Directory containing top level generated test output files (optional)
 │   ├── packages/              # Directory containing package files for the design or testbenches (optional)
 │   └── tests/                 # Directory containing all related testbench files used for testing
 ├── Scripts/                   # Directory containing scripts for automating testing tasks
