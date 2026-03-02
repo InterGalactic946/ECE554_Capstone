@@ -4,7 +4,7 @@
 # - check: Checks if Verilog design files are compliant.
 # - synthesis: Synthesizes design to Synopsys 32-nm Cell Library.
 # - kill: Closes all vsim instances started from the script.
-# - start: Launches hierarchical block-diagram GUI starter generator.
+# - start: Generates starter DUT/testbench files.
 # - run: Executes tests with specified arguments.
 # - log: Displays logs based on the provided log mode.
 # - clean: Cleans up generated files in the specified directory.
@@ -14,7 +14,7 @@
 # - make check                  - Checks if Verilog design files are compliant.
 # - make kill           	    - Closes all started vsim instances from the script.
 # - make synthesis              - Synthesizes design to Synopsys 32-nm Cell Library.
-# - make start                  - Launches hierarchical block-diagram GUI starter generator.
+# - make start <start_type>        - Generate DUT and testbench starter files as specified.
 # - make run <mode> (as) (ps|a)    - Assemble and run tests in a specified directory with a selected mode (optionally all tests in the directory).
 # - make log <log_type> (c|a|p|x) - Display logs for a specified directory and log type.
 # - make clean                  - Clean up generated files in a specified directory.
@@ -35,16 +35,21 @@ default:
 	@echo "  make check 	                  - Checks all .v design files for compliancy within a selected directory."
 	@echo "  make kill 	                  - Closes all started vsim instances from the script."
 	@echo "  make synthesis                  - Synthesizes design to Synopsys 32-nm Cell Library."
+	@echo "  make start <start_type>         - Generate starter files (start_type: d=design, t=testbench, default=both)."
 	@echo "  make run <mode> [as] [ps] (a)   - Run tests in a specified directory with a selected mode (c,s,g,v) and optionally assembles files."
 	@echo "  make log <log_type>             - Display logs for a specified directory and log type."
 	@echo "  make clean <clean_type>         - Clean up generated files in a specified directory."
 	@echo "  make ci                         - Run CI sweep (all directories) and summarize pass/fail."
 
-# Handle different goals (run, log, clean) by parsing arguments passed to make.
+# Handle different goals (run, log, clean, start) by parsing arguments passed to make.
 ifeq ($(firstword $(MAKECMDGOALS)), run)
   runargs := $(wordlist 2, $(words $(MAKECMDGOALS)), $(MAKECMDGOALS))
   # Prevent make from treating arguments as file targets for 'run'.
   $(eval $(runargs):;@true)
+else ifeq ($(firstword $(MAKECMDGOALS)), start)
+  startargs := $(wordlist 2, $(words $(MAKECMDGOALS)), $(MAKECMDGOALS))
+  # Prevent make from treating start arguments (for example d/t) as file targets.
+  $(eval $(startargs):;@true)
 else ifeq ($(firstword $(MAKECMDGOALS)), log)
   logargs := $(wordlist 2, $(words $(MAKECMDGOALS)), $(MAKECMDGOALS))
   # Prevent make from treating arguments as file targets for 'log'.
@@ -56,7 +61,7 @@ else ifeq ($(firstword $(MAKECMDGOALS)), clean)
 endif
 
 # Declare phony targets.
-.PHONY: default check synthesis kill run log clean ci $(runargs) $(logargs) $(cleanargs)
+.PHONY: default check synthesis kill start run log clean ci $(runargs) $(startargs) $(logargs) $(cleanargs)
 
 
 ##################################################
@@ -91,6 +96,44 @@ kill:
 ##################################################
 synthesis: 	
 	@cd Scripts && python3 execute_tasks.py -s
+
+
+##################################################
+# Target: start
+# This target generates DUT/testbench starter files with optional mode:
+# - no arg: both DUT + testbench
+# - d: DUT only
+# - t: testbench only
+# Usage:
+#   make start
+#   make start d
+#   make start t
+##################################################
+start:
+	@if [ "$(words $(startargs))" -eq 0 ]; then \
+		# No start_type provided: generate both DUT and testbench starters. \
+		cd Scripts && python3 generate_starter.py -k both; \
+	elif [ "$(words $(startargs))" -eq 1 ]; then \
+		# One start_type provided: route to design-only or testbench-only generation. \
+		case "$(word 1, $(startargs))" in \
+			d) cd Scripts && python3 generate_starter.py -k design ;; \
+			t) cd Scripts && python3 generate_starter.py -k testbench ;; \
+			*) \
+				# Reject unsupported start_type values with a clear usage message. \
+				echo "Error: Invalid arguments for 'start' target. Usage:"; \
+				echo "  make start      # Generate DUT + testbench"; \
+				echo "  make start d    # Generate DUT only"; \
+				echo "  make start t    # Generate testbench only"; \
+				exit 1 ;; \
+		esac; \
+	else \
+		# Reject multiple arguments (only one optional start_type is valid). \
+		echo "Error: Invalid arguments for 'start' target. Usage:"; \
+		echo "  make start      # Generate DUT + testbench"; \
+		echo "  make start d    # Generate DUT only"; \
+		echo "  make start t    # Generate testbench only"; \
+		exit 1; \
+	fi;
 
 
 ##################################################

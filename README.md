@@ -34,7 +34,7 @@ A custom out-of-order RISC-V processor serves as the system control plane: it co
 
 ---
 
-## **Installation**
+## **Setup**
 
 1. Clone the repository to your local machine:
    ```bash
@@ -51,19 +51,28 @@ A custom out-of-order RISC-V processor serves as the system control plane: it co
    pip install <dependencies>
    ```
 
+4. Consider running the `generate_starter.py` script via the Makefile to create initial design and testbench files:
+   ```bash
+   make start
+   ```
+
+5. For running GUI based simulations, ensure that you have a compatible X11 server or graphical environment set up, eg. XQuartz for macOS or MobaXterm for Windows
+   to connect to the CAE machines where simulations will be run.
+
 ---
 
-# **Makefile for Simulation, Logs, and File Collection**
+# **Makefile for Simulation, Starters, Logs, and CI**
 
-This Makefile is designed to streamline the process of managing synthesis, running simulations, viewing logs, and collecting design/test files. Below are the available targets and their respective usage instructions.
+This Makefile is designed to streamline the process of running simulations, generating starter code, viewing logs, and running CI sweeps. Below are the available targets and their respective usage instructions.
 
 ---
 
 ## **Table of Contents**
 1. [Run Simulations](#run-simulations)
-2. [View Logs](#view-logs)
-3. [Collect Files](#collect-files)
-4. [Clean Directory](#clean-directory)
+2. [Generate Starters](#generate-starters)
+3. [View Logs](#view-logs)
+4. [Run CI-Sweep](#run-ci-sweep)
+5. [Clean Directory](#clean-directory)
 
 ---
 
@@ -102,6 +111,37 @@ make run <mode> <args>
 4. Run a specific test after assembly in CMD mode:
    ```bash
    make run c as
+   ```
+
+---
+
+## **Generate Starters**
+Generates starter RTL and/or testbench files with minimal prompts (project, module name, optional description/ports).
+
+### Usage:
+```bash
+make start
+make start d
+make start t
+```
+
+### Modes:
+- `make start`   - Generate both DUT and testbench starter files
+- `make start d` - Generate DUT starter file only
+- `make start t` - Generate testbench starter file only
+
+### Examples:
+1. Generate both DUT and testbench starters:
+   ```bash
+   make start
+   ```
+2. Generate only a DUT starter:
+   ```bash
+   make start d
+   ```
+3. Generate only a testbench starter:
+   ```bash
+   make start t
    ```
 
 ---
@@ -175,6 +215,7 @@ make clean
 
 ## **Notes**
 - Ensure you have all required dependencies installed (e.g. Python, Make, etc.).
+- For merging code, please follow the Hardware Development Guide outlined in the project drive before submitting pull requests (PRs).
 - For troubleshooting or additional details, refer to individual target sections.
 
 ---
