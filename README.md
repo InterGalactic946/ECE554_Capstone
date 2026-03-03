@@ -57,7 +57,7 @@ A custom out-of-order RISC-V processor serves as the system control plane: it co
    ```
 
 5. For running GUI based simulations, ensure that you have a compatible X11 server or graphical environment set up, eg. XQuartz for macOS or MobaXterm for Windows
-   to connect to the CAE machines where simulations will be run.
+   to connect to the CAE machines where simulations will be run. Refer to the Environment Setup Guide in the project drive for more details.
 
 ---
 
