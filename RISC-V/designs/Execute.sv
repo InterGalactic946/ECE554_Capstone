@@ -7,16 +7,16 @@
 module Execute (
     input logic clk,                   // System clock
     input logic rst,                   // Active high synchronous reset
-    input logic [15:0] ALU_In1,        // First input to ALU (from the decode stage)
-    input logic [15:0] ALU_imm,        // Immediate for I-type ALU instructions (from the decode stage)
-    input logic [15:0] ALU_In2_step,   // Second ALU input based on the instruction type (from the decode stage)
+    input logic [31:0] ALU_In1,        // First input to ALU (from the decode stage)
+    input logic [31:0] ALU_imm,        // Immediate for I-type ALU instructions (from the decode stage)
+    input logic [31:0] ALU_In2_step,   // Second ALU input based on the instruction type (from the decode stage)
     input logic [3:0] ALUOp,           // ALU operation code (from the decode stage)
     input logic ALUSrc,                // Selects second ALU input (immediate or SrcReg2_data) based on instruction type (from the decode stage)
     input logic Z_en,                  // Enable signal for Z flag
     input logic NV_en,                 // Enable signal for N and V flags
     
     output logic [2:0] flags,          // Flags output: {ZF, VF, NF}
-    output logic [15:0] ALU_out        // ALU operation result output
+    output logic [31:0] ALU_out        // ALU operation result output
 );
 
   ////////////////////////////////////////////////
@@ -24,7 +24,7 @@ module Execute (
   ////////////////////////////////////////////////
   logic ZF, VF, NF;           // flag signals for zero, overflow, and negative
   logic Z_set, V_set, N_set;  // flag set signals by the ALU
-  logic [15:0] ALU_In2;       // Second ALU input based on the instruction type
+  logic [31:0] ALU_In2;       // Second ALU input based on the instruction type
   ////////////////////////////////////////////////
 
   /////////////////////////////////////////////

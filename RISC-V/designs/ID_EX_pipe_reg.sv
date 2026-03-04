@@ -9,14 +9,14 @@ module ID_EX_pipe_reg (
     input logic rst,                       // Active high synchronous reset
     input logic stall,                     // Stall signal (prevents updates)
     input logic flush,                     // Flush pipeline register
-    input logic [15:0] IF_ID_PC_next,      // Pipelined next PC from the fetch stage
-    input logic [62:0] EX_signals,         // Execute stage control signals from the decode stage
-    input logic [17:0] MEM_signals,        // Memory stage control signals from the decode stage
+    input logic [31:0] IF_ID_PC_next,      // Pipelined next PC from the fetch stage
+    input logic [110:0] EX_signals,        // Execute stage control signals from the decode stage
+    input logic [33:0] MEM_signals,        // Memory stage control signals from the decode stage
     input logic [7:0] WB_signals,          // Write-back stage control signals from the decode stage
     
-    output logic [15:0] ID_EX_PC_next,     // Pipelined next PC passed to the execute stage
-    output logic [62:0] ID_EX_EX_signals,  // Pipelined execute stage signals passed to the execute stage
-    output logic [17:0] ID_EX_MEM_signals, // Pipelined memory stage signals passed to the execute stage
+    output logic [31:0] ID_EX_PC_next,     // Pipelined next PC passed to the execute stage
+    output logic [110:0] ID_EX_EX_signals, // Pipelined execute stage signals passed to the execute stage
+    output logic [33:0] ID_EX_MEM_signals, // Pipelined memory stage signals passed to the execute stage
     output logic [7:0] ID_EX_WB_signals    // Pipelined write back stage signals passed to the execute stage
 );
   
@@ -28,14 +28,14 @@ module ID_EX_pipe_reg (
   ///////////////////////////// EXECUTE STAGE ////////////////////////////////////
   logic [3:0] ID_EX_SrcReg1;       // Pipelined first source register ID passed to the execute stage
   logic [3:0] ID_EX_SrcReg2;       // Pipelined second source register ID passed to the execute stage
-  logic [15:0] ID_EX_ALU_In1;      // Pipelined first ALU input passed to the execute stage
-  logic [15:0] ID_EX_ALU_imm;      // Pipelined ALU immediate input passed to the execute stage
-  logic [15:0] ID_EX_ALU_In2;      // Pipelined second ALU input passed to the execute stage
+  logic [31:0] ID_EX_ALU_In1;      // Pipelined first ALU input passed to the execute stage
+  logic [31:0] ID_EX_ALU_imm;      // Pipelined ALU immediate input passed to the execute stage
+  logic [31:0] ID_EX_ALU_In2;      // Pipelined second ALU input passed to the execute stage
   logic [3:0] ID_EX_ALUOp;         // Pipelined ALU operation code passed to the execute stage
   logic ID_EX_ALUSrc;              // Pipelined ALU select signal to choose between register/immediate operand passed to the execute stage
   logic ID_EX_Z_en, ID_EX_NV_en;   // Pipelined enable signals setting the Z, N, and V flags passed to the execute stage
   /////////////////////////// MEMORY STAGE ///////////////////////////////////////
-  logic [15:0] ID_EX_MemWriteData; // Pipelined Memory write data signal passed to the execute stage
+  logic [31:0] ID_EX_MemWriteData; // Pipelined Memory write data signal passed to the execute stage
   logic ID_EX_MemEnable;           // Pipelined Memory enable signal passed to the execute stage
   logic ID_EX_MemWrite;            // Pipelined Memory write signal passed to the execute stage
   /////////////////////////// WRITE BACK STAGE ///////////////////////////////////
@@ -62,7 +62,7 @@ module ID_EX_pipe_reg (
   ///////////////////////////////////////////////////////////////////////////////
   always @(posedge clk)
     if (rst)
-      ID_EX_PC_next <= 16'h0000;
+      ID_EX_PC_next <= 32'h0000_0000;
     else if (wen)
       ID_EX_PC_next <= IF_ID_PC_next;
   ///////////////////////////////////////////////////////////////////////////////
@@ -74,19 +74,19 @@ module ID_EX_pipe_reg (
     if (clr) begin
       ID_EX_SrcReg1 <= 4'h0;
       ID_EX_SrcReg2 <= 4'h0;
-      ID_EX_ALU_In1 <= 16'h0000;
-      ID_EX_ALU_imm <= 16'h0000;
-      ID_EX_ALU_In2 <= 16'h0000;
+      ID_EX_ALU_In1 <= 32'h0000_0000;
+      ID_EX_ALU_imm <= 32'h0000_0000;
+      ID_EX_ALU_In2 <= 32'h0000_0000;
       ID_EX_ALUOp <= 4'h0;
       ID_EX_ALUSrc <= 1'b0;
       ID_EX_Z_en <= 1'b0;
       ID_EX_NV_en <= 1'b0;
     end else if (wen) begin
-      ID_EX_SrcReg1 <= EX_signals[62:59];
-      ID_EX_SrcReg2 <= EX_signals[58:55];
-      ID_EX_ALU_In1 <= EX_signals[54:39];
-      ID_EX_ALU_imm <= EX_signals[38:23];
-      ID_EX_ALU_In2  <= EX_signals[22:7];
+      ID_EX_SrcReg1 <= EX_signals[110:107];
+      ID_EX_SrcReg2 <= EX_signals[106:103];
+      ID_EX_ALU_In1 <= EX_signals[102:71];
+      ID_EX_ALU_imm <= EX_signals[70:39];
+      ID_EX_ALU_In2  <= EX_signals[38:7];
       ID_EX_ALUOp <= EX_signals[6:3];
       ID_EX_ALUSrc <= EX_signals[2];
       ID_EX_Z_en <= EX_signals[1];
@@ -103,11 +103,11 @@ module ID_EX_pipe_reg (
   ////////////////////////////////////////////////////////////////////////////
   always @(posedge clk) begin
     if (clr) begin
-      ID_EX_MemWriteData <= 16'h0000;
+      ID_EX_MemWriteData <= 32'h0000_0000;
       ID_EX_MemEnable <= 1'b0;
       ID_EX_MemWrite <= 1'b0;
     end else if (wen) begin
-      ID_EX_MemWriteData <= MEM_signals[17:2];
+      ID_EX_MemWriteData <= MEM_signals[33:2];
       ID_EX_MemEnable <= MEM_signals[1];
       ID_EX_MemWrite <= MEM_signals[0];
     end

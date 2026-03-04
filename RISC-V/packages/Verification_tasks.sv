@@ -43,12 +43,12 @@ package Verification_tasks;
   task automatic verify_FETCH(
       input logic PC_stall, expected_PC_stall, I_cache_stall, WaySelect,
       input logic [5:0] set,
-      input logic [15:0] PC_next, expected_PC_next,
-      input logic [15:0] PC_inst, expected_PC_inst, cache_addr, cache_data,
-      input logic [15:0] PC_curr, expected_PC_curr,
+      input logic [31:0] PC_next, expected_PC_next,
+      input logic [31:0] PC_inst, expected_PC_inst, cache_addr, cache_data,
+      input logic [31:0] PC_curr, expected_PC_curr,
       input logic [1:0]  prediction, expected_prediction,
       input logic predicted_taken, expected_predicted_taken,
-      input logic [15:0] predicted_target, expected_predicted_target,
+      input logic [31:0] predicted_target, expected_predicted_target,
       output string fetch_msg
   );
     begin

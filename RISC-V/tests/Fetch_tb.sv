@@ -21,11 +21,11 @@ module Fetch_tb();
   
   logic actual_taken;                     // Flag indicating whether the branch was actually taken
   string fetch_msg;                       // Systematically prints out the state of the instruction fetched
-  logic [15:0] actual_target;             // Actual target address
-  logic [15:0] branch_target;             // Actual target address for the branch instruction
+  logic [31:0] actual_target;             // Actual target address
+  logic [31:0] branch_target;             // Actual target address for the branch instruction
   logic [1:0] IF_ID_prediction;           // Pipelined predicted signal passed to the decode stage
-  logic [15:0] IF_ID_predicted_target;    // Predicted target passed to the decode stage
-  logic [15:0] IF_ID_PC_curr;             // IF/ID stage current PC value
+  logic [31:0] IF_ID_predicted_target;    // Predicted target passed to the decode stage
+  logic [31:0] IF_ID_PC_curr;             // IF/ID stage current PC value
 
   logic mispredicted;                     // Indicates previous instruction's fetch mispredicted.
   logic target_miscomputed;               // Indicates previous instruction's fetch miscomputed the target.
@@ -42,30 +42,32 @@ module Fetch_tb();
   integer branch_count;                           // Number of branch instructions executed.
   integer num_tests;                              // Number of test cases to execute.
     
-  logic [15:0] PC_next;                   // Computed next PC value
-  logic [15:0] PC_curr;                   // Current PC value
+  logic [31:0] PC_next;                   // Computed next PC value
+  logic [31:0] PC_curr;                   // Current PC value
   logic [1:0] prediction;                 // The 2-bit predicted taken flag from the predictor
-  logic [15:0] predicted_target;          // The predicted target address from the predictor
+  logic [31:0] predicted_target;          // The predicted target address from the predictor
 
-  logic [15:0] PC_inst;                   // Instruction fetched from the current PC address
-  logic [15:0] expected_PC_inst;          // Expected instruction fetched from the current PC address
+  logic [31:0] PC_inst;                   // Instruction fetched from the current PC address
+  logic [31:0] expected_PC_inst;          // Expected instruction fetched from the current PC address
   logic hlt_fetched;                      // Indicates if the fetched instruction is a halt instruction.
   logic ICACHE_hit;                       // Indicates if the instruction cache hit
   logic ICACHE_miss;                      // Indicates if the instruction cache miss
   logic ICACHE_miss_mem_en;               // Enable signal for main memory access on cache miss
-  logic [15:0] I_MEM_addr;                // Address for instruction memory access
+  logic [31:0] I_MEM_addr;                // Address for instruction memory access
 
-  logic [15:0] mem_addr;                  // Address for main memory access
+  logic [31:0] mem_addr;                  // Address for main memory access
   logic mem_en;                           // Enable signal for main memory access
   logic mem_wr;                           // Write enable signal for main memory access
-  logic [15:0] mem_data_out;              // Data output to main memory
-  logic [15:0] mem_data_in;               // Data input from main memory
+  logic [31:0] mem_data_out;              // Data output to main memory
+  logic [31:0] mem_data_in;               // Data input from main memory
+  logic [15:0] mem_addr_legacy;           // Legacy memory address
+  logic [15:0] mem_data_out_legacy;       // Legacy memory data out
   logic mem_data_valid;                   // Indicates if the memory data is valid        
 
-  logic [15:0] expected_PC_next;          // The expected computed next PC value
-  logic [15:0] expected_PC_curr;          // The expected current PC value
+  logic [31:0] expected_PC_next;          // The expected computed next PC value
+  logic [31:0] expected_PC_curr;          // The expected current PC value
   logic [1:0] expected_prediction;        // The expected prediction from the model DBP
-  logic [15:0] expected_predicted_target; // The expected predicted target address from from the model DBP
+  logic [31:0] expected_predicted_target; // The expected predicted target address from from the model DBP
 
   // Instantiate the DUT: Dynamic Branch Predictor.
   Fetch iDUT (
@@ -89,14 +91,14 @@ module Fetch_tb();
   );
 
   // Instantiate instruction memory cache along with control.
-  memory_system_model iINSTR_MEM_CACHE (
+  memory_system iINSTR_MEM_CACHE (
       .clk(clk),
       .rst(rst),
       .enable(1'b1),
       .proceed(1'b1),
       .on_chip_wr(1'b0),
       .on_chip_memory_address(expected_PC_next),
-      .on_chip_memory_data(16'h0000),
+      .on_chip_memory_data(32'h0000_0000),
 
       .off_chip_memory_data(mem_data_out),
       .memory_data_valid(mem_data_valid),
@@ -111,17 +113,17 @@ module Fetch_tb();
   // Get the condition that we fetched a halt instruction.
   assign hlt_fetched = &expected_PC_inst[15:12];
 
-  // Instantiate main memory.
-  memory iMAIN_MEM (
+  // Instantiate main memory (legacy memory4c adapter).
+  memory4c iMAIN_MEM (
     .clk(clk),
     .rst(rst),
     .enable(mem_en),
-    .addr(mem_addr),
+    .addr(mem_addr_legacy),
     .wr(mem_wr),
     .data_in(16'h0000),
     
     .data_valid(mem_data_valid),
-    .data_out(mem_data_out)
+    .data_out(mem_data_out_legacy)
   );
 
   //////////////////////////////////////////////////////////
@@ -132,6 +134,8 @@ module Fetch_tb();
 
   // We send out the main memory address as from the instruction cache or data cache based on which is granted.
   assign mem_addr = I_MEM_addr;
+  assign mem_addr_legacy = mem_addr[15:0];
+  assign mem_data_out = {16'h0000, mem_data_out_legacy};
 
   // We enable main memory either on a cache miss (when either caches are allowed to proceed) or on a DCACHE write hit.
   assign mem_en = ICACHE_miss_mem_en;
@@ -206,8 +210,8 @@ module Fetch_tb();
       enable = 1'b1;           // Enable the branch predictor
       is_branch = 1'b0;        // Initially no branch
       actual_taken = 1'b0;     // Initially the branch is not taken
-      actual_target = 16'h0000; // Set target to 0 initially
-      branch_target = 16'h0000; // Set target to 0 initially
+      actual_target = 32'h0000_0000; // Set target to 0 initially
+      branch_target = 32'h0000_0000; // Set target to 0 initially
       fetch_msg = "";
 
       // Initialize counter values.
@@ -297,7 +301,7 @@ module Fetch_tb();
 
       4, 5: begin
         // 25% of the time: Randomize actual target (only if taken).
-        actual_target <= (actual_taken) ? (16'h0000 + ($random % (num_tests != 0 ? num_tests : 1)) * 2) : 16'h0000;
+        actual_target <= (actual_taken) ? (32'h0000_0000 + ($random % (num_tests != 0 ? num_tests : 1)) * 2) : 32'h0000_0000;
       end
 
       6: begin
@@ -309,7 +313,7 @@ module Fetch_tb();
         // 12.5% of the time: Randomize all relevant control signals.
         is_branch <= $random % 2;
         actual_taken <= $random % 2;
-        actual_target <= (actual_taken) ? (16'h0000 + ($random % (num_tests != 0 ? num_tests : 1)) * 2) : 16'h0000;
+        actual_target <= (actual_taken) ? (32'h0000_0000 + ($random % (num_tests != 0 ? num_tests : 1)) * 2) : 32'h0000_0000;
         enable <= $random % 2;
       end
     endcase
@@ -354,7 +358,7 @@ module Fetch_tb();
   // Model the PC curr register.
   always @(posedge clk)
     if (rst)
-      IF_ID_PC_curr <= 16'h0000;
+      IF_ID_PC_curr <= 32'h0000_0000;
     else if (enable)
       IF_ID_PC_curr <= expected_PC_curr;
   
@@ -368,7 +372,7 @@ module Fetch_tb();
   // Model the prediction target register.
   always @(posedge clk)
     if (rst)
-      IF_ID_predicted_target <= 16'h0000;
+      IF_ID_predicted_target <= 32'h0000_0000;
     else if (enable)
       IF_ID_predicted_target <= expected_predicted_target;
 

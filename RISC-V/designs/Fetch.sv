@@ -10,17 +10,17 @@ module Fetch (
     input logic hlt_fetched,            // Indicates if the fetched instruction is a halt instruction.
     input logic actual_taken,           // Signal used to determine whether branch instruction met condition codes
     input logic wen_BHT,                // Write enable for BHT (Branch History Table)
-    input logic [15:0] branch_target,   // 16-bit address of the branch target
+    input logic [31:0] branch_target,   // 16-bit address of the branch target
     input logic wen_BTB,                // Write enable for BTB (Branch Target Buffer)
-    input logic [15:0] actual_target,   // 16-bit address of the actual target
+    input logic [31:0] actual_target,   // 16-bit address of the actual target
     input logic update_PC,              // Signal to update the PC with the actual target
-    input logic [15:0] IF_ID_PC_curr,   // Pipelined previous PC value (from the fetch stage)
+    input logic [31:0] IF_ID_PC_curr,   // Pipelined previous PC value (from the fetch stage)
     input logic [1:0] IF_ID_prediction, // The predicted value of the previous branch instruction
     
-    output logic [15:0] PC_next,         // Computed next PC value
-    output logic [15:0] PC_curr,         // Current PC value
+    output logic [31:0] PC_next,         // Computed next PC value
+    output logic [31:0] PC_curr,         // Current PC value
     output logic [1:0] prediction,       // The 2-bit predicted value of the current branch instruction
-    output logic [15:0] predicted_target // The predicted target from the BTB.
+    output logic [31:0] predicted_target // The predicted target from the BTB.
 );
 
   /////////////////////////////////////////////////
@@ -28,9 +28,9 @@ module Fetch (
   ///////////////////////////////////////////////
   logic predicted_taken;            // The predicted value of the current instruction.
   logic enable;                     // Enables the reads/writes for PC, instruction memory, and BHT, BTB.
-  logic [15:0] PC_target;           // The target address of the branch instruction from the BTB or the next PC.
-  logic [15:0] PC_new;              // The PC is updated with the current PC if HLT is fetched, or the target address otherwise.
-  logic [15:0] PC_update;           // The address to update the PC with.
+  logic [31:0] PC_target;           // The target address of the branch instruction from the BTB or the next PC.
+  logic [31:0] PC_new;              // The PC is updated with the current PC if HLT is fetched, or the target address otherwise.
+  logic [31:0] PC_update;           // The address to update the PC with.
   ////////////////////////////////////////////////
 
   ///////////////////////////
@@ -69,12 +69,12 @@ module Fetch (
   // Model the PC register.
   always @(posedge clk)
     if (rst)
-      PC_curr <= 16'h0000;
+      PC_curr <= 32'h0000_0000;
     else if (enable)
       PC_curr <= PC_update;
 
   // Compute PC_new as the next instruction address.
-  assign PC_next = PC_curr + 16'h0002;
+  assign PC_next = PC_curr + 32'h0000_0002;
   //////////////////////////////////////
 
 endmodule

@@ -11,18 +11,18 @@ module memory_system (
     input  logic        enable,                 // Enable signal for memory access
     input  logic        proceed,                // Proceed flag to access main memory
     input  logic        on_chip_wr,             // Write enable from on-chip core
-    input  logic [15:0] on_chip_memory_address, // Address from processor core
-    input  logic [15:0] on_chip_memory_data,    // Data from processor core
+    input  logic [31:0] on_chip_memory_address, // Address from processor core
+    input  logic [31:0] on_chip_memory_data,    // Data from processor core
 
     // Interface to external memory
-    input  logic [15:0] off_chip_memory_data,   // Data from external memory
+    input  logic [31:0] off_chip_memory_data,   // Data from external memory
     input  logic        memory_data_valid,      // Valid signal from external memory
 
-    output logic [15:0] off_chip_memory_address, // Address to external memory
+    output logic [31:0] off_chip_memory_address, // Address to external memory
     
     output logic         miss_mem_en,            // Enables main memory on a cache miss
 
-    output logic [15:0] data_out,               // Data read from cache
+    output logic [31:0] data_out,               // Data read from cache
     output logic        hit                     // Cache hit signal
 );
 
@@ -32,13 +32,13 @@ module memory_system (
     logic wr_data_enable;        // Enable to write data to cache
     logic wr_tag_enable;         // Enable to write tag to cache
     /******************** CACHE SIGNALS **************************************/
-    logic [15:0] addr;           // The address to read from/write to.
-    logic [15:0] data_in;        // Data input to the cache (on-chip or memory)
-    logic [7:0] tag_in;          // Tag to be written to tag array
+    logic [31:0] addr;           // The address to read from/write to.
+    logic [31:0] data_in;        // Data input to the cache (on-chip or memory)
+    logic [23:0] tag_in;         // Tag to be written to tag array
     /******************** CACHE CONTROLLER SIGNALS ***************************/
     logic fsm_busy;              // Indicates the cache it is busy filling it with data on a miss.
     logic miss_detected;         // A miss is detected when cache is enabled and it is not a hit.
-    logic [15:0] controller_memory_address; // The address to write to the cache on a miss.
+    logic [31:0] controller_memory_address; // The address to write to the cache on a miss.
     logic write_data_array;      // FSM signal to write data array
     logic write_tag_array;       // FSM signal to write tag array
     /////////////////////////////////////////////////////////

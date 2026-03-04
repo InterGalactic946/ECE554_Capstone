@@ -9,14 +9,14 @@ module MEM_WB_pipe_reg (
     input logic rst,                        // Active high synchronous reset
     input logic flush,                      // Flush pipeline register
 
-    input logic [15:0] EX_MEM_PC_next,      // Pipelined next PC from the fetch stage
-    input logic [15:0] EX_MEM_ALU_out,      // Pipelined ALU output from the execute stage
-    input logic [15:0] MemData,             // Data read out from data memory from the memory stage
+    input logic [31:0] EX_MEM_PC_next,      // Pipelined next PC from the fetch stage
+    input logic [31:0] EX_MEM_ALU_out,      // Pipelined ALU output from the execute stage
+    input logic [31:0] MemData,             // Data read out from data memory from the memory stage
     input logic [7:0]  EX_MEM_WB_signals,   // Pipelined write back stage signals from the decode stage
 
-    output logic [15:0] MEM_WB_PC_next,     // Pipelined next PC passed to the write-back stage
-    output logic [15:0] MEM_WB_ALU_out,     // Pipelined ALU result passed to the write-back stage
-    output logic [15:0] MEM_WB_MemData,     // Pipelined data read from memory passed to the write-back stage
+    output logic [31:0] MEM_WB_PC_next,     // Pipelined next PC passed to the write-back stage
+    output logic [31:0] MEM_WB_ALU_out,     // Pipelined ALU result passed to the write-back stage
+    output logic [31:0] MEM_WB_MemData,     // Pipelined data read from memory passed to the write-back stage
     output logic [7:0]  MEM_WB_WB_signals   // Pipelined write back stage signals passed to the write-back stage
 );
 
@@ -42,7 +42,7 @@ module MEM_WB_pipe_reg (
   //////////////////////////////////////////////////////////////////////////////////
   always @(posedge clk)
     if (rst)
-      MEM_WB_PC_next <= 16'h0000;
+      MEM_WB_PC_next <= 32'h0000_0000;
     else
       MEM_WB_PC_next <= EX_MEM_PC_next;
 
@@ -51,7 +51,7 @@ module MEM_WB_pipe_reg (
   //////////////////////////////////////////////////////////////////
   always @(posedge clk)
     if (clr)
-      MEM_WB_ALU_out <= 16'h0000;
+      MEM_WB_ALU_out <= 32'h0000_0000;
     else
       MEM_WB_ALU_out <= EX_MEM_ALU_out;
 
@@ -60,7 +60,7 @@ module MEM_WB_pipe_reg (
   //////////////////////////////////////////////////////////////////////
   always @(posedge clk)
     if (clr)
-      MEM_WB_MemData <= 16'h0000;
+      MEM_WB_MemData <= 32'h0000_0000;
     else
       MEM_WB_MemData <= MemData;
 

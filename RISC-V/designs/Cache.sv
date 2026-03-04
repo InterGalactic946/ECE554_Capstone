@@ -7,18 +7,18 @@
 module Cache (
   input  logic         clk,                 // System clock
   input  logic         rst,                 // Active high synchronous reset
-  input  logic [15:0]  addr,                // Address of the memory to access
+  input  logic [31:0]  addr,                // Address of the memory to access
 
   // Data array control signals
-  input  logic [15:0]  data_in,             // Data (instruction or word) to write into the cache
+  input  logic [31:0]  data_in,             // Data (instruction or word) to write into the cache
   input  logic         write_data_array,    // Write enable for data array
 
   // Meta data array control signals
-  input logic [7:0] tag_in,                 // The new tag to be written to the cache on a miss
+  input logic [23:0] tag_in,                // The new tag to be written to the cache on a miss
   input logic       write_tag_array,        // Write enable for tag array
 
   // Outputs
-  output logic [15:0] data_out,             // Output data from cache (e.g., fetched instruction or memory word)
+  output logic [31:0] data_out,             // Output data from cache (e.g., fetched instruction or memory word)
   output logic hit                          // Indicates cache hit or miss in this cycle.
 );
 
@@ -31,14 +31,14 @@ module Cache (
   logic WaySelect;              // The line to write data to either on a hit or a miss.
   logic [5:0] set_enable;       // One hot set enable for the 64 sets in the cache.
   logic [2:0] word_enable;      // One hot word enable based on the b-bits of the address.
-  logic [15:0] first_data_out;  // The data currently stored in the first line of the cache.
-  logic [15:0] second_data_out; // The data currently stored in the second line of the cache.
+  logic [31:0] first_data_out;  // The data currently stored in the first line of the cache.
+  logic [31:0] second_data_out; // The data currently stored in the second line of the cache.
   logic first_way_match;        // 1-bit signal indicating the first "way" in the set caused a cache hit.
   logic second_way_match;       // 1-bit signal indicating the second "way" in the set caused a cache hit.
-  logic [7:0] first_tag_in;     // Input to the first line in MDA.
-  logic [7:0] second_tag_in;    // Input to the second line in MDA.
-  logic [7:0] first_tag_out;    // The tag currently stored in the first line of the cache to compare to.
-  logic [7:0] second_tag_out;   // The tag currently stored in the second line of the cache to compare to.
+  logic [23:0] first_tag_in;     // Input to the first line in MDA.
+  logic [23:0] second_tag_in;    // Input to the second line in MDA.
+  logic [23:0] first_tag_out;    // The tag currently stored in the first line of the cache to compare to.
+  logic [23:0] second_tag_out;   // The tag currently stored in the second line in the cache to compare to.
   ///////////////////////////////////////////////
 
   // Instantiate a 3:8 decoder to get which word of the 8 words to write to.
@@ -100,14 +100,14 @@ module Cache (
   assign first_tag_in = (hit | ~evict_first_way) ? first_tag_out : tag_in;
   assign second_tag_in = (hit | evict_first_way) ? second_tag_out : tag_in;
 
-  // Compare the tag stored in the cache currently at both "ways/lines" in parallel, checking for equality and valid bit set. (addr[16:8] == tag and TagOut[1] == valid)
-  assign first_way_match =  first_tag_out[1] & ~|(addr[15:10] ^ first_tag_out[7:2]);
-  assign second_way_match = second_tag_out[1] & ~|(addr[15:10] ^ second_tag_out[7:2]);
+  // Compare tags in both ways in parallel, checking for equality and valid bit set.
+  assign first_way_match =  first_tag_out[1] & ~|(addr[31:10] ^ first_tag_out[23:2]);
+  assign second_way_match = second_tag_out[1] & ~|(addr[31:10] ^ second_tag_out[23:2]);
   
   // It is a cache hit if either of the "ways" resulted in a match, else it is a miss.
   assign hit = first_way_match | second_way_match;
 
   // Grab the data to be output based on which way had a read hit, else if not a read hit, just output 0s.
-  assign data_out = (hit & ~write_data_array) ? ((second_way_match) ? second_data_out : first_data_out) : 16'h0000;
+  assign data_out = (hit & ~write_data_array) ? ((second_way_match) ? second_data_out : first_data_out) : 32'h0000_0000;
 
 endmodule

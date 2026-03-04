@@ -8,16 +8,16 @@ module EX_MEM_pipe_reg (
     input logic clk,                        // System clock
     input logic rst,                        // Active high synchronous reset
     input logic stall,                      // Stall signal (prevents updates)
-    input logic [15:0] ID_EX_PC_next,       // Pipelined next PC from the fetch stage
-    input logic [15:0] ALU_out,             // ALU output from the execute stage
+    input logic [31:0] ID_EX_PC_next,       // Pipelined next PC from the fetch stage
+    input logic [31:0] ALU_out,             // ALU output from the execute stage
     input logic [3:0] ID_EX_SrcReg2,        // Pipelined second source register ID pfrom the decode stage
-    input logic [17:0] ID_EX_MEM_signals,   // Pipelined memory stage signals from the decode stage
+    input logic [33:0] ID_EX_MEM_signals,   // Pipelined memory stage signals from the decode stage
     input logic [7:0] ID_EX_WB_signals,     // Pipelined write back stage signals from the decode stage
     
-    output logic [15:0] EX_MEM_PC_next,     // Pipelined next PC passed to the memory stage
-    output logic [15:0] EX_MEM_ALU_out,     // Pipelined ALU output passed to the memory stage
+    output logic [31:0] EX_MEM_PC_next,     // Pipelined next PC passed to the memory stage
+    output logic [31:0] EX_MEM_ALU_out,     // Pipelined ALU output passed to the memory stage
     output logic [3:0] EX_MEM_SrcReg2,      // Pipelined second source register ID passed to the memory stage
-    output logic [17:0] EX_MEM_MEM_signals, // Pipelined memory stage signals passed to the memory stage
+    output logic [33:0] EX_MEM_MEM_signals, // Pipelined memory stage signals passed to the memory stage
     output logic [7:0] EX_MEM_WB_signals    // Pipelined write back stage signals passed to the memory stage
 );
 
@@ -26,7 +26,7 @@ module EX_MEM_pipe_reg (
   ///////////////////////////////////////////////
   logic wen;                        // Register write enable signal.
   /////////////////////////// MEMORY STAGE ///////////////////////////////////////
-  logic [15:0] EX_MEM_MemWriteData; // Pipelined Memory write data signal passed to the memory stage
+  logic [31:0] EX_MEM_MemWriteData; // Pipelined Memory write data signal passed to the memory stage
   logic EX_MEM_MemEnable;           // Pipelined Memory enable signal passed to the memory stage
   logic EX_MEM_MemWrite;            // Pipelined Memory write signal passed to the memory stage
   /////////////////////////// WRITE BACK STAGE ///////////////////////////////////
@@ -49,7 +49,7 @@ module EX_MEM_pipe_reg (
   //////////////////////////////////////////////////////////////////////////////
   always @(posedge clk)
     if (rst)
-      EX_MEM_PC_next <= 16'h0000;
+      EX_MEM_PC_next <= 32'h0000_0000;
     else if (wen)
       EX_MEM_PC_next <= ID_EX_PC_next;
   //////////////////////////////////////////////////////////////////////////////
@@ -59,7 +59,7 @@ module EX_MEM_pipe_reg (
   //////////////////////////////////////////////////////////////
   always @(posedge clk)
     if (rst)
-      EX_MEM_ALU_out <= 16'h0000;
+      EX_MEM_ALU_out <= 32'h0000_0000;
     else if (wen)
       EX_MEM_ALU_out <= ALU_out;
   //////////////////////////////////////////////////////////////
@@ -79,11 +79,11 @@ module EX_MEM_pipe_reg (
   ////////////////////////////////////////////////////////////////////////////
   always @(posedge clk) begin
     if (rst) begin
-      EX_MEM_MemWriteData <= 16'h0000;
+      EX_MEM_MemWriteData <= 32'h0000_0000;
       EX_MEM_MemEnable    <= 1'b0;
       EX_MEM_MemWrite    <= 1'b0;
     end else if (wen) begin
-      EX_MEM_MemWriteData <= ID_EX_MEM_signals[17:2];
+      EX_MEM_MemWriteData <= ID_EX_MEM_signals[33:2];
       EX_MEM_MemEnable <= ID_EX_MEM_signals[1];
       EX_MEM_MemWrite <= ID_EX_MEM_signals[0];
     end

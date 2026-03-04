@@ -12,27 +12,27 @@ module Branch_Control (C, I, F, Rs_data, BR, Branch, IF_ID_predicted_target, PC_
   input logic [2:0] C;                       // 3-bit condition code
   input logic [8:0] I;                       // 9-bit signed offset right shifted by one
   input logic [2:0] F;                       // 3-bit flag register inputs for (F[2] = Z, F[1] = V, F[0] = N)
-  input logic [15:0] Rs_data;                // Register source input data for the BR instruction
+  input logic [31:0] Rs_data;                // Register source input data for the BR instruction
   input logic BR;                            // indicates a BR instruction vs a B instruction
   input logic Branch;                        // indicates a Branch instruction
-  input logic [15:0] IF_ID_predicted_target; // Predicted target address from the branch predictor of the previous instruction
-  input logic [15:0] PC_next;                // 16-bit address of the next (PC+2) instruction (from the fetch stage)
+  input logic [31:0] IF_ID_predicted_target; // Predicted target address from the branch predictor of the previous instruction
+  input logic [31:0] PC_next;                // 32-bit address of the next instruction (from the fetch stage)
   
   output logic taken;                        // Signal used to determine whether branch instruction met condition codes
   output logic wen_BHT;                      // Write enable for BHT (Branch History Table)
-  output logic [15:0] PC_branch;             // 16-bit address of the branch target
+  output logic [31:0] PC_branch;             // 32-bit address of the branch target
   output logic wen_BTB;                      // Write enable for BTB (Branch Target Buffer)
-  output logic [15:0] actual_target;         // 16-bit address of the actual target
+  output logic [31:0] actual_target;         // 32-bit address of the actual target
 
   /////////////////////////////////////////////////
   // Declare any internal signals as type wire  //
   ///////////////////////////////////////////////
-  logic [15:0] sext_offset;         // Sign-extended offset.
-  logic [15:0] shifted_offset;      // Shifted offset for the BR instruction.
+  logic [31:0] sext_offset;         // Sign-extended offset.
+  logic [31:0] shifted_offset;      // Shifted offset for the BR instruction.
   logic mispredicted;               // Indicates previous instruction's fetch mispredicted.
   logic branch_target_miscomputed;  // Indicates previous instruction's fetch miscomputed the target.
   logic branch_taken;               // Indicates branch was actually taken.
-  logic [15:0] PC_B;                // The PC value in case branch is taken (for B).
+  logic [31:0] PC_B;                // The PC value in case branch is taken (for B).
   //////////////////////////////////////////////////////////////////
 
   //////////////////////////////////////////////////////////////
@@ -42,7 +42,7 @@ module Branch_Control (C, I, F, Rs_data, BR, Branch, IF_ID_predicted_target, PC_
   assign PC_B = PC_next + ($signed(sext_offset) <<< 1'b1);
 
   // Sign extend the 9-bit offset to 16 bits.
-  assign sext_offset = {{7{I[8]}}, I};
+  assign sext_offset = {{23{I[8]}}, I};
 
   // The branch is taken either unconditionally when C = 3'b111 or when the conditon code matches the flag register setting.
   assign taken = (C == 3'b000) ? ~F[2]                    : // Not Equal (Z = 0)

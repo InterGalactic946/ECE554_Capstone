@@ -30,19 +30,19 @@
 // endmodule
 
 module MetaDataArray #(
-    parameter TAG_WIDTH = 8,
+    parameter TAG_WIDTH = 24,
     parameter NUM_BLOCKS = 64,
     parameter NUM_WAYS = 2
 )(
 	input clk,
 	input rst,
-	input [7:0] DataIn_first_way,
-	input [7:0] DataIn_second_way,
+	input [TAG_WIDTH-1:0] DataIn_first_way,
+	input [TAG_WIDTH-1:0] DataIn_second_way,
 	input Write,
 	input [5:0] SetEnable,
 	input Set_First_LRU,
-	output [7:0] DataOut_first_way,
-	output [7:0] DataOut_second_way
+	output [TAG_WIDTH-1:0] DataOut_first_way,
+	output [TAG_WIDTH-1:0] DataOut_second_way
 );
 
     // Tag and valid bit arrays
@@ -56,8 +56,8 @@ module MetaDataArray #(
             tag_array_second_way <= '{default: '0};
         end
         else if (Write) begin
-            tag_array_second_way[SetEnable]   <= {DataIn_second_way[7:1], ~Set_First_LRU};
-            tag_array_first_way[SetEnable]    <= {DataIn_first_way[7:1], Set_First_LRU};
+            tag_array_second_way[SetEnable]   <= {DataIn_second_way[TAG_WIDTH-1:1], ~Set_First_LRU};
+            tag_array_first_way[SetEnable]    <= {DataIn_first_way[TAG_WIDTH-1:1], Set_First_LRU};
         end
     end
 

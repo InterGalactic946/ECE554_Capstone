@@ -8,19 +8,19 @@ module Cache_Control (
     input  logic        clk, rst,           // Clock signal and active high reset signal
     input  logic        proceed,            // Signal to proceed with memory filling on a cache miss
     input  logic        miss_detected,      // High when tag match logic detects a cache miss from previous cycle         
-    input  logic [15:0] miss_address,       // Address that missed in the cache
+    input  logic [31:0] miss_address,       // Address that missed in the cache
     input  logic        memory_data_valid,  // Active high signal indicating valid data returning on memory bus
 
     output logic        fsm_busy,           // High while FSM is busy handling the miss (used as a pipeline stall signal)
     output logic        mem_en,             // Signal to enable main memory on a miss
     
-    output logic [7:0] tag_out,             // Output tag to rewrite upon a miss
+    output logic [23:0] tag_out,            // Output tag to rewrite upon a miss
     output logic        write_tag_array,    // Write enable to cache tag array when all words are filled in to data array
 
     output logic        write_data_array,   // Write enable to cache data array to signal when filling with memory_data
 
-    output logic [15:0] main_memory_address,  // Address to read from memory
-    output logic [15:0] cache_memory_address // Address to write to cache
+    output logic [31:0] main_memory_address,  // Address to read from memory
+    output logic [31:0] cache_memory_address // Address to write to cache
   );
   
   ///////////////////////////////////////
@@ -32,9 +32,9 @@ module Cache_Control (
   // Declare any internal signals as type wire  //
   ///////////////////////////////////////////////
   /********** Delayed/Pipelined memory addresses ********/
-  logic [15:0] memory_address_3; 
-  logic [15:0] memory_address_2;
-  logic [15:0] memory_address_1;
+  logic [31:0] memory_address_3;
+  logic [31:0] memory_address_2;
+  logic [31:0] memory_address_1;
   /*****************************************************/
   logic clr_count;           // Clear the word count register.
   logic incr_cnt;            // Increment the word count register.
@@ -58,7 +58,7 @@ module Cache_Control (
     if (rst) begin                 
       tag_out <= 8'h00;                             // Reset the tag out to zero.
     end else if (clr_count) begin                   // Clear the tag out register when we get a cache miss.
-      tag_out <= {miss_address[15:10], 1'b1, 1'b0}; // Reset the valid count to zero.
+      tag_out <= {miss_address[31:10], 1'b1, 1'b0}; // Reset the valid count to zero.
     end
   end
 
@@ -80,11 +80,11 @@ module Cache_Control (
   //////////////////////////////////////////////////
   always_ff @(posedge clk) begin
     if (rst) begin             
-      main_memory_address <= 16'h0000;                       // Clear the memory address register on reset.
+      main_memory_address <= 32'h0000_0000;                       // Clear the memory address register on reset.
     end else if (clr_count) begin                            // On a cache miss, set the memory address to the miss address.
-      main_memory_address <= {miss_address[15:4], 4'h0};     // Set the memory address to the first address of the block.
+      main_memory_address <= {miss_address[31:4], 4'h0};     // Set the memory address to the first address of the block.
     end else if (incr_cnt) begin                             // Increment the memory address register when we get valid data from memory.
-      main_memory_address <= main_memory_address + 16'h0002; // Update the memory address with the new value.
+      main_memory_address <= main_memory_address + 32'h0000_0002; // Update the memory address with the new value.
     end
   end
 
@@ -93,15 +93,15 @@ module Cache_Control (
   ////////////////////////////////////////////////////
   always_ff @(posedge clk) begin
     if (rst) begin             
-      memory_address_3 <= 16'h0000;          // Clear the memory address 3 register on reset.
-      memory_address_2 <= 16'h0000;          // Clear the memory address 2 register on reset.
-      memory_address_1 <= 16'h0000;          // Clear the memory address 1 register on reset.
-      cache_memory_address <= 16'h0000;      // Clear the cache memory address register on reset.
+      memory_address_3 <= 32'h0000_0000;          // Clear the memory address 3 register on reset.
+      memory_address_2 <= 32'h0000_0000;          // Clear the memory address 2 register on reset.
+      memory_address_1 <= 32'h0000_0000;          // Clear the memory address 1 register on reset.
+      cache_memory_address <= 32'h0000_0000;      // Clear the cache memory address register on reset.
     end else begin
-      memory_address_3 <= (clr_count) ? {miss_address[15:4], 4'h0} : main_memory_address; 
-      memory_address_2 <= (clr_count) ? {miss_address[15:4], 4'h0} :  memory_address_3;
-      memory_address_1 <= (clr_count) ? {miss_address[15:4], 4'h0} :  memory_address_2;
-      cache_memory_address <= (clr_count) ? {miss_address[15:4], 4'h0} :  memory_address_1; // This is the address we write to in the cache once we get the valid signal.
+      memory_address_3 <= (clr_count) ? {miss_address[31:4], 4'h0} : main_memory_address;
+      memory_address_2 <= (clr_count) ? {miss_address[31:4], 4'h0} :  memory_address_3;
+      memory_address_1 <= (clr_count) ? {miss_address[31:4], 4'h0} :  memory_address_2;
+      cache_memory_address <= (clr_count) ? {miss_address[31:4], 4'h0} :  memory_address_1; // This is the address we write to in the cache once we get the valid signal.
     end
   end
 
@@ -136,7 +136,7 @@ module Cache_Control (
       mem_en <= 1'b0;
   end
 
-  // We are done setting the memory enable for 6 cycles when the LSBs of main memory address is 0xE.
+  // We are done setting memory enable once we have issued 8 halfword reads.
   assign eight_cycles = main_memory_address[3:0] == 4'hE;
 
   // We are done filling 7 words in the cache.

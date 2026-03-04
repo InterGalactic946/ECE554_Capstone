@@ -11,16 +11,11 @@ package Monitor_tasks;
   typedef enum logic [1:0] {STRONG_NOT_TAKEN, WEAK_NOT_TAKEN, WEAK_TAKEN, STRONG_TAKEN} state_t;
 
   // Struct Definitions for BTB, BHT, cache, and data memory models.
-  typedef struct {
-    logic [15:0] PC_addr;
-    state_t prediction;
-    logic valid;
-  } model_BHT_t;
-  
-  typedef struct {
-    logic [15:0] PC_addr; 
-    logic [15:0] target;
-  } model_BTB_t;
+  // DBP storage formats used by DynamicBranchPredictor:
+  // BHT entry = {tag[27:0], prediction[1:0], valid}
+  // BTB entry = predicted target address
+  typedef logic [30:0] model_BHT_t;
+  typedef logic [31:0] model_BTB_t;
 
   // Tag block each entry holds LRU, valid and 6-bit tag along with full address for debugging
   typedef struct {
@@ -89,8 +84,10 @@ package Monitor_tasks;
 
     integer i, file;
     int clock_cycle;
-    logic [15:0] model_PC_BHT, model_pred;
-    logic [15:0] model_PC_BTB, model_target;
+    logic [27:0] model_tag_BHT;
+    logic [1:0] model_pred;
+    logic model_valid;
+    logic [31:0] model_target;
 
       begin
           // Calculate the clock cycle
@@ -112,19 +109,17 @@ package Monitor_tasks;
           $fdisplay(file, "-------------------------------------|----------------------------------------");
           $fdisplay(file, "                 BHT                 |                   BTB                  ");
           $fdisplay(file, "-------------------------------------|----------------------------------------");
-          $fdisplay(file, "    IF_ID_PC_curr | PREDICTION       |      IF_ID_PC_curr | TARGET            ");
+          $fdisplay(file, "      TAG(31:4)   | PRED | V         | TARGET              ");
 
           for (i = 0; i < 8; i = i + 1) begin  
               // Fetch values from Model and DUT  
-              model_PC_BHT = model_BHT[i].PC_addr;
-              model_pred   = model_BHT[i].prediction;
-
-              model_PC_BTB = model_BTB[i].PC_addr;
-              model_target = model_BTB[i].target;
+              model_tag_BHT = model_BHT[i][30:3];
+              model_pred = model_BHT[i][2:1];
+              model_valid = model_BHT[i][0];
+              model_target = model_BTB[i];
               
               // Write to File with newline
-              $fwrite(file, "         0x%04X         %2b           |", (model_PC_BHT === 16'hxxxx) ? 16'hXXXX : model_PC_BHT, model_pred);
-              $fdisplay(file, "         0x%04X       0x%04X   ", (model_PC_BTB === 16'hxxxx) ? 16'hXXXX : model_PC_BTB, model_target);
+              $fdisplay(file, "        0x%07X      %2b   %1b       | 0x%08X", model_tag_BHT, model_pred, model_valid, model_target);
           end  
 
           $fdisplay(file, "\n");
@@ -186,7 +181,7 @@ package Monitor_tasks;
 
 
   // Task: Prints register file contents to a file with the current clock cycle.
-  task automatic log_regfile_dump(input logic [15:0] regfile [0:15]);
+  task automatic log_regfile_dump(input logic [31:0] regfile [0:15]);
       integer file;  // File handle
       int clock_cycle;
       string title, header, separator;
@@ -202,7 +197,7 @@ package Monitor_tasks;
       end
 
       // Format the title with the current clock cycle
-      title = $sformatf("|  REGFILE DUMP - CLOCK CYCLE %0d |", clock_cycle);
+      title = $sformatf("|  REGFILE DUMP - CLOCK CYCLE %0d  |", clock_cycle);
       
       // Define a separator for formatting
       separator = "===================================";
@@ -215,7 +210,7 @@ package Monitor_tasks;
 
       // Iterate through the 16 registers and write formatted values
       for (int addr = 0; addr < 16; addr++) begin
-          $fwrite(file, "|      0x%04X    |     0x%04X     |\n", addr, regfile[addr]);
+          $fwrite(file, "|      0x%04X    |   0x%08X   |\n", addr, regfile[addr]);
           // $display("ADDR: %04x, VALUE: %04x", addr, regfile[addr]);
       end
 

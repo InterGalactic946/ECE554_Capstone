@@ -12,15 +12,15 @@ module Arbitrator (
     // ICACHE Interface
     input  logic        ICACHE_hit,           // Indicates a hit in ICACHE
     input  logic        ICACHE_miss_mem_en,   // ICACHE miss memory enable
-    input  logic [15:0] ICACHE_miss_addr,     // Address used for ICACHE miss
+    input  logic [31:0] ICACHE_miss_addr,     // Address used for ICACHE miss
 
     // DCACHE Interface
     input  logic        DCACHE_hit,         // Indicates a hit in DCACHE
     input  logic        DCACHE_en,          // DCACHE request enable
     input  logic        DCACHE_write,       // DCACHE write enable
     input  logic        DCACHE_miss_mem_en, // DCACHE miss memory enable
-    input  logic [15:0] DCACHE_miss_addr,   // Address used for DCACHE miss
-    input  logic [15:0] DCACHE_hit_addr,    // Address used for DCACHE hit
+    input  logic [31:0] DCACHE_miss_addr,   // Address used for DCACHE miss
+    input  logic [31:0] DCACHE_hit_addr,    // Address used for DCACHE hit
 
     // Arbitration Outputs
     output logic        ICACHE_proceed,  // Grant signal for ICACHE to proceed to access main memory
@@ -28,7 +28,7 @@ module Arbitrator (
 
     // Main Memory Interface
     output logic        mem_en,     // Enable signal for main memory access
-    output logic [15:0]  mem_addr   // Address for main memory access
+    output logic [31:0]  mem_addr   // Address for main memory access
 );
   
   ///////////////////////////////////////
@@ -94,7 +94,7 @@ module Arbitrator (
     clr_ICACHE_proceed = 1'b0;  // Default clear ICACHE proceed signal is low.
     clr_DCACHE_proceed = 1'b0;  // Default clear DCACHE proceed signal is low.
     mem_en = 1'b0;              // Default memory enable signal is low.
-    mem_addr = 16'h0000;        // Default memory address is 0.
+    mem_addr = 32'h0000_0000;   // Default memory address is 0.
     error = 1'b0;               // Default no error state.
 
     case (state)
@@ -155,7 +155,7 @@ module Arbitrator (
         clr_ICACHE_proceed = 1'b0;  // Default clear ICACHE proceed signal is low.
         clr_DCACHE_proceed = 1'b0;  // Default clear DCACHE proceed signal is low.
         mem_en = 1'b0;               // Clear memory enable signal.
-        mem_addr = 16'h0000;         // Clear memory address.
+        mem_addr = 32'h0000_0000;    // Clear memory address.
         error = 1'b1;                // Default error state.
       end
     endcase

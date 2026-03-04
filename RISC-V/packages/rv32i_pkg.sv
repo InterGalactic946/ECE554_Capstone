@@ -61,11 +61,34 @@ package rv32i_pkg;
     localparam logic [2:0] F3_OR      = 3'b110;
     localparam logic [2:0] F3_AND     = 3'b111;
 
+    // JALR funct3 value
+    localparam logic [2:0] F3_JALR    = 3'b000;
+
+    // MISC-MEM funct3 values
+    localparam logic [2:0] F3_FENCE   = 3'b000;
+    localparam logic [2:0] F3_FENCE_I = 3'b001;
+
+    // SYSTEM funct3 values
+    localparam logic [2:0] F3_PRIV    = 3'b000; // ECALL/EBREAK
+    localparam logic [2:0] F3_CSRRW   = 3'b001;
+    localparam logic [2:0] F3_CSRRS   = 3'b010;
+    localparam logic [2:0] F3_CSRRC   = 3'b011;
+    localparam logic [2:0] F3_CSRRWI  = 3'b101;
+    localparam logic [2:0] F3_CSRRSI  = 3'b110;
+    localparam logic [2:0] F3_CSRRCI  = 3'b111;
+
     // --------------------------------------------------------
     // funct7 constants used by RV32I OP/OP-IMM variants
     // --------------------------------------------------------
     localparam logic [6:0] F7_BASE = 7'b0000000;
     localparam logic [6:0] F7_ALT  = 7'b0100000; // SUB/SRA variant selector
+
+    // --------------------------------------------------------
+    // SYSTEM immediate constants for priv-encoded operations
+    // (identified when opcode=SYSTEM and funct3=F3_PRIV)
+    // --------------------------------------------------------
+    localparam logic [11:0] IMM12_ECALL  = 12'h000;
+    localparam logic [11:0] IMM12_EBREAK = 12'h001;
 
     // --------------------------------------------------------
     // ALU operation enum used by control/decode

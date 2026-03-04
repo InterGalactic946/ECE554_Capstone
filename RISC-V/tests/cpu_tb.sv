@@ -19,8 +19,8 @@ module cpu_tb();
   /////////////////////////
   logic clk, rst_n;                  // Clock and reset signals
   logic hlt, expected_hlt;           // Halt signals for execution stop for each DUT and model
-  logic [15:0] expected_pc;          // Expected program counter value for verification
-  logic [15:0] pc;                   // Current program counter value
+  logic [31:0] expected_pc;          // Expected program counter value for verification
+  logic [31:0] pc;                   // Current program counter value
 
   logic I_cache_stall;               // Indicates a stall in the pipeline due to I_cache miss
   logic D_cache_stall;               // Indicates a stall in the pipeline due to D_cache miss
@@ -118,8 +118,8 @@ module cpu_tb();
         // Dump the contents of memory whenever we write to the BTB or BHT.
         if (wen_BHT || wen_BTB || HLT) begin
           log_BTB_BHT_dump (
-            .model_BHT(iMODEL.iPROC.iFETCH.iDBP_model.BHT),
-            .model_BTB(iMODEL.iPROC.iFETCH.iDBP_model.BTB)
+            .model_BHT(iMODEL.iPROC.iFETCH.iDBP.BHT),
+            .model_BTB(iMODEL.iPROC.iFETCH.iDBP.BTB)
           );
         end
 

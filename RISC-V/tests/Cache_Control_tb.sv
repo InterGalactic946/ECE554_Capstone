@@ -8,14 +8,14 @@ module Cache_Control_tb();
 
   logic clk;                             // Clock signal
   logic rst;                             // Active high reset 
-  logic [15:0] mem[0:65535];             // Initial memory
+  logic [31:0] mem[0:65535];             // Initial memory (word-addressed model)
   
   // Cache block structure to hold data and tag.
   typedef struct {
-    logic [15:0] data[0:7];              // Cache data array
-    logic [15:0] mem_addr[0:7];          // Memory address array
+    logic [31:0] data[0:7];              // Cache data array
+    logic [31:0] mem_addr[0:7];          // Memory address array
     integer cycle_time[0:8];             // Cycle time array
-    logic [7:0] tag;                     // Cache tag
+    logic [23:0] tag;                    // Cache tag
   } cache_block_t;                       // Cache block structure
 
   logic [3:0] word_count;                // Number of words filled in the cache data array
@@ -29,31 +29,31 @@ module Cache_Control_tb();
   logic set_miss_detected;               // Signal to set the miss_detected signal
   logic miss_detected_pl;                // Delayed version of the miss_detected signal
   logic miss_detected;                   // Indicates a cache miss
-  logic [15:0] miss_address;             // Address that missed in the cache
-  logic [15:0] data_out_4;               // First cycle of read data
-  logic [15:0] data_out_3, data_out_2, data_out_1; // Pipelined data
-  logic [15:0] memory_data;              // Data returned by memory after delay
+  logic [31:0] miss_address;             // Address that missed in the cache
+  logic [31:0] data_out_4;               // First cycle of read data
+  logic [31:0] data_out_3, data_out_2, data_out_1; // Pipelined data
+  logic [31:0] memory_data;              // Data returned by memory after delay
   logic data_valid_4;                    // First cycle of memory enable signal
   logic data_valid_3, data_valid_2, data_valid_1; // Pipelined enable signals
   logic memory_data_valid;               // Active high signal indicating valid data returning on memory bus  
     
   logic fsm_busy;                        // High while FSM is busy handling the miss (used as a pipeline stall signal)
   logic miss_mem_en;                     // miss memory enable
-  logic [7:0] tag_out;                   // The tag to write into the cache
+  logic [23:0] tag_out;                  // The tag to write into the cache
   logic write_tag_array;                 // Write enable to cache tag array when all words are filled in to data array
   logic write_data_array;                // Write enable to cache data array to signal when filling with memory_data
-  logic [15:0] memory_address;           // Address to read from memory
-  logic [15:0] cache_memory_address;     // The address to write to the cache on a miss.
-  logic [15:0] memory_data_out;          // Data to be written to the cache data array
+  logic [31:0] memory_address;           // Address to read from memory
+  logic [31:0] cache_memory_address;     // The address to write to the cache on a miss.
+  logic [31:0] memory_data_out;          // Data to be written to the cache data array
   
   logic expected_fsm_busy;                    // Expected value of fsm_busy
   logic expected_miss_mem_en;                 // Expected value of memory enable
-  logic [7:0] expected_tag_out;               // Expected tag to write into the cache
+  logic [23:0] expected_tag_out;              // Expected tag to write into the cache
   logic expected_write_tag_array;             // Expected value of write_tag_array
   logic expected_write_data_array;            // Expected value of write_data_array
-  logic [15:0] expected_memory_address;       // Expected value of memory_address
-  logic [15:0] expected_cache_memory_address; // The expected address to write to the cache on a miss.
-  logic [15:0] expected_memory_data_out;      // Expected value of memory_data_out
+  logic [31:0] expected_memory_address;       // Expected value of memory_address
+  logic [31:0] expected_cache_memory_address; // The expected address to write to the cache on a miss.
+  logic [31:0] expected_memory_data_out;      // Expected value of memory_data_out
 
 
   // Instantiate the DUT: Cache Control.  
@@ -100,7 +100,7 @@ module Cache_Control_tb();
 
     /* Model the memory */
     /////////////////////////////////////////////////////////
-    assign data_out_4 = (miss_mem_en) ? mem[memory_address[15:1]] : 16'h0000;
+    assign data_out_4 = (miss_mem_en) ? mem[memory_address[16:1]] : 32'h0000_0000;
     assign data_valid_4 = miss_mem_en;
     
     always_ff @(posedge clk) begin
@@ -114,10 +114,10 @@ module Cache_Control_tb();
     always_ff @(posedge clk) begin
         if (rst) begin
             // Reset all output and pipeline stages
-            data_out_3 <= 16'h0000;
-            data_out_2 <= 16'h0000;
-            data_out_1 <= 16'h0000;
-            memory_data <= 16'h0000;
+            data_out_3 <= 32'h0000_0000;
+            data_out_2 <= 32'h0000_0000;
+            data_out_1 <= 32'h0000_0000;
+            memory_data <= 32'h0000_0000;
 
             data_valid_3 <= 1'b0;
             data_valid_2 <= 1'b0;
@@ -191,7 +191,7 @@ module Cache_Control_tb();
       clk = 1'b0;               // Initially clk is low
       rst = 1'b1;               // Initially rst is high
       set_miss_detected = 1'b0; // Initially set_miss_detected is low
-      miss_address = 16'h0000;  // Initially miss_address is 0
+      miss_address = 32'h0000_0000;  // Initially miss_address is 0
 
       // Wait for the first clock cycle to assert reset
       @(posedge clk);
@@ -210,7 +210,7 @@ module Cache_Control_tb();
 
       // Set the miss_detected signal to 1 to start the FSM.
       @(negedge clk) begin
-        miss_address = 16'h0006;
+        miss_address = 32'h0000_0006;
         set_miss_detected = 1'b1;
       end
 
@@ -223,8 +223,8 @@ module Cache_Control_tb();
 
         // Set a new miss address.
         @(negedge clk) begin
-            // Generate a random miss address that is a multiple of 2.
-            miss_address = {4'h0, $random} & 16'hFFFE; // Ensure the address is even.
+            // Generate a random miss address aligned to 2 bytes.
+            miss_address = {16'h0000, $random} & 32'h0000_FFFE;
             set_miss_detected = 1'b1;
         end
 
@@ -292,16 +292,16 @@ module Cache_Control_tb();
   // Capture the memory data received from the memory bus.
   always @(posedge clk) begin
     if (rst) begin
-        cache_block.data <= '{default: 16'h0000}; // Reset cache_block data to 0 on reset.
-        cache_block.mem_addr <= '{default: 16'hxxxx}; // Reset cache_block memory address to x on reset.
+        cache_block.data <= '{default: 32'h0000_0000}; // Reset cache_block data to 0 on reset.
+        cache_block.mem_addr <= '{default: 32'hxxxx_xxxx}; // Reset cache_block memory address to x on reset.
         cache_block.cycle_time <= '{default: 0}; // Reset cache_block cycle time to 0 on reset.
-        cache_block.tag <= 12'h000; // Reset cache_block tag to 0 on reset.
+        cache_block.tag <= 24'h000000; // Reset cache_block tag to 0 on reset.
     end 
     
     if (write_data_array) begin
-        cache_block.data[cache_memory_address[3:1]] <= memory_data; // Write the memory data to the cache_block at index word_count.
-        cache_block.mem_addr[cache_memory_address[3:1]] <= cache_memory_address; // Write the memory address to the cache_block at index word_count.
-        cache_block.cycle_time[cache_memory_address[3:1]] <=  $time/10; // Write the cycle time to the cache_block at index word_count.
+        cache_block.data[cache_memory_address[3:1]] <= memory_data; // Write the memory data to the cache block word slot.
+        cache_block.mem_addr[cache_memory_address[3:1]] <= cache_memory_address; // Store written cache address.
+        cache_block.cycle_time[cache_memory_address[3:1]] <=  $time/10; // Store cycle time for each cache word write.
     end 
     
     if (write_tag_array) begin
