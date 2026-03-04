@@ -38,6 +38,9 @@ module Decode (
   ///////////////////////////////////////////////
   /////////////////////////// DECODE INSTRUCTION SIGNALS //////////////////////////
   logic [3:0] opcode;        // Opcode of the instruction
+  logic [6:0] opcode7;       // RV32I opcode field inst[6:0].
+  logic [2:0] funct3;        // RV32I funct3 field inst[14:12].
+  logic [6:0] funct7;        // RV32I funct7 field inst[31:25].
   logic is_NOP;              // Indicates a NOP instruction
   /********************************** REGFILE Signals ******************************/
   logic [3:0] reg_rs;         // Register ID of the first source register extracted from the instruction
@@ -82,6 +85,9 @@ module Decode (
   //////////////////////////////////////////////
   // Get the opcode from the instructions.
   assign opcode = pc_inst[15:12];
+  assign opcode7 = pc_inst[6:0];
+  assign funct3 = pc_inst[14:12];
+  assign funct7 = pc_inst[31:25];
 
   // Indicates a NOP instruction.
   assign is_NOP = (pc_inst == 32'h0000_0000);
@@ -89,6 +95,9 @@ module Decode (
   // Instantiate the Control Unit.
   ControlUnit iCC (
     .Opcode(opcode),
+    .opcode7_i(opcode7),
+    .funct3_i(funct3),
+    .funct7_i(funct7),
     
     .Branch(is_branch),
     

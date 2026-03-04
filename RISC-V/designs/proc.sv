@@ -1,7 +1,5 @@
-`default_nettype none // Set the default as none to avoid errors
-
 ////////////////////////////////////////////////////////////
-// proc.v: Processor Core Module                          //
+// proc.sv: Processor Core Module                         //
 //                                                        //
 // This module implements the CPU core that interfaces    //
 // with external memory using a simple handshake protocol.//
@@ -52,6 +50,8 @@ module proc (
   wire [31:0] IF_ID_PC_inst;            // Instruction word pipelined from the Fetch stage
   wire [1:0]  IF_ID_prediction;         // Branch prediction outcome pipelined from the Fetch stage
   wire [31:0] IF_ID_predicted_target;   // Predicted branch target address pipelined from the Fetch stage
+  Fetch_Decode_if if_id_if_i();         // Fetch bundle into IF/ID register (input side).
+  Fetch_Decode_if if_id_if_o();         // Registered IF/ID bundle into Decode (output side).
 
   /* DECODE stage signals */
   wire [31:0] MEM_result;    // Result from the memory stage or write-back stage
@@ -215,26 +215,33 @@ module proc (
   assign hlt_fetched = &PC_inst[15:12];
   //////////////////////////////////////////
 
-  /////////////////////////////////////////////////
-  // Pass the instruction word, current PC, prediction & target, and the next PC address to the IF/ID pipeline register.
+  /////////////////////////////////////////////////////////////////////
+  // Pass Fetch bundle through interface-based IF/ID pipeline register //
+  /////////////////////////////////////////////////////////////////////
+  // Fetch stage drives the IF/ID input bundle.
+  assign if_id_if_i.pc_curr = pc;
+  assign if_id_if_i.pc_next = PC_next;
+  assign if_id_if_i.pc_inst = PC_inst;
+  assign if_id_if_i.prediction = prediction;
+  assign if_id_if_i.predicted_target = predicted_target;
+
+  // Preserve existing signal names for downstream modules and debug.
+  assign IF_ID_PC_curr = if_id_if_o.pc_curr;
+  assign IF_ID_PC_next = if_id_if_o.pc_next;
+  assign IF_ID_PC_inst = if_id_if_o.pc_inst;
+  assign IF_ID_prediction = if_id_if_o.prediction;
+  assign IF_ID_predicted_target = if_id_if_o.predicted_target;
+
   IF_ID_pipe_reg iIF_ID (
-    .clk(clk),
-    .rst(rst),
-    .stall(IF_ID_stall),
-    .flush(IF_flush),
-    .PC_curr(pc),
-    .PC_next(PC_next),
-    .PC_inst(PC_inst),
-    .prediction(prediction),
-    .predicted_target(predicted_target),
+    .clk_i(clk),
+    .rst_i(rst),
+    .stall_i(IF_ID_stall),
+    .flush_i(IF_flush),
+    .if_id_if_i(if_id_if_i),
     
-    .IF_ID_PC_curr(IF_ID_PC_curr), 
-    .IF_ID_PC_next(IF_ID_PC_next),
-    .IF_ID_PC_inst(IF_ID_PC_inst),
-    .IF_ID_prediction(IF_ID_prediction),
-    .IF_ID_predicted_target(IF_ID_predicted_target)
+    .if_id_if_o(if_id_if_o)
   );
-  /////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////
 
   ///////////////////////////////////////////////////////////////////////////
   // DECODE instruction word, resolve branches, and access register file   //
@@ -441,5 +448,3 @@ module proc (
   assign RegWriteData = (MEM_WB_MemToReg) ? MEM_WB_MemData : ((MEM_WB_PCS) ? MEM_WB_PC_next : MEM_WB_ALU_out);
 
 endmodule
-
-`default_nettype wire  // Reset default behavior at the end

@@ -89,8 +89,9 @@ def make_f_file(test_name, post_synth):
     # Get the files required for the testbench, including dependencies in DFS order.
     dependencies = collect_files(graph, test_name, post_synth)
 
-    # Lists to hold package and other files separately.
+    # Lists to hold package, interface, and other files separately.
     package_files = []
+    interface_files = []
     other_files = []
 
     # Iterate through the dependencies and categorize them.
@@ -104,14 +105,27 @@ def make_f_file(test_name, post_synth):
                 package_files.append(entry["rtl_file"])
             continue
 
+        # Categorize interface files.
+        if entry["type"] == "interface":
+            if entry["rtl_file"]:
+                interface_files.append(entry["rtl_file"])
+            continue
+
         # Categorize non-package modules.
         if post_synth and entry["gate_file"]:
             other_files.append(entry["gate_file"])
         elif entry["rtl_file"]:
             other_files.append(entry["rtl_file"])
 
-    # Ensure packages ALWAYS first.
-    file_list = package_files + other_files
+    # Ensure interfaces are always compiled even when not explicitly present
+    # in module instantiation edges (interface usage is often type-based).
+    for _, entry in graph.items():
+        if entry.get("type") == "interface" and entry.get("rtl_file"):
+            interface_files.append(entry["rtl_file"])
+
+    # Deduplicate while preserving order.
+    ordered_files = package_files + interface_files + other_files
+    file_list = list(dict.fromkeys(ordered_files))
 
     # Write the collected files to the .f file.
     f_file_path = os.path.join(config.BUILD_DIR, f"{test_name}.f")
@@ -328,7 +342,8 @@ def find_files():
         list[str]: Sorted list of full paths to all matching Verilog files.
     """
     # Subdirectories to search within the phase directory.
-    dirs = [config.DESIGNS_DIR, config.TESTS_DIR, config.PACKAGES_DIR]
+    # interfaces/ is optional and included only when present.
+    dirs = [config.DESIGNS_DIR, config.TESTS_DIR, config.PACKAGES_DIR, config.INTERFACES_DIR]
 
     # List to store discovered file paths.
     files = []
@@ -369,6 +384,8 @@ def classify_file_by_path(file_path):
     # Classify based on path patterns and return the appropriate type.
     if '/packages/' in low or low.startswith('packages/'):
         return 'package'
+    elif '/interfaces/' in low or low.startswith('interfaces/'):
+        return 'interface'
     elif os.path.basename(low).endswith('_tb.sv') or os.path.basename(low).endswith('_tb.v'):
         return 'testbench'
     else:
@@ -395,9 +412,15 @@ def build_dependency_graph():
     # Matches package definitions. For example: 'package my_package;'.
     PACKAGE_DEF_RE = re.compile(r'^\s*package\s+([A-Za-z_]\w*)', re.MULTILINE)
 
+    # Matches interface definitions. For example: 'interface my_if (...);'.
+    INTERFACE_DEF_RE = re.compile(r'^\s*interface\s+([A-Za-z_]\w*)', re.MULTILINE)
+
     # Matches module instantiations. For example: 'my_module u1 (...);'
     MODULE_INST_RE = re.compile(
-        r'^\s*(?!module\b)(?!else\b)(?!begin\b)(?!end\b)(?!if\b)(?!for\b)(?!while\b)(?!case\b)(?!always\b)(?!assign\b)(?!task\b)([A-Za-z_]\w*)\s*(?:#\([^)]*\))?\s+[A-Za-z_]\w*\s*(?:\[[^\]]*\])?\s*\(.*?\)\s*;', 
+        r'^\s*(?!module\b)(?!endmodule\b)(?!interface\b)(?!endinterface\b)(?!package\b)(?!endpackage\b)'
+        r'(?!modport\b)(?!else\b)(?!begin\b)(?!end\b)(?!if\b)(?!for\b)(?!while\b)(?!case\b)'
+        r'(?!always\b)(?!always_ff\b)(?!always_comb\b)(?!always_latch\b)(?!assign\b)(?!task\b)(?!function\b)'
+        r'([A-Za-z_]\w*)\s*(?:#\([^)]*\))?\s+[A-Za-z_]\w*\s*(?:\[[^\]]*\])?\s*\(.*?\)\s*;',
         re.MULTILINE | re.DOTALL
     )
 
@@ -421,6 +444,9 @@ def build_dependency_graph():
 
     # Map: package_name -> file path where the package is defined.
     package_defs = {}
+
+    # Map: interface_name -> file path where the interface is defined.
+    interface_defs = {}
 
     # Map: file_path -> entire contents of the file (this avoids reopening files during the second pass).
     file_content_cache = {}
@@ -464,6 +490,11 @@ def build_dependency_graph():
         for package_name in PACKAGE_DEF_RE.findall(file_text):
             # Store the defining file for this package (if duplicated, last one wins — duplicates are not expected).
             package_defs[package_name] = file_path
+
+        # Find every interface definition in this file.
+        for interface_name in INTERFACE_DEF_RE.findall(file_text):
+            # Store the defining file for this interface.
+            interface_defs[interface_name] = file_path
 
     # ------------------------------------------------------------------
     # DUPLICATE DEFINITION CHECKS (DIAGNOSTIC ONLY)
@@ -534,7 +565,8 @@ def build_dependency_graph():
     all_entity_names = (
         set(module_rtl.keys()) |
         set(module_gate.keys()) |
-        set(package_defs.keys())
+        set(package_defs.keys()) |
+        set(interface_defs.keys())
     )
 
     # Process each entity in deterministic (sorted) order.
@@ -549,8 +581,11 @@ def build_dependency_graph():
         # Get package definition file if this is a package.
         package_file = package_defs.get(entity_name)
 
+        # Get interface definition file if this is an interface.
+        interface_file = interface_defs.get(entity_name)
+
         # Choose which file to inspect for dependencies either RTL or package definition.
-        defining_file = rtl_file or package_file
+        defining_file = rtl_file or package_file or interface_file
 
         # Initialize empty dependency list.
         dependencies = []
@@ -574,6 +609,8 @@ def build_dependency_graph():
         # Determine entity type (design vs. package vs. testbench)
         if entity_name in package_defs:
             entity_type = "package"
+        elif entity_name in interface_defs:
+            entity_type = "interface"
         else:
             source_path = rtl_file or gate_file
             entity_type = classify_file_by_path(source_path)
