@@ -4,6 +4,7 @@
 // of data memory, register file, and BTB, BHT contents.     //
 ///////////////////////////////////////////////////////////////
 package Monitor_tasks;
+  import Core_Cfg_pkg::*;
   
   ///////////////////////////////////////
   // Declare state types as enumerated //
@@ -12,10 +13,10 @@ package Monitor_tasks;
 
   // Struct Definitions for BTB, BHT, cache, and data memory models.
   // DBP storage formats used by DynamicBranchPredictor:
-  // BHT entry = {tag[27:0], prediction[1:0], valid}
+  // BHT entry = {tag[DBP_TAG_W-1:0], prediction[1:0], valid}
   // BTB entry = predicted target address
-  typedef logic [30:0] model_BHT_t;
-  typedef logic [31:0] model_BTB_t;
+  typedef logic [DBP_BHT_ENTRY_W-1:0] model_BHT_t;
+  typedef logic [XLEN-1:0] model_BTB_t;
 
   // Tag block each entry holds LRU, valid and 6-bit tag along with full address for debugging
   typedef struct {
@@ -78,16 +79,16 @@ package Monitor_tasks;
 
   // Task: Dumps contents of DUT and model BHT and BTB memory.
   task automatic log_BTB_BHT_dump(
-    input model_BHT_t model_BHT [0:7],  
-    input model_BTB_t model_BTB [0:7]
+    input model_BHT_t model_BHT [0:BHT_ENTRIES-1],  
+    input model_BTB_t model_BTB [0:BTB_ENTRIES-1]
   );
 
     integer i, file;
     int clock_cycle;
-    logic [27:0] model_tag_BHT;
+    logic [DBP_TAG_W-1:0] model_tag_BHT;
     logic [1:0] model_pred;
     logic model_valid;
-    logic [31:0] model_target;
+    logic [XLEN-1:0] model_target;
 
       begin
           // Calculate the clock cycle
@@ -109,17 +110,17 @@ package Monitor_tasks;
           $fdisplay(file, "-------------------------------------|----------------------------------------");
           $fdisplay(file, "                 BHT                 |                   BTB                  ");
           $fdisplay(file, "-------------------------------------|----------------------------------------");
-          $fdisplay(file, "      TAG(31:4)   | PRED | V         | TARGET              ");
+          $fdisplay(file, "      TAG         | PRED | V         | TARGET              ");
 
-          for (i = 0; i < 8; i = i + 1) begin  
+          for (i = 0; i < BHT_ENTRIES; i = i + 1) begin  
               // Fetch values from Model and DUT  
-              model_tag_BHT = model_BHT[i][30:3];
+              model_tag_BHT = model_BHT[i][DBP_BHT_ENTRY_W-1:3];
               model_pred = model_BHT[i][2:1];
               model_valid = model_BHT[i][0];
               model_target = model_BTB[i];
               
               // Write to File with newline
-              $fdisplay(file, "        0x%07X      %2b   %1b       | 0x%08X", model_tag_BHT, model_pred, model_valid, model_target);
+              $fdisplay(file, "        0x%0h      %2b   %1b       | 0x%0h", model_tag_BHT, model_pred, model_valid, model_target);
           end  
 
           $fdisplay(file, "\n");

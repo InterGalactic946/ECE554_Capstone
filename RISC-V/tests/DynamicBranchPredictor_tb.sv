@@ -65,21 +65,21 @@ module DynamicBranchPredictor_tb();
   wire [15:0] expected_predicted_target;  // The expected predicted target address from from the model DBP
 
   // Instantiate the DUT: Dynamic Branch Predictor.
-  DynamicBranchPredictor iDUT (
-    .clk(clk), 
-    .rst(rst), 
-    .PC_curr(PC_curr), 
-    .IF_ID_PC_curr(IF_ID_PC_curr), 
-    .IF_ID_prediction(IF_ID_prediction), 
-    .enable(enable),
-    .wen_BTB(wen_BTB),
-    .wen_BHT(wen_BHT),
-    .actual_taken(actual_taken),
-    .actual_target(actual_target),  
+  Dynamic_Branch_Predictor iDUT (
+    .clk_i(clk), 
+    .rst_i(rst), 
+    .PC_curr_i(PC_curr), 
+    .IF_ID_PC_curr_i(IF_ID_PC_curr), 
+    .IF_ID_prediction_i(IF_ID_prediction), 
+    .enable_i(enable),
+    .wen_BTB_i(wen_BTB),
+    .wen_BHT_i(wen_BHT),
+    .actual_taken_i(actual_taken),
+    .actual_target_i(actual_target),  
     
-    .predicted_taken(predicted_taken),
-    .prediction(prediction), 
-    .predicted_target(predicted_target)
+    .predicted_taken_o(predicted_taken),
+    .prediction_o(prediction), 
+    .predicted_target_o(predicted_target)
   );
 
   // Instantiate the model dynamic branch predictor.

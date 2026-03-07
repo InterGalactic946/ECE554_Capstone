@@ -1,16 +1,11 @@
 // ------------------------------------------------------------
-// Package: rv32i_pkg
+// Package: Rv32i_pkg
 // Description: Shared RV32I ISA constants, ALU op encodings,
 // and immediate extraction helpers.
 // Author: Srivibhav Jonnalagadda
 // Date: 03-03-2026
 // ------------------------------------------------------------
-package rv32i_pkg;
-
-    // --------------------------------------------------------
-    // Architectural constants
-    // --------------------------------------------------------
-    localparam int unsigned XLEN = 32;
+package Rv32i_pkg;
 
     // --------------------------------------------------------
     // RV32I opcode constants (inst[6:0])

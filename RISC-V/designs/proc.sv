@@ -6,22 +6,24 @@
 // It is responsible for fetching, decoding, executing    //
 // instructions, and managing caches and registers.       //
 ////////////////////////////////////////////////////////////
+import Core_Cfg_pkg::*;
+
 module proc (
   input  wire        clk,               // System clock
   input  wire        rst,               // Active high synchronous reset
 
   // Memory interface
   input  wire        mem_data_valid,    // Indicates valid data on read
-  input  wire [31:0] mem_data_in,       // Data read from memory
+  input  xlen_t      mem_data_in,       // Data read from memory
 
   output wire        mem_en,            // Memory enable signal
-  output wire [31:0] mem_addr,          // Address to read/write
+  output addr_t      mem_addr,          // Address to read/write
   output wire        mem_wr,            // Memory write enable
-  output wire [31:0] mem_data_out,      // Data to be written to memory
+  output xlen_t      mem_data_out,      // Data to be written to memory
 
   // Top-level outputs
   output wire        hlt,               // Processor halt signal
-  output wire [31:0] pc                 // Current program counter
+  output addr_t      pc                 // Current program counter
 );
 
   ///////////////////////////////////
@@ -33,37 +35,34 @@ module proc (
   wire DCACHE_proceed;           // Signal to proceed with data memory access on an DCACHE miss
   
   /* FETCH stage signals */
-  wire [31:0] PC_next;          // Next PC address
-  wire [1:0] prediction;        // 2-bit Prediction from the branch history table
-  wire [31:0] predicted_target; // Predicted target address of the branch instruction
+  addr_t PC_next;                // Next PC address
+  wire [1:0] prediction;         // 2-bit Prediction from the branch history table
+  addr_t predicted_target;       // Predicted target address of the branch instruction
 
   /* ICACHE signals */
-  wire [31:0] PC_inst;          // Instruction fetched from memory at the current PC address
-  wire hlt_fetched;             // Indicates if the fetched instruction is a halt instruction.
-  wire [31:0] I_MEM_addr;       // The address to access in off chip memory on an ICACHE miss
-  wire ICACHE_miss_mem_en;      // Miss memory enable for ICACHE
-  wire ICACHE_hit;              // Indicates a cache hit for the current PC access
+  inst_t PC_inst;                // Instruction fetched from memory at the current PC address
+  addr_t I_MEM_addr;             // The address to access in off chip memory on an ICACHE miss
+  wire ICACHE_miss_mem_en;       // Miss memory enable for ICACHE
+  wire ICACHE_hit;               // Indicates a cache hit for the current PC access
 
   /* IF/ID Pipeline Register signals */
-  wire [31:0] IF_ID_PC_curr;            // Current PC value pipelined from the Fetch stage
-  wire [31:0] IF_ID_PC_next;            // Next PC value pipelined from the Fetch stage
-  wire [31:0] IF_ID_PC_inst;            // Instruction word pipelined from the Fetch stage
-  wire [1:0]  IF_ID_prediction;         // Branch prediction outcome pipelined from the Fetch stage
-  wire [31:0] IF_ID_predicted_target;   // Predicted branch target address pipelined from the Fetch stage
-  Fetch_Decode_if if_id_if_i();         // Fetch bundle into IF/ID register (input side).
-  Fetch_Decode_if if_id_if_o();         // Registered IF/ID bundle into Decode (output side).
+  addr_t IF_ID_PC_curr;                    // Current PC value pipelined from the Fetch stage
+  addr_t IF_ID_PC_next;                    // Next PC value pipelined from the Fetch stage
+  inst_t IF_ID_PC_inst;                    // Instruction word pipelined from the Fetch stage
+  wire [1:0]  IF_ID_prediction;            // Branch prediction outcome pipelined from the Fetch stage
+  addr_t IF_ID_predicted_target;           // Predicted branch target address pipelined from the Fetch stage
 
   /* DECODE stage signals */
-  wire [31:0] MEM_result;    // Result from the memory stage or write-back stage
-  wire actual_taken;         // Signal used to determine whether an instruction met condition codes
-  wire wen_BHT;              // Write enable for BHT (Branch History Table)
-  wire [31:0] branch_target; // Computed branch target address
-  wire wen_BTB;              // Write enable for BTB (Branch Target Buffer)
-  wire [31:0] actual_target; // Computed actual target address
-  wire update_PC;            // Signal to update the PC with the actual target
-  wire [110:0] EX_signals;   // Execute stage control signals
-  wire [33:0] MEM_signals;   // Memory stage control signals
-  wire [7:0] WB_signals;     // Write-back stage control signals
+  xlen_t MEM_result;                  // Result from the memory stage or write-back stage
+  wire actual_taken;                  // Signal used to determine whether an instruction met condition codes
+  wire wen_BHT;                       // Write enable for BHT (Branch History Table)
+  addr_t branch_target;               // Computed branch target address
+  wire wen_BTB;                       // Write enable for BTB (Branch Target Buffer)
+  addr_t actual_target;               // Computed actual target address
+  wire update_PC;                     // Signal to update the PC with the actual target
+  wire [110:0] EX_signals;            // Execute stage control signals
+  wire [33:0] MEM_signals;            // Memory stage control signals
+  wire [7:0] WB_signals;              // Write-back stage control signals
 
   /* HAZARD DETECTION UNIT signals */
   wire PC_stall;                        // Stall signal for the PC register
@@ -73,20 +72,20 @@ module proc (
   wire IF_flush, ID_flush, MEM_flush;   // Flush signals for each pipeline register
 
   /* ID/EX Pipeline Register signals */
-  wire [3:0] ID_EX_SrcReg1;        // Pipelined first source register ID from the decode stage
-  wire [3:0] ID_EX_SrcReg2;        // Pipelined second source register ID from the decode stage
-  wire [31:0] ID_EX_ALU_In1;       // Pipelined first ALU input from the decode stage
-  wire [31:0] ID_EX_ALU_imm;       // Pipelined ALU immediate input from the decode stage
-  wire [31:0] ID_EX_ALU_In2;       // Pipelined second ALU input from the decode stage
-  wire [3:0] ID_EX_ALUOp;          // Pipelined ALU operation code from the decode stage
-  wire ID_EX_ALUSrc;               // Pipelined ALU select signal to choose between register/immediate operand from the decode stage
-  wire ID_EX_Z_en, ID_EX_NV_en;    // Pipelined enable signals setting the Z, N, and V flags from the decode stage
-  wire [33:0] ID_EX_MEM_signals;   // Pipelined Memory stage control signals from the decode stage
-  wire [7:0] ID_EX_WB_signals;     // Pipelined Write-back stage control signals from the decode stage
-  wire [31:0] ID_EX_PC_next;       // Pipelined next instruction (previous PC_next) address from the fetch stage
+  wire [3:0] ID_EX_SrcReg1;           // Pipelined first source register ID from the decode stage
+  wire [3:0] ID_EX_SrcReg2;           // Pipelined second source register ID from the decode stage
+  xlen_t ID_EX_ALU_In1;               // Pipelined first ALU input from the decode stage
+  xlen_t ID_EX_ALU_imm;               // Pipelined ALU immediate input from the decode stage
+  xlen_t ID_EX_ALU_In2;               // Pipelined second ALU input from the decode stage
+  wire [3:0] ID_EX_ALUOp;             // Pipelined ALU operation code from the decode stage
+  wire ID_EX_ALUSrc;                  // Pipelined ALU select signal to choose between register/immediate operand from the decode stage
+  wire ID_EX_Z_en, ID_EX_NV_en;       // Pipelined enable signals setting the Z, N, and V flags from the decode stage
+  wire [33:0] ID_EX_MEM_signals;      // Pipelined Memory stage control signals from the decode stage
+  wire [7:0] ID_EX_WB_signals;        // Pipelined Write-back stage control signals from the decode stage
+  addr_t ID_EX_PC_next;               // Pipelined next instruction (previous PC_next) address from the fetch stage
 
   /* EXECUTE stage signals */
-  wire [31:0] ALU_out;             // ALU output
+  xlen_t ALU_out;                  // ALU output
   wire [2:0] flags;                // Flag signals {ZF, VF, NF} computed from the ALU output
 
   /* FORWARDING UNIT signals */
@@ -95,33 +94,33 @@ module proc (
   wire Forward_MEM;                // Forwarding signal for the SW instruction in the MEM stage
 
   /* EX/MEM Pipeline Register signals */
-  wire [31:0] EX_MEM_ALU_out;      // Pipelined data memory address/arithemtic computation result computed from the execute stage
-  wire [3:0] EX_MEM_SrcReg2;       // Pipelined second source register ID from the decode stage
-  wire [31:0] EX_MEM_MemWriteData; // Pipelined write data for SW from the decode stage
-  wire EX_MEM_MemEnable;           // Pipelined data memory access enable signal from the decode stage
-  wire EX_MEM_MemWrite;            // Pipelined data memory write enable signal from the decode stage
-  wire [7:0] EX_MEM_WB_signals;    // Pipelined Write-back stage control signals from the decode stage
-  wire [31:0] EX_MEM_PC_next;      // Pipelined next instruction (previous PC_next) address from the fetch stage
+  xlen_t EX_MEM_ALU_out;                 // Pipelined data memory address/arithmetic computation result
+  wire [3:0] EX_MEM_SrcReg2;             // Pipelined second source register ID from the decode stage
+  xlen_t EX_MEM_MemWriteData;            // Pipelined write data for SW from the decode stage
+  wire EX_MEM_MemEnable;                 // Pipelined data memory access enable signal from the decode stage
+  wire EX_MEM_MemWrite;                  // Pipelined data memory write enable signal from the decode stage
+  wire [7:0] EX_MEM_WB_signals;          // Pipelined Write-back stage control signals from the decode stage
+  addr_t EX_MEM_PC_next;                 // Pipelined next instruction (previous PC_next) address from the fetch stage
 
   /* MEMORY stage signals */
-  wire [31:0] MemWriteData;        // Data written to memory
-  wire [31:0] D_MEM_addr;          // The address to access in off chip memory on an DCACHE miss
-  wire DCACHE_miss_mem_en;         // Miss memory enable for DCACHE
-  wire [31:0] MemData;             // Data read from memory
-  wire DCACHE_hit;                 // Indicates if current memory access was a cache hit
+  xlen_t MemWriteData;                  // Data written to memory
+  addr_t D_MEM_addr;                    // The address to access in off chip memory on a DCACHE miss
+  wire DCACHE_miss_mem_en;              // Miss memory enable for DCACHE
+  xlen_t MemData;                       // Data read from memory
+  wire DCACHE_hit;                      // Indicates if current memory access was a cache hit
 
   /* MEM/WB Pipeline Register signals */
-  wire [31:0] MEM_WB_MemData; // Pipelined data read from memory from the memory stage
-  wire [31:0] MEM_WB_ALU_out; // Pipelined arithemtic computation result computed from the execute stage
-  wire [3:0] MEM_WB_reg_rd;   // Pipelined register ID of the destination register from the decode stage
-  wire MEM_WB_RegWrite;       // Pipelined write enable to the register file from the decode stage
-  wire MEM_WB_MemToReg;       // Pipelined select signal to write data read from memory or ALU result back to the register file
-  wire MEM_WB_HLT;            // Pipelined HLT signal from the decode stage (indicates that the HLT instruction, if fetched, entered the WB stage) 
-  wire MEM_WB_PCS;            // Pipelined PCS signal from the decode stage (indicates that the PCS instruction, if fetched, entered the WB stage)
-  wire [31:0] MEM_WB_PC_next; // Pipelined next instruction (previous PC_next) address from the fetch stage
+  xlen_t MEM_WB_MemData;                // Pipelined data read from memory from the memory stage
+  xlen_t MEM_WB_ALU_out;                // Pipelined arithmetic computation result computed from the execute stage
+  wire [3:0] MEM_WB_reg_rd;             // Pipelined register ID of the destination register from the decode stage
+  wire MEM_WB_RegWrite;                 // Pipelined write enable to the register file from the decode stage
+  wire MEM_WB_MemToReg;                 // Pipelined select signal to write data read from memory or ALU result back to the register file
+  wire MEM_WB_HLT;                      // Pipelined HLT signal from the decode stage (indicates that the HLT instruction, if fetched, entered the WB stage) 
+  wire MEM_WB_PCS;                      // Pipelined PCS signal from the decode stage (indicates that the PCS instruction, if fetched, entered the WB stage)
+  addr_t MEM_WB_PC_next;                // Pipelined next instruction (previous PC_next) address from the fetch stage
 
   /* WRITE_BACK stage signals */
-  wire [31:0] RegWriteData;   // Data to write back to the register file
+  xlen_t RegWriteData;                  // Data to write back to the register file
   //////////////////////////////////////////////////
 
   //////////////////////////////////////////////////////////////////
@@ -171,23 +170,22 @@ module proc (
   // FETCH instruction from PC  //
   ////////////////////////////////
   Fetch iFETCH (
-    .clk(clk), 
-    .rst(rst), 
-    .stall(PC_stall), 
-    .hlt_fetched(hlt_fetched),
-    .actual_taken(actual_taken),
-    .wen_BHT(wen_BHT),
-    .branch_target(branch_target),
-    .wen_BTB(wen_BTB),
-    .actual_target(actual_target),
-    .update_PC(update_PC),
-    .IF_ID_PC_curr(IF_ID_PC_curr),
-    .IF_ID_prediction(IF_ID_prediction), 
+    .clk_i(clk), 
+    .rst_i(rst), 
+    .stall_i(PC_stall), 
+    .actual_taken_i(actual_taken),
+    .wen_BHT_i(wen_BHT),
+    .branch_target_i(branch_target),
+    .wen_BTB_i(wen_BTB),
+    .actual_target_i(actual_target),
+    .update_PC_i(update_PC),
+    .IF_ID_PC_curr_i(IF_ID_PC_curr),
+    .IF_ID_prediction_i(IF_ID_prediction), 
       
-    .PC_next(PC_next), 
-    .PC_curr(pc),
-    .prediction(prediction),
-    .predicted_target(predicted_target)
+    .PC_next_o(PC_next), 
+    .PC_curr_o(pc),
+    .prediction_o(prediction),
+    .predicted_target_o(predicted_target)
   );
   ///////////////////////////////////
 
@@ -199,7 +197,7 @@ module proc (
       .proceed(ICACHE_proceed),
       .on_chip_wr(1'b0),
       .on_chip_memory_address(pc),
-      .on_chip_memory_data(32'h0000_0000),
+      .on_chip_memory_data('0),
 
       .off_chip_memory_data(mem_data_in),
       .memory_data_valid(mem_data_valid),
@@ -210,36 +208,27 @@ module proc (
       .data_out(PC_inst),
       .hit(ICACHE_hit)
   );
-
-  // Get the condition that we fetched a halt instruction.
-  assign hlt_fetched = &PC_inst[15:12];
   //////////////////////////////////////////
 
   /////////////////////////////////////////////////////////////////////
-  // Pass Fetch bundle through interface-based IF/ID pipeline register //
+  // Pass Fetch bundle through scalar IF/ID pipeline register //
   /////////////////////////////////////////////////////////////////////
-  // Fetch stage drives the IF/ID input bundle.
-  assign if_id_if_i.pc_curr = pc;
-  assign if_id_if_i.pc_next = PC_next;
-  assign if_id_if_i.pc_inst = PC_inst;
-  assign if_id_if_i.prediction = prediction;
-  assign if_id_if_i.predicted_target = predicted_target;
-
-  // Preserve existing signal names for downstream modules and debug.
-  assign IF_ID_PC_curr = if_id_if_o.pc_curr;
-  assign IF_ID_PC_next = if_id_if_o.pc_next;
-  assign IF_ID_PC_inst = if_id_if_o.pc_inst;
-  assign IF_ID_prediction = if_id_if_o.prediction;
-  assign IF_ID_predicted_target = if_id_if_o.predicted_target;
-
-  IF_ID_pipe_reg iIF_ID (
+  IF_ID_Pipe_Reg iIF_ID (
     .clk_i(clk),
     .rst_i(rst),
     .stall_i(IF_ID_stall),
     .flush_i(IF_flush),
-    .if_id_if_i(if_id_if_i),
-    
-    .if_id_if_o(if_id_if_o)
+    .PC_curr_i(pc),
+    .PC_next_i(PC_next),
+    .PC_inst_i(PC_inst),
+    .prediction_i(prediction),
+    .predicted_target_i(predicted_target),
+
+    .IF_ID_PC_curr_o(IF_ID_PC_curr),
+    .IF_ID_PC_next_o(IF_ID_PC_next),
+    .IF_ID_PC_inst_o(IF_ID_PC_inst),
+    .IF_ID_prediction_o(IF_ID_prediction),
+    .IF_ID_predicted_target_o(IF_ID_predicted_target)
   );
   /////////////////////////////////////////////////////////////////////
 

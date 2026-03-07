@@ -49,7 +49,6 @@ module Fetch_tb();
 
   logic [31:0] PC_inst;                   // Instruction fetched from the current PC address
   logic [31:0] expected_PC_inst;          // Expected instruction fetched from the current PC address
-  logic hlt_fetched;                      // Indicates if the fetched instruction is a halt instruction.
   logic ICACHE_hit;                       // Indicates if the instruction cache hit
   logic ICACHE_miss;                      // Indicates if the instruction cache miss
   logic ICACHE_miss_mem_en;               // Enable signal for main memory access on cache miss
@@ -71,23 +70,22 @@ module Fetch_tb();
 
   // Instantiate the DUT: Dynamic Branch Predictor.
   Fetch iDUT (
-    .clk(clk), 
-    .rst(rst), 
-    .stall(enable), 
-    .hlt_fetched(hlt_fetched),
-    .actual_taken(actual_taken),
-    .wen_BHT(wen_BHT),
-    .branch_target(branch_target),
-    .wen_BTB(wen_BTB),
-    .actual_target(actual_target),
-    .update_PC(update_PC),
-    .IF_ID_PC_curr(IF_ID_PC_curr),
-    .IF_ID_prediction(IF_ID_prediction), 
+    .clk_i(clk), 
+    .rst_i(rst), 
+    .stall_i(enable), 
+    .actual_taken_i(actual_taken),
+    .wen_BHT_i(wen_BHT),
+    .branch_target_i(branch_target),
+    .wen_BTB_i(wen_BTB),
+    .actual_target_i(actual_target),
+    .update_PC_i(update_PC),
+    .IF_ID_PC_curr_i(IF_ID_PC_curr),
+    .IF_ID_prediction_i(IF_ID_prediction),
       
-    .PC_next(PC_next), 
-    .PC_curr(PC_curr),
-    .prediction(prediction),
-    .predicted_target(predicted_target)
+    .PC_next_o(PC_next), 
+    .PC_curr_o(PC_curr),
+    .prediction_o(prediction),
+    .predicted_target_o(predicted_target)
   );
 
   // Instantiate instruction memory cache along with control.
@@ -109,9 +107,6 @@ module Fetch_tb();
       .data_out(expected_PC_inst),
       .hit(ICACHE_hit)
   );
-
-  // Get the condition that we fetched a halt instruction.
-  assign hlt_fetched = &expected_PC_inst[15:12];
 
   // Instantiate main memory (legacy memory4c adapter).
   memory4c iMAIN_MEM (
@@ -149,7 +144,6 @@ module Fetch_tb();
     .clk(clk), 
     .rst(rst), 
     .stall(enable), 
-    .hlt_fetched(hlt_fetched),
     .actual_taken(actual_taken),
     .wen_BHT(wen_BHT),
     .branch_target(branch_target),
@@ -157,7 +151,7 @@ module Fetch_tb();
     .actual_target(actual_target),
     .update_PC(update_PC),
     .IF_ID_PC_curr(IF_ID_PC_curr),
-    .IF_ID_prediction(IF_ID_prediction), 
+    .IF_ID_prediction(IF_ID_prediction),
       
     .PC_next(expected_PC_next), 
     .PC_curr(expected_PC_curr),

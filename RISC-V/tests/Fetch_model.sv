@@ -7,7 +7,6 @@ module Fetch_model (
     input logic clk,                    // System clock
     input logic rst,                    // Active high synchronous reset
     input logic stall,                  // Stall signal for the PC (from the hazard detection unit)
-    input logic hlt_fetched,            // Indicates if the fetched instruction is a halt instruction.
     input logic actual_taken,           // Signal used to determine whether branch instruction met condition codes
     input logic wen_BHT,                // Write enable for BHT (Branch History Table)
     input logic [31:0] branch_target,   // 32-bit address of the branch target
@@ -39,14 +38,11 @@ module Fetch_model (
   // We write to the PC whenever we don't stall on decode.
   assign enable = ~stall;
 
-  // Get the branch instruction address from the BTB, if predicted to be taken, else it is PC + 2.
+  // Get the branch instruction address from the BTB, if predicted to be taken, else it is PC + 4.
   assign PC_target = (predicted_taken) ? predicted_target : PC_next;
 
-  // Get the new PC with the current PC if HLT is fetched, or the target address otherwise.
-  assign PC_new = (hlt_fetched) ? PC_curr : PC_target;
-
-  // Update the PC with correct target on misprediction or the new PC otherwise.
-  assign PC_update = (update_PC) ? actual_target : PC_new;
+  // Update the PC with correct target on misprediction or the target PC otherwise.
+  assign PC_update = (update_PC) ? actual_target : PC_target;
 
   // Instantiate the Dynamic Branch Predictor model.
   DynamicBranchPredictor_model iDBP_model (
@@ -59,7 +55,7 @@ module Fetch_model (
     .wen_BTB(wen_BTB),
     .wen_BHT(wen_BHT),
     .actual_taken(actual_taken),
-    .actual_target(branch_target),  
+    .actual_target(actual_target),  
     
     .predicted_taken(predicted_taken),
     .prediction(prediction), 
@@ -74,7 +70,8 @@ module Fetch_model (
       PC_curr <= PC_update;
 
   // Compute PC_new as the next instruction address.
-  assign PC_next = PC_curr + 32'h0000_0002;
+  assign PC_next = PC_curr + 32'h0000_0004;
+
   //////////////////////////////////////
 
 endmodule
