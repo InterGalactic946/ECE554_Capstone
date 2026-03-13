@@ -36,27 +36,31 @@ A custom out-of-order RISC-V processor serves as the system control plane: it co
 
 ## **Setup**
 
-1. Clone the repository to your local machine:
+1. Review the Hardware Developer Guide and Environment Setup Guide before starting.
+   - Hardware Developer Guide: [https://docs.google.com/document/d/1VRHJHG_KFuNlk5hXbIOxGa4ctv0QYRE6IQTADC8tNUY/edit]
+   - Environment Setup Guide: [https://docs.google.com/document/d/1KB8uardO7TWdqhmX1iiylOPLwSkADvgM9QdCFSwMMS8/edit]
+   
+2. Clone the repository to your local machine:
    ```bash
    git clone https://github.com/InterGalactic946/ECE554_Capstone.git
    cd ECE554_Capstone/
    ```
-
-2. Ensure that Python 3 and Make are installed on your system:
+   
+3. Ensure that Python 3 and Make are installed on your system:
    - Python 3: [Installation Guide](https://www.python.org/downloads/)
    - Make: [Installation Guide](https://www.gnu.org/software/make/)
 
-3. Install required Python dependencies (if needed):
+4. Install required Python dependencies (if needed):
    ```bash
    pip install <dependencies>
    ```
-
-4. Consider running the `generate_starter.py` script via the Makefile to create initial design and testbench files:
+   
+5. Consider running the `generate_starter.py` script via the Makefile to create initial design and testbench files:
    ```bash
    make start
    ```
-
-5. For running GUI based simulations, ensure that you have a compatible X11 server or graphical environment set up, eg. XQuartz for macOS or MobaXterm for Windows
+   
+6. For running GUI based simulations, ensure that you have a compatible X11 server or graphical environment set up, eg. XQuartz for macOS or MobaXterm for Windows
    to connect to the CAE machines where simulations will be run. Refer to the Environment Setup Guide in the project drive for more details.
 
 ---
