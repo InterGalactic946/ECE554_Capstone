@@ -313,11 +313,39 @@ def render_design_template(module_name, description, ports, use_nettype_guard):
         ports (list[Port]): Ordered list of DUT ports.
         use_nettype_guard (bool): Emit default_nettype guard only for Verilog (.v) output.
 
+    Args:
+        submodules (list[tuple[str, list[Port]]]): Optional list of submodule names with their ports.
+
+    Returns:
+        str: Full design source text for the starter DUT file.
+    """
+    # Dispatch to the submodule-aware renderer with no submodules.
+    return render_design_template_with_submodules(
+        module_name=module_name,            # Top-level DUT module name.
+        description=description,            # Header description text.
+        ports=ports,                        # DUT port list.
+        use_nettype_guard=use_nettype_guard,# Nettype guard toggle for .v output.
+        submodules=[],                      # No submodules for the default path.
+    )
+
+def render_design_template_with_submodules(
+    module_name, description, ports, use_nettype_guard, submodules
+):
+    """
+    Generate DUT starter source text with optional submodule instantiations.
+
+    Args:
+        module_name (str): DUT module name.
+        description (str): Header description text.
+        ports (list[Port]): Ordered list of DUT ports.
+        use_nettype_guard (bool): Emit default_nettype guard only for Verilog (.v) output.
+        submodules (list[tuple[str, list[Port]]]): Optional list of submodule names with their ports.
+
     Returns:
         str: Full design source text for the starter DUT file.
     """
     # Start with optional nettype guard and header banner.
-    lines = []
+    lines = []  # List of output lines for the generated source.
     if use_nettype_guard:
         lines.extend(["`default_nettype none // Set the default as none to avoid errors", ""])
     lines.extend(make_header_banner("Module", module_name, description))
@@ -328,9 +356,9 @@ def render_design_template(module_name, description, ports, use_nettype_guard):
 
         # Emit each port with optional width and comment.
         for idx, port in enumerate(ports):
-            comma = "," if idx < len(ports) - 1 else ""
-            width = f"[{port.width}] " if port.width else ""
-            comment = f" // {port.desc}" if port.desc else ""
+            comma = "," if idx < len(ports) - 1 else ""          # Trailing comma on all but last port.
+            width = f"[{port.width}] " if port.width else ""     # Optional packed width.
+            comment = f" // {port.desc}" if port.desc else ""     # Optional port comment.
             lines.append(f"    {port.direction} {port.data_type} {width}{port.name}{comma}{comment}")
 
         lines.append(");")
@@ -338,19 +366,80 @@ def render_design_template(module_name, description, ports, use_nettype_guard):
         # Support empty stub modules for fast kickoff.
         lines.append(f"module {module_name}();")
 
-    # Add structured placeholder sections in existing repository style.
+    # Declare state machine types and signals.
     lines.extend(
         [
+            "  ////////////////////////////////////////",
+            "  // Declare state types as enumerated //",
+            "  //////////////////////////////////////",
+            "  typedef enum logic [TODO:0] {//TODO} state_t;",
             "",
+            "  /////////////////////////////////////////////////",
+            "  // Declare any internal signals as type logic //",
+            "  ///////////////////////////////////////////////",
+            "  state_t state;      // Holds the current state.",
+            "  state_t nxt_state;  // Holds the next state.",
+            "",
+        ]
+    )
+
+    # Declare signals for optional submodule wiring.
+    if submodules:
+        lines.append("  // Signals for submodule connections.")
+        for sub_name, sub_ports in submodules:
+            instance_name = f"u_{sub_name}"  # Instance prefix for signals and instantiation.
+            if not sub_ports:
+                lines.append(f"  // TODO: add signals for {sub_name} ports (unable to parse).")
+                continue
+            for port in sub_ports:
+                width = f"[{port.width}] " if port.width else ""             # Optional packed width.
+                signal_name = f"{instance_name}_{port.name}"                 # Unique signal name.
+                lines.append(f"  logic {width}{signal_name};")
+
+        lines.append("")
+
+        # Emit submodule instantiation stubs.
+        lines.extend(
+            [
+                "  //////////////////////////",
+                "  // Submodule instances //",
+                "  ////////////////////////",
+            ]
+        )
+        for sub_name, sub_ports in submodules:
+            instance_name = f"u_{sub_name}"  # Instance name for the submodule.
+            lines.append(f"  {sub_name} {instance_name} (")
+            if sub_ports:
+                for idx, port in enumerate(sub_ports):
+                    comma = "," if idx < len(sub_ports) - 1 else ""          # Trailing comma on all but last port.
+                    signal_name = f"{instance_name}_{port.name}"             # Signal name for the port connection.
+                    lines.append(f"    .{port.name}({signal_name}){comma}")
+            lines.append("  );")
+            lines.append("")
+
+    lines.extend(
+        [
+            "  ////////////////////////////////////////",
+            f"  // Implement the logic for {module_name} //",
+            "  //////////////////////////////////////",
+            "",
+            "  /////////////////////////////////////",
+            "  // Implements State Machine Logic //",
             "  ///////////////////////////////////",
-            "  // Declare any internal signals //",
-            "  /////////////////////////////////",
+            "  // Implements state machine register, holding current state or next state, accordingly.",
+            "  always_ff @(posedge clk) begin",
+            "    if(rst)",
+            "      state <= IDLE; // Reset into the idle state if machine is reset.",
+            "    else",
+            "      state <= nxt_state; // Store the next state as the current state by default.",
+            "  end",
             "",
-            "  ////////////////////////////////////////////////////////",
-            "  // Implement the module logic as structural/dataflow //",
-            "  //////////////////////////////////////////////////////",
-            "",
-            "  // Add module internals here.",
+            "  //////////////////////////////////////////////////////////////////////////////////////////",
+            "  // Implements the combinational state transition and output logic of the state machine.//",
+            "  ////////////////////////////////////////////////////////////////////////////////////////",
+            "  always_comb begin",
+            "    /* Default all SM outputs & nxt_state */",
+            "  end",
             "",
             "endmodule",
         ]
@@ -363,6 +452,105 @@ def render_design_template(module_name, description, ports, use_nettype_guard):
     # Return final source content.
     return "\n".join(lines) + "\n"
 
+
+def render_testbench_template_multi(testbench_name, description, dut_list):
+    """
+    Generate testbench starter source text for multiple DUTs.
+
+    Args:
+        testbench_name (str): Testbench module name.
+        description (str): Header description text.
+        dut_list (list[tuple[str, list[Port]]]): List of DUT names and parsed ports.
+
+    Returns:
+        str: Full starter testbench source text.
+    """
+    # Emit header and TB declaration.
+    lines = []  # List of output lines for the generated source.
+    lines.extend(make_header_banner("Testbench", testbench_name, description))
+    lines.append(f"module {testbench_name}();")
+    lines.append("")
+
+    # Track test failures through a common error counter.
+    lines.append("  int error_count;")
+    lines.append("")
+
+    # Emit signal declaration section.
+    lines.extend(
+        [
+            "  /////////////////////////////",
+            "  // Stimulus of type logic //",
+            "  ///////////////////////////",
+        ]
+    )
+
+    # Declare TB signals for each DUT port.
+    if dut_list:
+        for dut_name, ports in dut_list:
+            instance_name = f"i_{dut_name}"  # Instance prefix for TB signal names.
+            lines.append(f"  // Signals for {dut_name}")
+            if not ports:
+                lines.append(f"  // TODO: add signals for {dut_name} ports (unable to parse).")
+                continue
+            for port in ports:
+                width = f"[{port.width}] " if port.width else ""             # Optional packed width.
+                signal_name = f"{instance_name}_{port.name}"                 # Unique TB signal name.
+                lines.append(f"  logic {width}{signal_name};")
+    else:
+        lines.append("  // logic clk_i;")
+        lines.append("  // logic rst_n_i;")
+
+    # Emit DUT instantiation block.
+    lines.extend(
+        [
+            "",
+            "  ///////////////////////",
+            "  // Instantiate DUTs //",
+            "  /////////////////////",
+        ]
+    )
+
+    if dut_list:
+        for dut_name, ports in dut_list:
+            instance_name = f"i_{dut_name}"  # Instance name for the DUT instantiation.
+            lines.append(f"  {dut_name} {instance_name} (")
+            if ports:
+                for idx, port in enumerate(ports):
+                    comma = "," if idx < len(ports) - 1 else ""              # Trailing comma on all but last port.
+                    signal_name = f"{instance_name}_{port.name}"             # TB signal driving the port.
+                    lines.append(f"    .{port.name}({signal_name}){comma}")
+            lines.append("  );")
+            lines.append("")
+
+    # Emit starter simulation flow with required pass/fail messages.
+    lines.extend(
+        [
+            "  initial begin",
+            "    error_count = 0;",
+            "    // TODO: Initialize inputs.",
+            "    // TODO: Apply stimulus and checks.",
+            "",
+            "    if (error_count == 0) begin",
+            "      $display(\"YAHOO!! All tests passed.\");",
+            "    end else begin",
+            "      $display(\"ERROR: %0d test(s) failed.\", error_count);",
+            "    end",
+            "",
+            "    $stop();",
+            "  end",
+            "",
+            "  ////////////////////////////////////////////////////",
+            "  // Optional clock generation for synchronous DUT //",
+            "  //////////////////////////////////////////////////",
+            "  // always",
+            "  //   #5 clk = ~clk;",
+            "",
+            "endmodule",
+        ]
+    )
+
+    # Return final source content.
+    return "\n".join(lines) + "\n"
 
 def render_testbench_template(module_name, description, ports):
     """
@@ -396,9 +584,9 @@ def render_testbench_template(module_name, description, ports):
     # Emit signal declaration section.
     lines.extend(
         [
-            "  ///////////////////////////",
+            "  /////////////////////////////",
             "  // Stimulus of type logic //",
-            "  /////////////////////////",
+            "  ///////////////////////////",
         ]
     )
 
@@ -450,9 +638,9 @@ def render_testbench_template(module_name, description, ports):
             "    $stop();",
             "  end",
             "",
-            "  ///////////////////////////////////////////////",
+            "  ////////////////////////////////////////////////////",
             "  // Optional clock generation for synchronous DUT //",
-            "  ///////////////////////////////////////////////",
+            "  //////////////////////////////////////////////////",
             "  // always",
             "  //   #5 clk = ~clk;",
             "",
@@ -700,6 +888,116 @@ def parse_ports_from_dut(module_name, dut_path):
     return parsed_ports
 
 
+def list_design_modules():
+    """
+    List candidate DUT modules based on filenames in designs directory.
+
+    Returns:
+        dict[str, Path]: Mapping from module name to its source path.
+    """
+    # Guard against missing design directory configuration.
+    if not config.DESIGNS_DIR:
+        return {}
+
+    # Resolve the designs directory path.
+    designs_dir = Path(config.DESIGNS_DIR)
+    if not designs_dir.exists():
+        return {}
+
+    # Build a module name map from filenames.
+    module_map = {}
+    for ext in ("*.sv", "*.v"):
+        for path in sorted(designs_dir.glob(ext)):
+            name = path.stem  # Module name from filename.
+            if name not in module_map:
+                module_map[name] = path  # Prefer .sv when both exist.
+    return module_map
+
+
+def ask_yes_no(prompt, default=False):
+    """
+    Ask a yes/no question with a default.
+
+    Args:
+        prompt (str): Prompt text shown to user.
+        default (bool): Default when user presses Enter.
+
+    Returns:
+        bool: True for yes, False for no.
+    """
+    # Define accepted responses.
+    yes_values = {"y", "yes"}
+    no_values = {"n", "no"}
+    default_text = "Y/n" if default else "y/N"
+
+    # Keep prompting until a valid response is entered.
+    while True:
+        response = input(f"{prompt} [{default_text}] ").strip().lower()
+        if response == "":
+            return default
+        if response in yes_values:
+            return True
+        if response in no_values:
+            return False
+        print("Invalid input. Please enter 'y' or 'n'.")
+
+
+def choose_multiple_from_list(items, prompt, pre_prompt):
+    """
+    Prompt user to select multiple items from a list.
+
+    Args:
+        items (list[str]): Items to choose from.
+        prompt (str): Prompt text.
+        pre_prompt (str): Header text before listing items.
+
+    Returns:
+        list[str]: Selected items.
+    """
+    # Return early when there are no items to choose from.
+    if not items:
+        print("No items available.")
+        return []
+
+    # Display list of items for selection.
+    print(pre_prompt)
+    for idx, item in enumerate(items, start=1):
+        print(f"{idx}. {item}")
+
+    # Prompt until a valid selection is made.
+    while True:
+        raw = input(prompt).strip().lower()
+        if raw == "":
+            return list(items)  # Default to all when user presses Enter.
+        if raw in {"a", "all"}:
+            return list(items)  # Explicit all selection.
+
+        # Parse comma-separated indices.
+        try:
+            indices = [int(token.strip()) for token in raw.split(",") if token.strip()]
+        except ValueError:
+            print("Invalid input. Enter comma-separated numbers, 'all', or press Enter.")
+            continue
+
+        # Require at least one selection.
+        if not indices:
+            print("Please select at least one item.")
+            continue
+
+        # Validate indices are in range.
+        if any(idx < 1 or idx > len(items) for idx in indices):
+            print(f"Invalid input. Please enter numbers between 1 and {len(items)}.")
+            continue
+
+        # Preserve order and remove duplicates.
+        selected = []
+        for idx in indices:
+            item = items[idx - 1]
+            if item not in selected:
+                selected.append(item)
+        return selected
+
+
 def select_project_dir():
     """
     Resolve the target project directory used for starter output.
@@ -767,7 +1065,16 @@ def write_file(path_obj, content):
     return True
 
 
-def build_outputs(module_name, kind, description, ports, tb_description=None, design_ext="sv"):
+def build_outputs(
+    module_name,
+    kind,
+    description,
+    ports,
+    tb_description=None,
+    design_ext="sv",
+    submodules=None,
+    tb_multi=None,
+):
     """
     Build the list of output files and rendered content.
 
@@ -783,29 +1090,50 @@ def build_outputs(module_name, kind, description, ports, tb_description=None, de
     """
     # Accumulate generation tasks in deterministic order.
     tasks = []
+    submodules = submodules if submodules else []
 
     # Generate DUT output when requested.
     if kind in {"design", "both"}:
         design_file = f"{module_name}.{design_ext}"
         design_path = Path(config.DESIGNS_DIR) / design_file
-        design_text = render_design_template(
-            module_name=module_name,
-            description=description,
-            ports=ports,
-            use_nettype_guard=(design_ext == "v"),
-        )
+        # Use submodule-aware renderer when requested.
+        if submodules:
+            design_text = render_design_template_with_submodules(
+                module_name=module_name,
+                description=description,
+                ports=ports,
+                use_nettype_guard=(design_ext == "v"),
+                submodules=submodules,
+            )
+        else:
+            design_text = render_design_template(
+                module_name=module_name,
+                description=description,
+                ports=ports,
+                use_nettype_guard=(design_ext == "v"),
+            )
         tasks.append((design_path, design_text))
 
     # Generate testbench output when requested.
     if kind in {"testbench", "both"}:
-        tb_base = f"{module_name}_tb"
-        tb_file = f"{tb_base}.sv"
-        tb_path = Path(config.TESTS_DIR) / tb_file
-        tb_text = render_testbench_template(
-            module_name=module_name,
-            description=tb_description if tb_description else f"Verifies {module_name} behavior.",
-            ports=ports,
-        )
+        if tb_multi:
+            tb_base = tb_multi["name"]
+            tb_file = f"{tb_base}.sv"
+            tb_path = Path(config.TESTS_DIR) / tb_file
+            tb_text = render_testbench_template_multi(
+                testbench_name=tb_base,
+                description=tb_multi["description"],
+                dut_list=tb_multi["dut_list"],
+            )
+        else:
+            tb_base = f"{module_name}_tb"
+            tb_file = f"{tb_base}.sv"
+            tb_path = Path(config.TESTS_DIR) / tb_file
+            tb_text = render_testbench_template(
+                module_name=module_name,
+                description=tb_description if tb_description else f"Verifies {module_name} behavior.",
+                ports=ports,
+            )
         tasks.append((tb_path, tb_text))
 
     # Return collected generation tasks.
@@ -846,30 +1174,84 @@ def main():
 
         # Testbench-only flow: target an existing DUT and auto-derive metadata.
         if kind == "testbench":
-            # Ask for DUT module name used for instantiation.
-            module_name = input("DUT module name for testbench [No response is treated as MyModule]: ").strip()
-            module_name = module_name if module_name else "MyModule"
+            # Initialize multi-DUT container for optional use.
+            tb_multi = None
 
-            # Try to locate DUT source in designs directory.
-            dut_path = find_dut_file(module_name)
-            if dut_path is None:
-                raise FileNotFoundError(
-                    f"Could not find DUT file for '{module_name}' in {config.DESIGNS_DIR}."
-                )
+            # Resolve DUTs available in the designs directory.
+            design_modules = list_design_modules()
+            module_names = list(design_modules.keys())
 
-            # Parse DUT ports so TB signals/instantiation match the DUT interface.
-            ports = parse_ports_from_dut(module_name, dut_path)
+            # Default to the single available DUT when possible.
+            if len(module_names) == 1:
+                module_name = module_names[0]
+                dut_path = design_modules[module_name]
+                ports = parse_ports_from_dut(module_name, dut_path)
+                dut_description = extract_dut_description(dut_path)
+                tb_description = make_testbench_description(module_name, dut_description)
+            else:
+                # When multiple DUTs exist, ask whether to instantiate more than one.
+                use_multiple = False
+                if module_names:
+                    use_multiple = ask_yes_no(
+                        "Multiple DUTs found. Instantiate multiple DUTs in the testbench?",
+                        default=False,
+                    )
 
-            # Derive TB description from DUT description.
-            dut_description = extract_dut_description(dut_path)
-            tb_description = make_testbench_description(module_name, dut_description)
+                if use_multiple:
+                    selected = choose_multiple_from_list(
+                        items=module_names,
+                        pre_prompt="Available DUTs:",
+                        prompt="Select DUTs by number (comma-separated), or press Enter for all: ",
+                    )
 
-            # Keep generic design description unused in testbench-only mode.
-            description = "not used in testbench-only mode."
+                    dut_list = []
+                    for dut_name in selected:
+                        dut_path = design_modules[dut_name]
+                        dut_ports = parse_ports_from_dut(dut_name, dut_path)
+                        dut_list.append((dut_name, dut_ports))
+
+                    tb_name = input(
+                        "Testbench module name [No response is treated as Multi_Dut_tb]: "
+                    ).strip()
+                    tb_name = tb_name if tb_name else "Multi_Dut_tb"
+                    tb_description = f"Verifies multiple DUTs: {', '.join(selected)}."
+                    tb_multi = {
+                        "name": tb_name,
+                        "description": tb_description,
+                        "dut_list": dut_list,
+                    }
+
+                    # Keep generic design description unused in testbench-only mode.
+                    description = "not used in testbench-only mode."
+                    module_name = tb_name
+                    ports = []
+                else:
+                    # Ask for DUT module name used for instantiation.
+                    module_name = input(
+                        "DUT module name for testbench [No response is treated as My_Module]: "
+                    ).strip()
+                    module_name = module_name if module_name else "My_Module"
+
+                    # Try to locate DUT source in designs directory.
+                    dut_path = find_dut_file(module_name)
+                    if dut_path is None:
+                        raise FileNotFoundError(
+                            f"Could not find DUT file for '{module_name}' in {config.DESIGNS_DIR}."
+                        )
+
+                    # Parse DUT ports so TB signals/instantiation match the DUT interface.
+                    ports = parse_ports_from_dut(module_name, dut_path)
+
+                    # Derive TB description from DUT description.
+                    dut_description = extract_dut_description(dut_path)
+                    tb_description = make_testbench_description(module_name, dut_description)
+
+                    # Keep generic design description unused in testbench-only mode.
+                    description = "not used in testbench-only mode."
         else:
             # Prompt for module name with quick default.
-            module_name = input("Module name [No response is treated as MyModule]: ").strip()
-            module_name = module_name if module_name else "MyModule"
+            module_name = input("Module name [No response is treated as My_Module]: ").strip()
+            module_name = module_name if module_name else "My_Module"
 
             # Ask user for design file extension when DUT generation is requested.
             design_ext = choose_design_extension()
@@ -899,6 +1281,29 @@ def main():
             inout_ports = parse_ports_compact(inout_line, "inout") if inout_line else []
             ports = input_ports + output_ports + inout_ports
 
+            # Prepare optional submodule list for DUT instantiation.
+            submodules = []
+
+            # Offer submodule instantiation when other DUTs exist.
+            design_modules = list_design_modules()
+            candidate_names = [name for name in design_modules.keys() if name != module_name]
+            if candidate_names:
+                use_submodules = ask_yes_no(
+                    "Other DUTs found. Instantiate submodules in this DUT?",
+                    default=False,
+                )
+                if use_submodules:
+                    selected = choose_multiple_from_list(
+                        items=candidate_names,
+                        pre_prompt="Available submodules:",
+                        prompt="Select submodules by number (comma-separated), or press Enter for all: ",
+                    )
+
+                    for sub_name in selected:
+                        sub_path = design_modules[sub_name]
+                        sub_ports = parse_ports_from_dut(sub_name, sub_path)
+                        submodules.append((sub_name, sub_ports))
+
         # Build requested output files and render content.
         outputs = build_outputs(
             module_name,
@@ -907,6 +1312,8 @@ def main():
             ports,
             tb_description=tb_description,
             design_ext=design_ext,
+            submodules=submodules if kind in {"design", "both"} else None,
+            tb_multi=tb_multi if kind == "testbench" else None,
         )
 
         # Write all outputs and track whether any file was actually written.

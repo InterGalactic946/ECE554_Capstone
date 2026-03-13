@@ -1,8 +1,8 @@
 ###################################
 # Read in the verilog files first #
 ###################################
-read_file -format verilog { \
-  ../designs/proc.v \
+read_file -format sverilog { \
+  ../designs/proc.sv \
   ../designs/ALU.v \
   ../designs/BHT.v \
   ../designs/BitCell.v \

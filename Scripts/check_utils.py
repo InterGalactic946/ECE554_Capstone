@@ -7,19 +7,19 @@ import subprocess
 """
 This module provides utility functions for checking Verilog design files using the Vcheck tool.
 It includes a function to check design files in the current directory, excluding testbench files.
-It runs the 'java Vcheck <design_file.v>' command on each file and reports any errors.
+It runs the 'java Vcheck <design_file.sv or .v>' command on each file and reports any errors.
 It also provides a function to check the design files in the specified directory.
 """
 
 
 def check_design_files():
     """
-    Checks Verilog design files in the current directory, excluding testbench files (_tb.v).
-    Runs the 'java Vcheck <design_file.v>' command on each file and reports any errors.
+    Checks Verilog design files in the current directory, excluding testbench files (_tb.sv).
+    Runs the 'java Vcheck <design_file.sv or .v>' command on each file and reports any errors.
 
     This function:
-    - Scans the current directory for Verilog design files (.v).
-    - Excludes testbench files (_tb.v).
+    - Scans the current directory for Verilog design files (.sv or .v).
+    - Excludes testbench files (_tb.sv).
     - Runs the Vcheck tool on each file and captures the output.
     - Prints error messages for any design files that fail the check.
     - Prints a success message if all design files are compliant.
@@ -39,7 +39,7 @@ def check_design_files():
     # Iterate over each design file and run the Vcheck command.
     for vfile in verilog_files:
         try:
-            # Run 'java Vcheck <design_file.v>' with the specified classpath
+            # Run 'java Vcheck <design_file.sv or .v>' with the specified classpath
             result = subprocess.run(
                 f"java -cp {config.SCRIPTS_DIR} Vcheck {vfile}",  # Command to execute
                 shell=True,                                # Execute in a shell
