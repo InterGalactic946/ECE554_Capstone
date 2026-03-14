@@ -60,21 +60,27 @@ package Core_Cfg_pkg;
   // Dynamic Branch Predictor geometry parameters.
   localparam int unsigned BHT_ENTRIES = 8;  // Number of entries in the Branch History Table (BHT).
   localparam int unsigned BTB_ENTRIES = 8;  // Number of entries in the Branch Target Buffer (BTB).
-  localparam int unsigned BHT_IDX_W = $clog2(
-      BHT_ENTRIES
-  );  // Width of the BHT index (log2 of number of entries).
-  localparam int unsigned BTB_IDX_W = $clog2(
-      BTB_ENTRIES
-  );  // Width of the BTB index (log2 of number of entries).
-  localparam int unsigned PC_ALIGN_LSB = $clog2(
-      ILEN_BYTES
-  );  // Number of always-zero PC LSBs for aligned instruction fetch.
-  localparam int unsigned BHT_IDX_LSB = PC_ALIGN_LSB; // Least-significant bit used for BHT index extraction from PC.
-  localparam int unsigned BHT_IDX_MSB = BHT_IDX_LSB + BHT_IDX_W - 1; // Most-significant bit used for BHT index extraction.
-  localparam int unsigned BTB_IDX_LSB = PC_ALIGN_LSB; // Least-significant bit used for BTB index extraction from PC.
-  localparam int unsigned BTB_IDX_MSB = BTB_IDX_LSB + BTB_IDX_W - 1; // Most-significant bit used for BTB index extraction.
-  localparam int unsigned DBP_TAG_W = XLEN - (BHT_IDX_MSB + 1); // Width of the tag stored in BHT entries after removing index and alignment bits.
-  localparam int unsigned DBP_BHT_ENTRY_W = DBP_TAG_W + 3; // Total width of a BHT entry: tag bits + 2 bits for prediction + 1 valid bit.
+
+  // Width of the BHT/BTB index (log2 of number of entries).
+  localparam int unsigned BHT_IDX_W = $clog2(BHT_ENTRIES);
+  localparam int unsigned BTB_IDX_W = $clog2(BTB_ENTRIES);
+
+  // Number of always-zero PC LSBs for aligned instruction fetch.
+  localparam int unsigned PC_ALIGN_LSB = $clog2(ILEN_BYTES);
+
+  // Extracted index bit positions for BHT indexing from the PC.
+  localparam int unsigned BHT_IDX_LSB = PC_ALIGN_LSB;
+  localparam int unsigned BHT_IDX_MSB = BHT_IDX_LSB + BHT_IDX_W - 1;
+
+  // Extracted index bit positions for BTB indexing from the PC.
+  localparam int unsigned BTB_IDX_LSB = PC_ALIGN_LSB;
+  localparam int unsigned BTB_IDX_MSB = BTB_IDX_LSB + BTB_IDX_W - 1;
+
+  // Width of the tag stored in BHT entries after removing index and alignment bits.
+  localparam int unsigned DBP_TAG_W = XLEN - (BHT_IDX_MSB + 1);
+
+  // Total width of a BHT entry: tag bits + 2 bits for prediction + 1 valid bit.
+  localparam int unsigned DBP_BHT_ENTRY_W = DBP_TAG_W + 3;
 
   // Cache geometry parameters (for potential future use in cache modules).
   localparam int unsigned CACHE_SET_COUNT = 64;
