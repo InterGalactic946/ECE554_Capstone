@@ -58,8 +58,8 @@ package Core_Cfg_pkg;
   // Microarchitectural Baseline Dimensions
   // ------------------------------------------------------------
   // Dynamic Branch Predictor geometry parameters.
-  localparam int unsigned BHT_ENTRIES = 8;  // Number of entries in the Branch History Table (BHT).
-  localparam int unsigned BTB_ENTRIES = 8;  // Number of entries in the Branch Target Buffer (BTB).
+  localparam int unsigned BHT_ENTRIES = 128;  // Number of entries in the Branch History Table (BHT).
+  localparam int unsigned BTB_ENTRIES = 128;  // Number of entries in the Branch Target Buffer (BTB).
 
   // Width of the BHT/BTB index (log2 of number of entries).
   localparam int unsigned BHT_IDX_W = $clog2(BHT_ENTRIES);
@@ -82,10 +82,46 @@ package Core_Cfg_pkg;
   // Total width of a BHT entry: tag bits + 2 bits for prediction + 1 valid bit.
   localparam int unsigned DBP_BHT_ENTRY_W = DBP_TAG_W + 3;
 
-  // Cache geometry parameters (for potential future use in cache modules).
-  localparam int unsigned CACHE_SET_COUNT = 64;
-  localparam int unsigned CACHE_WAYS = 2;
-  localparam int unsigned CACHE_LINE_WORDS = 8;
+  // ================= Cache Geometry Parameters =================
+  // Number of cache sets
+  localparam int unsigned CACHE_SET_COUNT = 64;  // 64 sets
+  localparam int unsigned CACHE_SET_IDX_W = $clog2(CACHE_SET_COUNT);  // 6 bits for set index
+
+  // Number of ways per set
+  localparam int unsigned CACHE_WAYS = 2;  // 2-way set associative
+  localparam int unsigned CACHE_WAY_IDX_W = $clog2(CACHE_WAYS);  // 1 bit for way select
+
+  // Block (cache line) parameters
+  localparam int unsigned CACHE_LINE_WORDS = 8;  // 8 words per block
+  localparam int unsigned CACHE_LINE_WORD_W = 32;  // 32-bit word width
+  localparam int unsigned CACHE_LINE_BYTE_W = CACHE_LINE_WORD_W / 8;  // 4 bytes per word
+  localparam int unsigned CACHE_LINE_SIZE_B = CACHE_LINE_WORDS * CACHE_LINE_BYTE_W; // 32 bytes per line
+
+  // // 64 sets * 2 ways * 32B = 4096B = 4KB total cache size
+  localparam int unsigned CACHE_SIZE_BYTES = CACHE_SET_COUNT * CACHE_WAYS * CACHE_LINE_SIZE_B;
+
+  // Word/byte enable widths
+  localparam int unsigned WORD_ENABLE_W = $clog2(CACHE_LINE_WORDS);  // 3 bits for word enable
+  localparam int unsigned BYTE_ENABLE_W = 4;  // 4 bytes per word
+
+  // ================= Memory Geometry =================
+  // Total address width from CPU
+  localparam int unsigned MEM_ADDR_WIDTH = PLEN;
+
+  // Word size
+  localparam int unsigned MEM_WORD_BITS = XLEN;
+  localparam int unsigned MEM_WORD_BYTES = MEM_WORD_BITS / 8;
+
+  // Alignment (log2 of bytes per word)
+  localparam int unsigned MEM_BYTE_OFFSET_W = $clog2(MEM_WORD_BYTES);
+
+  // Depth and number of words in memory.
+  localparam longint MEM_DEPTH = 1 << MEM_ADDR_WIDTH;
+  localparam int unsigned MEM_WORD_COUNT = 1 << (MEM_ADDR_WIDTH - MEM_BYTE_OFFSET_W);
+
+  // Address slice used for indexing memory
+  localparam int unsigned MEM_ADDR_MSB = MEM_ADDR_WIDTH - 1;
+  localparam int unsigned MEM_ADDR_LSB = MEM_BYTE_OFFSET_W;
 
   // ------------------------------------------------------------
   // ISA Feature Flags

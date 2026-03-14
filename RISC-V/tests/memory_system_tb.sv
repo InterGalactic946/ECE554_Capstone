@@ -59,7 +59,7 @@ module memory_system_tb();
       .proceed(1'b1),
       .on_chip_wr(1'b0),
       .on_chip_memory_address(pc),
-      .on_chip_memory_data(16'h0000),
+      .on_chip_memory_data('0),
 
       .off_chip_memory_data(mem_data_in),
       .memory_data_valid(mem_data_valid),
@@ -98,16 +98,16 @@ module memory_system_tb();
   assign EX_MEM_MemWrite = EX_MEM_out[0];
 
   /* Model the memory */
-  memory4c iMAIN_MEM (
-    .clk(clk),
-    .rst(rst),
-    .enable(mem_en),
-    .addr(mem_addr),
-    .wr(mem_wr),
-    .data_in(mem_data_out),
+  Memory iMAIN_MEM (
+    .clk_i(clk),
+    .rst_i(rst),
+    .enable_i(mem_en),
+    .addr_i(mem_addr),
+    .wr_i(mem_wr),
+    .data_i(mem_data_out),
     
-    .data_valid(mem_data_valid),
-    .data_out(mem_data_in)
+    .data_valid_o(mem_data_valid),
+    .data_o(mem_data_in)
   );
 
   //////////////////////////////////////////////////////////

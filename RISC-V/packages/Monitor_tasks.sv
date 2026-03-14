@@ -16,12 +16,18 @@ package Monitor_tasks;
     STRONG_TAKEN
   } state_t;
 
-  // Struct Definitions for BTB, BHT, cache, and data memory models.
-  // DBP storage formats used by DynamicBranchPredictor:
-  // BHT entry = {tag[DBP_TAG_W-1:0], prediction[1:0], valid}
-  // BTB entry = predicted target address
-  typedef logic [DBP_BHT_ENTRY_W-1:0] model_BHT_t;
-  typedef logic [XLEN-1:0] model_BTB_t;
+  // Struct Definitions for BTB, BHT.
+  typedef struct {
+    addr_t  PC_addr;
+    state_t prediction;
+    logic   valid;
+  } model_BHT_t;
+
+  typedef struct {
+    addr_t PC_addr;
+    addr_t target;
+  } model_BTB_t;
+
 
   // Tag block each entry holds LRU, valid and 6-bit tag along with full address for debugging
   typedef struct {
@@ -79,15 +85,20 @@ package Monitor_tasks;
 
 
   // Task: Dumps contents of DUT and model BHT and BTB memory.
-  task automatic log_BTB_BHT_dump(input model_BHT_t model_BHT[0:BHT_ENTRIES-1],
-                                  input model_BTB_t model_BTB[0:BTB_ENTRIES-1]);
+  task automatic log_BTB_BHT_dump(input model_BHT_t model_BHT[BHT_ENTRIES],
+                                  input model_BTB_t model_BTB[BTB_ENTRIES]);
 
     integer i, file;
     int clock_cycle;
-    logic [DBP_TAG_W-1:0] model_tag_BHT;
-    logic [1:0] model_pred;
-    logic model_valid;
-    logic [XLEN-1:0] model_target;
+    addr_t model_PC_BHT;
+    state_t model_pred;
+    addr_t model_PC_BTB;
+    addr_t model_target;
+
+    // Calculate hex widths for formatting based on the bit widths of the model structures.
+    int BHT_HEX_W    = $bits(model_PC_BHT) / 4;
+    int BTB_HEX_W    = $bits(model_PC_BTB) / 4;
+    int TARGET_HEX_W = $bits(model_target) / 4;
 
     begin
       // Calculate the clock cycle
@@ -106,7 +117,7 @@ package Monitor_tasks;
       $fdisplay(file,
                 "===============================================================================");
       $fdisplay(file,
-                "|        DYNAMIC BRANCH PREDICTOR MEMORY DUMP - CLOCK CYCLE %0d               |",
+                "|        DYNAMIC BRANCH PREDICTOR MEMORY DUMP - CLOCK CYCLE %0d                |",
                 clock_cycle);
       $fdisplay(file,
                 "===============================================================================");
@@ -116,18 +127,24 @@ package Monitor_tasks;
                 "                 BHT                 |                   BTB                  ");
       $fdisplay(file,
                 "-------------------------------------|----------------------------------------");
-      $fdisplay(file, "      TAG         | PRED | V         | TARGET              ");
+      $fdisplay(file,
+                "    IF_ID_PC_curr | PREDICTION       |      IF_ID_PC_curr |    TARGET            ");
 
       for (i = 0; i < BHT_ENTRIES; i = i + 1) begin
-        // Fetch values from Model and DUT  
-        model_tag_BHT = model_BHT[i][DBP_BHT_ENTRY_W-1:3];
-        model_pred = model_BHT[i][2:1];
-        model_valid = model_BHT[i][0];
-        model_target = model_BTB[i];
+        // Fetch values from Model and DUT
+        model_PC_BHT = model_BHT[i].PC_addr;
+        model_pred   = model_BHT[i].prediction;
+
+        model_PC_BTB = model_BTB[i].PC_addr;
+        model_target = model_BTB[i].target;
 
         // Write to File with newline
-        $fdisplay(file, "        0x%0h      %2b   %1b       | 0x%0h", model_tag_BHT, model_pred,
-                  model_valid, model_target);
+        $fwrite(file, "     0x%h         %2b           |", (model_PC_BHT === 'x) ? {$bits
+                (model_PC_BHT) {1'bx}} : model_PC_BHT, model_pred);
+
+        $fdisplay(file, "       0x%h      0x%h", (model_PC_BTB === 'x) ? {$bits(model_PC_BTB)
+                  {1'bx}} : model_PC_BTB, (model_target === 'x) ? {$bits(model_target)
+                  {1'bx}} : model_target);
       end
 
       $fdisplay(file, "\n");

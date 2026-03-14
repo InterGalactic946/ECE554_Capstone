@@ -11,6 +11,7 @@
 package Verification_tasks;
 
   import Monitor_tasks::*;
+  import Core_Cfg_pkg::*;
 
   // Task to initialize testbench signals.
   task automatic Initialize(ref logic clk, ref logic rst_n);
@@ -41,11 +42,11 @@ package Verification_tasks;
 
   // Task: A task to verify the FETCH stage.
   task automatic verify_FETCH(
-      input logic PC_stall, expected_PC_stall, I_cache_stall, WaySelect, input logic [5:0] set,
-      input logic [31:0] PC_next, expected_PC_next, input logic [31:0] PC_inst, expected_PC_inst,
-      cache_addr, cache_data, input logic [31:0] PC_curr, expected_PC_curr,
-      input logic [1:0] prediction, expected_prediction, input logic predicted_taken,
-      expected_predicted_taken, input logic [31:0] predicted_target, expected_predicted_target,
+      input logic PC_stall, input logic expected_PC_stall, I_cache_stall, WaySelect, input logic [CACHE_SET_IDX_W-1:0] set,
+      input addr_t PC_next, input addr_t expected_PC_next, input inst_t PC_inst, input inst_t expected_PC_inst,
+      input addr_t cache_addr, input xlen_t cache_data, input addr_t PC_curr, input addr_t expected_PC_curr,
+      input logic [1:0] prediction, input logic [1:0] expected_prediction, input logic predicted_taken, 
+      input logic expected_predicted_taken, input addr_t predicted_target, input addr_t expected_predicted_target,
       output string fetch_msg);
     begin
       // Stores the state of the prediction.

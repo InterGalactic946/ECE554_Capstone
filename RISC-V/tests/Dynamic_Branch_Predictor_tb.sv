@@ -1,14 +1,17 @@
-///////////////////////////////////////////////////////////////////////
-// DynamicBranchPredictor_tb.v: Testbench for the Dynamic Branch     //
-// Predictor module with BHT and BTB. This testbench verifies the    //
-// functionality of the branch predictor by applying various test    //
-// cases and checking the outputs, including both correct and        //
-// mispredicted branch predictions, by comparing against a model DBP //
-///////////////////////////////////////////////////////////////////////
-
+//-------------------------------------------------------------
+// Module: Dynamic_Branch_Predictor_tb
+// Description: Testbench for the Dynamic Branch Predictor.
+//              Generates randomized branch instruction patterns,
+//              applies them to the predictor, and verifies the
+//              predictions against a reference model.
+// Author: Srivibhav Jonnalagadda
+// Date: 03-13-2026
+// -------------------------------------------------------------
 import Monitor_tasks::*;
+import Core_Cfg_pkg::*;
 
-module DynamicBranchPredictor_tb();
+
+module Dynamic_Branch_Predictor_tb();
 
   logic clk;                              // Clock signal
   logic rst;                              // Reset signal
@@ -21,11 +24,11 @@ module DynamicBranchPredictor_tb();
   logic is_branch;                        // Flag to indicate if the previous instruction was a branch
   
   logic actual_taken;                     // Flag indicating whether the branch was actually taken
-  logic [15:0] actual_target;             // Actual target address of the branch
+  addr_t actual_target;                   // Actual target address of the branch
   logic [1:0] IF_ID_prediction;           // Pipelined predicted signal passed to the decode stage
-  logic [15:0] IF_ID_predicted_target;    // Predicted target passed to the decode stage
-  logic [15:0] PC_curr;                   // Current PC value
-  logic [15:0] IF_ID_PC_curr;             // IF/ID stage current PC value
+  addr_t IF_ID_predicted_target;          // Predicted target passed to the decode stage
+  addr_t PC_curr;                         // Current PC value
+  addr_t IF_ID_PC_curr;                   // IF/ID stage current PC value
 
   logic mispredicted;                     // Indicates previous instruction's fetch mispredicted.
   logic target_miscomputed;               // Indicates previous instruction's fetch miscomputed the target.
@@ -59,45 +62,45 @@ module DynamicBranchPredictor_tb();
 
   wire predicted_taken;                   // The predicted value of the current instruction.
   wire [1:0] prediction;                  // The 2-bit predicted taken flag from the predictor
-  wire [15:0] predicted_target;           // The predicted target address from the predictor
+  addr_t predicted_target;                // The predicted target address from the predictor
   wire expected_predicted_taken;          // The expected predicted taken value from the model DBP
   wire [1:0] expected_prediction;         // The expected prediction from the model DBP
-  wire [15:0] expected_predicted_target;  // The expected predicted target address from from the model DBP
+  addr_t expected_predicted_target;       // The expected predicted target address from from the model DBP
 
   // Instantiate the DUT: Dynamic Branch Predictor.
   Dynamic_Branch_Predictor iDUT (
-    .clk_i(clk), 
-    .rst_i(rst), 
-    .PC_curr_i(PC_curr), 
-    .IF_ID_PC_curr_i(IF_ID_PC_curr), 
-    .IF_ID_prediction_i(IF_ID_prediction), 
+    .clk_i(clk),
+    .rst_i(rst),
+    .PC_curr_i(PC_curr),
+    .IF_ID_PC_curr_i(IF_ID_PC_curr),
+    .IF_ID_prediction_i(IF_ID_prediction),
     .enable_i(enable),
     .wen_BTB_i(wen_BTB),
     .wen_BHT_i(wen_BHT),
     .actual_taken_i(actual_taken),
-    .actual_target_i(actual_target),  
-    
+    .actual_target_i(actual_target),
+
     .predicted_taken_o(predicted_taken),
-    .prediction_o(prediction), 
+    .prediction_o(prediction),
     .predicted_target_o(predicted_target)
   );
 
   // Instantiate the model dynamic branch predictor.
-  DynamicBranchPredictor_model iDBP_model (
-    .clk(clk), 
-    .rst(rst), 
-    .PC_curr(PC_curr), 
-    .IF_ID_PC_curr(IF_ID_PC_curr), 
-    .IF_ID_prediction(IF_ID_prediction), 
-    .enable(enable),
-    .wen_BTB(wen_BTB),
-    .wen_BHT(wen_BHT),
-    .actual_taken(actual_taken),
-    .actual_target(actual_target),  
-    
-    .predicted_taken(expected_predicted_taken),
-    .prediction(expected_prediction), 
-    .predicted_target(expected_predicted_target)
+  Dynamic_Branch_Predictor_model iDBP_model (
+    .clk_i(clk),
+    .rst_i(rst),
+    .PC_curr_i(PC_curr),
+    .IF_ID_PC_curr_i(IF_ID_PC_curr),
+    .IF_ID_prediction_i(IF_ID_prediction),
+    .enable_i(enable),
+    .wen_BTB_i(wen_BTB),
+    .wen_BHT_i(wen_BHT),
+    .actual_taken_i(actual_taken),
+    .actual_target_i(actual_target),
+
+    .predicted_taken_o(expected_predicted_taken),
+    .prediction_o(expected_prediction),
+    .predicted_target_o(expected_predicted_target)
   );
 
   // A task to verify the prediction and target.
@@ -145,7 +148,7 @@ module DynamicBranchPredictor_tb();
       enable = 1'b1;           // Enable the branch predictor
       is_branch = 1'b0;        // Initially no branch
       actual_taken = 1'b0;     // Initially the branch is not taken
-      actual_target = 16'h0000; // Set target to 0 initially
+      actual_target = '0;      // Set target to 0 initially
 
       // Initialize counter values.
       predicted_taken_actual_not_count       = 0;
@@ -241,16 +244,16 @@ module DynamicBranchPredictor_tb();
   always 
     #5 clk = ~clk; // toggle clock every 5 time units.
 
-  always @(posedge clk) begin
+  always_ff @(posedge clk) begin
     if (rst)
-      PC_curr <= 16'h0000;
+      PC_curr <= '0;
     else if (enable) begin
       if (update_PC)
         PC_curr <= actual_target;
       else if (expected_prediction[1])
         PC_curr <= expected_predicted_target;
       else
-        PC_curr <= PC_curr + 16'h0002;
+        PC_curr <= PC_curr + ILEN_BYTES;
     end
   end
 
@@ -262,30 +265,30 @@ module DynamicBranchPredictor_tb();
     case (test_counter % 8)
       0, 1: begin
         // 25% of the time: Randomize whether it's a branch.
-        is_branch <= $random % 2;
+        is_branch <= $urandom % 2;
       end
       
       2, 3: begin
         // 25% of the time: Randomize actual taken status.
-        actual_taken <= $random % 2;
+        actual_taken <= $urandom % 2;
       end
 
       4, 5: begin
         // 25% of the time: Randomize actual target (only if taken).
-        actual_target <= (actual_taken) ? (16'h0000 + ($random % (num_tests != 0 ? num_tests : 1)) * 2) : 16'h0000;
+        actual_target <= (actual_taken) ? ('0 + ($urandom % (num_tests !== 0 ? num_tests : 1)) * 2) : '0;
       end
 
       6: begin
         // 12.5% of the time: Randomize enable.
-        enable <= $random % 2;
+        enable <= $urandom % 2;
       end
 
       default: begin
         // 12.5% of the time: Randomize all relevant control signals.
-        is_branch <= $random % 2;
-        actual_taken <= $random % 2;
-        actual_target <= (actual_taken) ? (16'h0000 + ($random % (num_tests != 0 ? num_tests : 1)) * 2) : 16'h0000;
-        enable <= $random % 2;
+        is_branch <= $urandom % 2;
+        actual_taken <= $urandom % 2;
+        actual_target <= (actual_taken) ? ('0 + ($urandom % (num_tests !== 0 ? num_tests : 1)) * 2) : '0;
+        enable <= $urandom % 2;
       end
     endcase
   end
@@ -343,23 +346,23 @@ module DynamicBranchPredictor_tb();
 
 
   // Model the PC curr register.
-  always @(posedge clk)
+  always_ff @(posedge clk)
     if (rst)
-      IF_ID_PC_curr <= 16'h0000;
+      IF_ID_PC_curr <= '0;
     else if (enable)
       IF_ID_PC_curr <= PC_curr;
   
   // Model the prediction register.
-  always @(posedge clk)
+  always_ff @(posedge clk)
     if (rst)
       IF_ID_prediction <= 2'b00;
     else if (enable)
       IF_ID_prediction <= expected_prediction;
   
   // Model the prediction target register.
-  always @(posedge clk)
+  always_ff @(posedge clk)
     if (rst)
-      IF_ID_predicted_target <= 16'h0000;
+      IF_ID_predicted_target <= '0;
     else if (enable)
       IF_ID_predicted_target <= expected_predicted_target;
   
@@ -367,10 +370,10 @@ module DynamicBranchPredictor_tb();
   assign branch_taken = (is_branch & actual_taken);
 
   // It is mispredicted when the predicted taken value doesn't match the actual taken value.
-  assign mispredicted = (IF_ID_prediction[1] != actual_taken);
+  assign mispredicted = (IF_ID_prediction[1] !== actual_taken);
 
   // A target is miscomputed when the predicted target differs from the actual target.
-  assign target_miscomputed = (IF_ID_predicted_target != actual_target);
+  assign target_miscomputed = (IF_ID_predicted_target !== actual_target);
 
   // Update BTB whenever the it is a branch and it is actually taken or when the target was miscomputed.
   assign wen_BTB = (is_branch) & ((actual_taken) & (target_miscomputed));

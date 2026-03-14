@@ -1,31 +1,33 @@
-////////////////////////////////////////////////////////////////////
-// Fetch_tb.sv: Testbench for the Fetch Stage of the CPU          //
-// Verifies functionality by comparing outputs with a scoreboard  //
-// class.                                                         //
-////////////////////////////////////////////////////////////////////
-
+// ------------------------------------------------------------
+// Module: Fetch_tb
+// Description: Testbench for the Fetch module. It tests the
+//              functionality of the instruction fetch stage.
+// Author: Srivibhav Jonnalagadda
+// Date: 03-14-2026
+// ------------------------------------------------------------
 import Monitor_tasks::*;
 import Verification_tasks::*;
+import Core_Cfg_pkg::*;
 
 module Fetch_tb();
 
   logic clk;                              // Clock signal
   logic rst;                              // Reset signal
-  
+
   logic enable;                           // Enable signal for the branch predictor
   logic wen_BTB;                          // Write enable for BTB (Branch Target Buffer) (from the decode stage)
   logic wen_BHT;                          // Write enable for BHT (Branch History Table) (from the decode stage)
   logic update_PC;                        // Signal to update the PC with the actual target
 
   logic is_branch;                        // Flag to indicate if the previous instruction was a branch
-  
+
   logic actual_taken;                     // Flag indicating whether the branch was actually taken
   string fetch_msg;                       // Systematically prints out the state of the instruction fetched
-  logic [31:0] actual_target;             // Actual target address
-  logic [31:0] branch_target;             // Actual target address for the branch instruction
+  addr_t actual_target;                   // Actual target address
+  addr_t branch_target;                   // Actual target address for the branch instruction
   logic [1:0] IF_ID_prediction;           // Pipelined predicted signal passed to the decode stage
-  logic [31:0] IF_ID_predicted_target;    // Predicted target passed to the decode stage
-  logic [31:0] IF_ID_PC_curr;             // IF/ID stage current PC value
+  addr_t IF_ID_predicted_target;          // Predicted target passed to the decode stage
+  addr_t IF_ID_PC_curr;                   // IF/ID stage current PC value
 
   logic mispredicted;                     // Indicates previous instruction's fetch mispredicted.
   logic target_miscomputed;               // Indicates previous instruction's fetch miscomputed the target.
@@ -41,38 +43,37 @@ module Fetch_tb();
   integer stalls;                                 // Number of PC stall cycles due to pipeline bubbles or hazards.
   integer branch_count;                           // Number of branch instructions executed.
   integer num_tests;                              // Number of test cases to execute.
-    
-  logic [31:0] PC_next;                   // Computed next PC value
-  logic [31:0] PC_curr;                   // Current PC value
-  logic [1:0] prediction;                 // The 2-bit predicted taken flag from the predictor
-  logic [31:0] predicted_target;          // The predicted target address from the predictor
 
-  logic [31:0] PC_inst;                   // Instruction fetched from the current PC address
-  logic [31:0] expected_PC_inst;          // Expected instruction fetched from the current PC address
+  addr_t PC_next;                         // Computed next PC value
+  addr_t PC_curr;                         // Current PC value
+  logic [1:0] prediction;                 // The 2-bit predicted taken flag from the predictor
+  addr_t predicted_target;                // The predicted target address from the predictor
+
+  inst_t PC_inst;                         // Instruction fetched from the current PC address
+  inst_t expected_PC_inst;                // Expected instruction fetched from the current PC address
   logic ICACHE_hit;                       // Indicates if the instruction cache hit
   logic ICACHE_miss;                      // Indicates if the instruction cache miss
   logic ICACHE_miss_mem_en;               // Enable signal for main memory access on cache miss
-  logic [31:0] I_MEM_addr;                // Address for instruction memory access
+  addr_t I_MEM_addr;                      // Address for instruction memory access
 
-  logic [31:0] mem_addr;                  // Address for main memory access
+  addr_t mem_addr;                        // Address for main memory access
   logic mem_en;                           // Enable signal for main memory access
   logic mem_wr;                           // Write enable signal for main memory access
-  logic [31:0] mem_data_out;              // Data output to main memory
-  logic [31:0] mem_data_in;               // Data input from main memory
-  logic [15:0] mem_addr_legacy;           // Legacy memory address
+  xlen_t mem_data_out;                    // Data output to main memory
+  xlen_t mem_data_in;                     // Data input from main memory
   logic [15:0] mem_data_out_legacy;       // Legacy memory data out
   logic mem_data_valid;                   // Indicates if the memory data is valid        
 
-  logic [31:0] expected_PC_next;          // The expected computed next PC value
-  logic [31:0] expected_PC_curr;          // The expected current PC value
+  addr_t expected_PC_next;                // The expected computed next PC value
+  addr_t expected_PC_curr;                // The expected current PC value
   logic [1:0] expected_prediction;        // The expected prediction from the model DBP
-  logic [31:0] expected_predicted_target; // The expected predicted target address from from the model DBP
+  addr_t expected_predicted_target;       // The expected predicted target address from from the model DBP
 
   // Instantiate the DUT: Dynamic Branch Predictor.
   Fetch iDUT (
-    .clk_i(clk), 
-    .rst_i(rst), 
-    .stall_i(enable), 
+    .clk_i(clk),
+    .rst_i(rst),
+    .stall_i(enable),
     .actual_taken_i(actual_taken),
     .wen_BHT_i(wen_BHT),
     .branch_target_i(branch_target),
@@ -81,8 +82,8 @@ module Fetch_tb();
     .update_PC_i(update_PC),
     .IF_ID_PC_curr_i(IF_ID_PC_curr),
     .IF_ID_prediction_i(IF_ID_prediction),
-      
-    .PC_next_o(PC_next), 
+
+    .PC_next_o(PC_next),
     .PC_curr_o(PC_curr),
     .prediction_o(prediction),
     .predicted_target_o(predicted_target)
@@ -96,12 +97,12 @@ module Fetch_tb();
       .proceed(1'b1),
       .on_chip_wr(1'b0),
       .on_chip_memory_address(expected_PC_next),
-      .on_chip_memory_data(32'h0000_0000),
+      .on_chip_memory_data('0),
 
       .off_chip_memory_data(mem_data_out),
       .memory_data_valid(mem_data_valid),
 
-      .off_chip_memory_address(I_MEM_addr),      
+      .off_chip_memory_address(I_MEM_addr),
       .miss_mem_en(ICACHE_miss_mem_en),
 
       .data_out(expected_PC_inst),
@@ -109,16 +110,16 @@ module Fetch_tb();
   );
 
   // Instantiate main memory (legacy memory4c adapter).
-  memory4c iMAIN_MEM (
-    .clk(clk),
-    .rst(rst),
-    .enable(mem_en),
-    .addr(mem_addr_legacy),
-    .wr(mem_wr),
-    .data_in(16'h0000),
-    
-    .data_valid(mem_data_valid),
-    .data_out(mem_data_out_legacy)
+  Memory iMAIN_MEM (
+    .clk_i(clk),
+    .rst_i(rst),
+    .enable_i(mem_en),
+    .addr_i(mem_addr),
+    .wr_i(mem_wr),
+    .data_i('0),
+
+    .data_valid_o(mem_data_valid),
+    .data_o(mem_data_out)
   );
 
   //////////////////////////////////////////////////////////
@@ -129,8 +130,6 @@ module Fetch_tb();
 
   // We send out the main memory address as from the instruction cache or data cache based on which is granted.
   assign mem_addr = I_MEM_addr;
-  assign mem_addr_legacy = mem_addr[15:0];
-  assign mem_data_out = {16'h0000, mem_data_out_legacy};
 
   // We enable main memory either on a cache miss (when either caches are allowed to proceed) or on a DCACHE write hit.
   assign mem_en = ICACHE_miss_mem_en;
@@ -141,22 +140,22 @@ module Fetch_tb();
 
   // Instantiate the model fetch unit.
   Fetch_model iMODEL (
-    .clk(clk), 
-    .rst(rst), 
-    .stall(enable), 
-    .actual_taken(actual_taken),
-    .wen_BHT(wen_BHT),
-    .branch_target(branch_target),
-    .wen_BTB(wen_BTB),
-    .actual_target(actual_target),
-    .update_PC(update_PC),
-    .IF_ID_PC_curr(IF_ID_PC_curr),
-    .IF_ID_prediction(IF_ID_prediction),
-      
-    .PC_next(expected_PC_next), 
-    .PC_curr(expected_PC_curr),
-    .prediction(expected_prediction),
-    .predicted_target(expected_predicted_target)
+    .clk_i(clk),
+    .rst_i(rst),
+    .stall_i(enable),
+    .actual_taken_i(actual_taken),
+    .wen_BHT_i(wen_BHT),
+    .branch_target_i(branch_target),
+    .wen_BTB_i(wen_BTB),
+    .actual_target_i(actual_target),
+    .update_PC_i(update_PC),
+    .IF_ID_PC_curr_i(IF_ID_PC_curr),
+    .IF_ID_prediction_i(IF_ID_prediction),
+
+    .PC_next_o(expected_PC_next),
+    .PC_curr_o(expected_PC_curr),
+    .prediction_o(expected_prediction),
+    .predicted_target_o(expected_predicted_target)
   );
 
   // At negative edge of clock, verify the predictions match the model.
@@ -171,17 +170,17 @@ module Fetch_tb();
               .WaySelect(iINSTR_MEM_CACHE.iL1_CACHE.WaySelect),
               .cache_addr(iINSTR_MEM_CACHE.iL1_CACHE.addr),
               .cache_data(iINSTR_MEM_CACHE.iL1_CACHE.data_in),
-              .PC_next(PC_next), 
-              .expected_PC_next(expected_PC_next), 
-              .PC_inst(expected_PC_inst), 
-              .expected_PC_inst(expected_PC_inst), 
-              .PC_curr(PC_curr), 
-              .expected_PC_curr(expected_PC_curr), 
-              .prediction(prediction), 
+              .PC_next(PC_next),
+              .expected_PC_next(expected_PC_next),
+              .PC_inst(expected_PC_inst),
+              .expected_PC_inst(expected_PC_inst),
+              .PC_curr(PC_curr),
+              .expected_PC_curr(expected_PC_curr),
+              .prediction(prediction),
               .expected_prediction(expected_prediction),
               .predicted_taken(iDUT.predicted_taken),
-              .expected_predicted_taken(iMODEL.predicted_taken), 
-              .predicted_target(predicted_target), 
+              .expected_predicted_taken(iMODEL.predicted_taken),
+              .predicted_target(predicted_target),
               .expected_predicted_target(expected_predicted_target),
               .fetch_msg(fetch_msg)
         );
@@ -204,8 +203,8 @@ module Fetch_tb();
       enable = 1'b1;           // Enable the branch predictor
       is_branch = 1'b0;        // Initially no branch
       actual_taken = 1'b0;     // Initially the branch is not taken
-      actual_target = 32'h0000_0000; // Set target to 0 initially
-      branch_target = 32'h0000_0000; // Set target to 0 initially
+      actual_target = '0; // Set target to 0 initially
+      branch_target = '0; // Set target to 0 initially
       fetch_msg = "";
 
       // Initialize counter values.
@@ -224,7 +223,7 @@ module Fetch_tb();
 
       // Wait for the first clock cycle to assert reset
       @(posedge clk);
-      
+
       // Assert reset
       @(negedge clk) rst = 1'b1;
 
@@ -244,7 +243,7 @@ module Fetch_tb();
       $display("Total branch instructions executed:          %0d", branch_count);
       $display("  └─ Actually taken:                         %0d", actual_taken_count);
       $display("  └─ Actually not taken:                     %0d", branch_count - actual_taken_count);
-      
+
       // Prediction outcomes
       $display("Predicted taken:                             %0d", predicted_taken_count);
       $display("Predicted not taken:                         %0d", predicted_not_taken_count);
@@ -267,7 +266,7 @@ module Fetch_tb();
         $display("Prediction accuracy:                         N/A (no branches)");
       end
       $display("============================================================\n");
-      
+
       // If we reached here it means all tests passed.
       $display("YAHOO!! All tests passed.");
       $stop();
@@ -285,30 +284,30 @@ module Fetch_tb();
     case (test_counter % 8)
       0, 1: begin
         // 25% of the time: Randomize whether it's a branch.
-        is_branch <= $random % 2;
+        is_branch <= $urandom % 2;
       end
-      
+
       2, 3: begin
         // 25% of the time: Randomize actual taken status.
-        actual_taken <= $random % 2;
+        actual_taken <= $urandom % 2;
       end
 
       4, 5: begin
         // 25% of the time: Randomize actual target (only if taken).
-        actual_target <= (actual_taken) ? (32'h0000_0000 + ($random % (num_tests != 0 ? num_tests : 1)) * 2) : 32'h0000_0000;
+        actual_target <= (actual_taken) ? ('0 + ($urandom % (num_tests != 0 ? num_tests : 1)) * 2) : '0;
       end
 
       6: begin
         // 12.5% of the time: Randomize enable.
-        enable <= $random % 2;
+        enable <= $urandom % 2;
       end
 
       default: begin
         // 12.5% of the time: Randomize all relevant control signals.
-        is_branch <= $random % 2;
-        actual_taken <= $random % 2;
-        actual_target <= (actual_taken) ? (32'h0000_0000 + ($random % (num_tests != 0 ? num_tests : 1)) * 2) : 32'h0000_0000;
-        enable <= $random % 2;
+        is_branch <= $urandom % 2;
+        actual_taken <= $urandom % 2;
+        actual_target <= (actual_taken) ? ('0 + ($urandom % (num_tests != 0 ? num_tests : 1)) * 2) : '0;
+        enable <= $urandom % 2;
       end
     endcase
   end
@@ -350,23 +349,23 @@ module Fetch_tb();
   end
 
   // Model the PC curr register.
-  always @(posedge clk)
+  always_ff @(posedge clk)
     if (rst)
-      IF_ID_PC_curr <= 32'h0000_0000;
+      IF_ID_PC_curr <= '0;
     else if (enable)
       IF_ID_PC_curr <= expected_PC_curr;
-  
+
   // Model the prediction register.
-  always @(posedge clk)
+  always_ff @(posedge clk)
     if (rst)
       IF_ID_prediction <= 2'b00;
     else if (enable)
       IF_ID_prediction <= expected_prediction;
-  
+
   // Model the prediction target register.
-  always @(posedge clk)
+  always_ff @(posedge clk)
     if (rst)
-      IF_ID_predicted_target <= 32'h0000_0000;
+      IF_ID_predicted_target <= '0;
     else if (enable)
       IF_ID_predicted_target <= expected_predicted_target;
 
@@ -380,7 +379,7 @@ module Fetch_tb();
   assign target_miscomputed = (IF_ID_predicted_target !== actual_target);
 
   // Update BTB whenever the it is a branch and it is actually taken or when the target was miscomputed.
-  assign wen_BTB = (is_branch) & ((actual_taken) | (target_miscomputed));
+  assign wen_BTB = (is_branch) & ((actual_taken) & (target_miscomputed));
 
   // Update BHT on every branch.
   assign wen_BHT = (is_branch);
