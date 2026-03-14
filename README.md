@@ -37,8 +37,8 @@ A custom out-of-order RISC-V processor serves as the system control plane: it co
 ## **Setup**
 
 1. Review the Hardware Developer Guide and Environment Setup Guide before starting.
-   - Hardware Developer Guide: [https://docs.google.com/document/d/1VRHJHG_KFuNlk5hXbIOxGa4ctv0QYRE6IQTADC8tNUY/edit]
-   - Environment Setup Guide: [https://docs.google.com/document/d/1KB8uardO7TWdqhmX1iiylOPLwSkADvgM9QdCFSwMMS8/edit]
+   - [Hardware Developer Guide](https://docs.google.com/document/d/1VRHJHG_KFuNlk5hXbIOxGa4ctv0QYRE6IQTADC8tNUY/edit)
+   - [Environment Setup Guide](https://docs.google.com/document/d/1KB8uardO7TWdqhmX1iiylOPLwSkADvgM9QdCFSwMMS8/edit)
    
 2. Clone the repository to your local machine:
    ```bash
