@@ -12,20 +12,20 @@
 import Core_Cfg_pkg::*;
 
 module Dynamic_Branch_Predictor (
-    input logic clk_i,  // System clock
-    input logic rst_i,  // Active high reset signal
-    input xlen_t PC_curr_i,  // Current PC address
-    input xlen_t IF_ID_PC_curr_i,  // Pipelined previous PC address
+    input logic clk_i,                     // System clock
+    input logic rst_i,                     // Active high reset signal
+    input xlen_t PC_curr_i,                // Current PC address
+    input xlen_t IF_ID_PC_curr_i,          // Pipelined previous PC address
     input logic [1:0] IF_ID_prediction_i,  // The predicted value of the previous branch inst.
-    input logic enable_i,  // Enable signal for the DynamicBranchPredictor
-    input logic wen_BTB_i,  // Write enable for BTB (Branch Target Buffer) (from the decode stage)
-    input logic wen_BHT_i,  // Write enable for BHT (Branch History Table) (from the decode stage)
-    input logic actual_taken_i,  // Actual branch taken value (from the decode stage)
-    input xlen_t actual_target_i,  // Actual target address for the branch (from the decode stage)
+    input logic enable_i,                  // Enable signal for the DynamicBranchPredictor
+    input logic wen_BTB_i,                 // Write enable for BTB (Branch Target Buffer) (from the decode stage)
+    input logic wen_BHT_i,                 // Write enable for BHT (Branch History Table) (from the decode stage)
+    input logic actual_taken_i,            // Actual branch taken value (from the decode stage)
+    input xlen_t actual_target_i,          // Actual target address for the branch (from the decode stage)
 
-    output logic predicted_taken_o,  // Indicates if the branch is predicted taken (1) or not (0)
-    output logic [1:0] prediction_o,  // 2-bit Predicted branch signal (from BHT)
-    output xlen_t predicted_target_o  // Predicted target address (from BTB)
+    output logic predicted_taken_o,        // Indicates if the branch is predicted taken (1) or not (0)
+    output logic [1:0] prediction_o,       // 2-bit Predicted branch signal (from BHT)
+    output xlen_t predicted_target_o       // Predicted target address (from BTB)
 );
 
   ///////////////////////////////////////

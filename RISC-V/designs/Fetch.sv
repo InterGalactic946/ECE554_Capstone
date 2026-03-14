@@ -52,19 +52,19 @@ module Fetch (
 
   // Instantiate the Dynamic Branch Predictor to get the target branch address cached in the BTB before the decode stage.
   Dynamic_Branch_Predictor iDBP (
-    .clk_i(clk_i), 
-    .rst_i(rst_i), 
-    .PC_curr_i(PC_curr_o), 
-    .IF_ID_PC_curr_i(IF_ID_PC_curr_i), 
-    .IF_ID_prediction_i(IF_ID_prediction_i), 
+    .clk_i(clk_i),
+    .rst_i(rst_i),
+    .PC_curr_i(PC_curr_o),
+    .IF_ID_PC_curr_i(IF_ID_PC_curr_i),
+    .IF_ID_prediction_i(IF_ID_prediction_i),
     .enable_i(enable),
     .wen_BTB_i(wen_BTB_i),
     .wen_BHT_i(wen_BHT_i),
     .actual_taken_i(actual_taken_i),
-    .actual_target_i(actual_target_i),  
-    
+    .actual_target_i(actual_target_i),
+
     .predicted_taken_o(predicted_taken),
-    .prediction_o(prediction_o), 
+    .prediction_o(prediction_o),
     .predicted_target_o(predicted_target_o)
   );
 

@@ -20,14 +20,14 @@ module IF_ID_Pipe_Reg (
     input addr_t PC_curr_i,                 // Current PC from the fetch stage
     input addr_t PC_next_i,                 // Next PC from the fetch stage
     input inst_t PC_inst_i,                 // Current instruction word from the fetch stage
-    input logic [1:0]  prediction_i,        // 2-bit prediction from the fetch stage
+    input logic [1:0] prediction_i,         // 2-bit prediction from the fetch stage
     input addr_t predicted_target_i,        // Predicted target from the BTB
 
-    output addr_t IF_ID_PC_curr_o,                // Pipelined current instruction address passed to the decode stage
-    output addr_t IF_ID_PC_next_o,                // Pipelined next PC passed to the decode stage
-    output inst_t IF_ID_PC_inst_o,                // Pipelined current instruction word passed to the decode stage
-    output logic [1:0]  IF_ID_prediction_o,       // Pipelined 2-bit branch prediction signal passed to the decode stage
-    output addr_t IF_ID_predicted_target_o        // Pipelined predicted target passed to the decode stage
+    output addr_t IF_ID_PC_curr_o,          // Pipelined current instruction address passed to the decode stage
+    output addr_t IF_ID_PC_next_o,          // Pipelined next PC passed to the decode stage
+    output inst_t IF_ID_PC_inst_o,          // Pipelined current instruction word passed to the decode stage
+    output logic [1:0]  IF_ID_prediction_o, // Pipelined 2-bit branch prediction signal passed to the decode stage
+    output addr_t IF_ID_predicted_target_o  // Pipelined predicted target passed to the decode stage
   );
 
   ///////////////////////////////////////////////
@@ -42,7 +42,7 @@ module IF_ID_Pipe_Reg (
   ///////////////////////////////////////
   // We write to the register whenever we don't stall.
   assign wen = ~stall_i;
- 
+
   // We clear the instruction word register whenever we flush or during rst.
   assign clr = flush_i | rst_i;
 
@@ -52,28 +52,28 @@ module IF_ID_Pipe_Reg (
       IF_ID_PC_curr_o <= '0;
     else if (wen)
       IF_ID_PC_curr_o <= PC_curr_i;
-  
+
   // Infer register for storing the next instruction's address.
   always_ff @(posedge clk_i)
     if (rst_i)
       IF_ID_PC_next_o <= '0;
     else if (wen)
       IF_ID_PC_next_o <= PC_next_i;
-  
+
   // Infer register for storing the fetched instruction word (clear the instruction on flush).
   always_ff @(posedge clk_i)
     if (clr)
       IF_ID_PC_inst_o <= '0;
     else if (wen)
       IF_ID_PC_inst_o <= PC_inst_i;
-  
+
   // Infer register for storing the predicted branch taken signal (clear the signal on flush).
   always_ff @(posedge clk_i)
     if (clr)
       IF_ID_prediction_o <= '0;
     else if (wen)
       IF_ID_prediction_o <= prediction_i;
-  
+
   // Infer register for storing the predicted target address (clear the data on flush).
   always_ff @(posedge clk_i)
     if (clr)
