@@ -22,7 +22,7 @@ module Fetch (
     input logic update_PC_i,                   // Signal to update the PC with the actual target
     input addr_t IF_ID_PC_curr_i,              // Pipelined previous PC value (from the fetch stage)
     input logic [1:0] IF_ID_prediction_i,      // The predicted value of the previous branch instruction
-    
+
     output addr_t PC_next_o,                   // Computed next PC value
     output addr_t PC_curr_o,                   // Current PC value
     output logic [1:0] prediction_o,           // The 2-bit predicted value of the current branch instruction
