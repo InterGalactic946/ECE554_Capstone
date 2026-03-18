@@ -33,12 +33,12 @@ module Register_File (
   //////////////////////////////
   // Implement Register_File //
   ////////////////////////////
-  // Hardcode register 0 to always hold 32'h0000_0000.
+  // Hardcode register 0 to always hold 0.
   assign DstData_operand = (DstReg_i == '0) ? '0 : DstData_i;
 
   // Alllow for RF-bypassing by checking if the source register matches the destination register and if a write is enabled.
-  assign SrcData1_o = (WriteReg_i && (DstReg_i == SrcReg1_i)) ? DstData_operand : regfile[SrcReg1_i];
-  assign SrcData2_o = (WriteReg_i && (DstReg_i == SrcReg2_i)) ? DstData_operand : regfile[SrcReg2_i];
+  assign SrcData1_o = (WriteReg_i & (DstReg_i == SrcReg1_i)) ? DstData_operand : regfile[SrcReg1_i];
+  assign SrcData2_o = (WriteReg_i & (DstReg_i == SrcReg2_i)) ? DstData_operand : regfile[SrcReg2_i];
 
   // Synchronously write to the regfile.
   always_ff @(posedge clk_i) begin
