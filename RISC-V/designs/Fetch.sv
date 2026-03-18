@@ -61,7 +61,7 @@ module Fetch (
     .wen_BTB_i(wen_BTB_i),
     .wen_BHT_i(wen_BHT_i),
     .actual_taken_i(actual_taken_i),
-    .actual_target_i(actual_target_i),
+    .actual_target_i(branch_target_i),
 
     .predicted_taken_o(predicted_taken),
     .prediction_o(prediction_o),
