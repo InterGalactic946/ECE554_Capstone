@@ -161,7 +161,7 @@ module Mic_Mode_Fsm (
       nxt_mode = mode;
       wait_cycles = MODECHANGE_CYCLES;
 
-      case (mode)
+      unique case (mode)
         ON_SLEEP: begin
           nxt_mode = final_mode;
           wait_cycles = WAKEUP_CYCLES;
@@ -273,7 +273,7 @@ module Mic_Mode_Fsm (
             ON_STD: begin  // No action
             end
 
-            ON_ULT: begin
+            ON_ULT: begin  // Ensure ULT goes to STD first from OFF.
               nxt_mode = ON_STD;
             end
 
