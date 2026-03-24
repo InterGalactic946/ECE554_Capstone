@@ -399,7 +399,7 @@ def build_dependency_graph():
     MODULE_INST_RE = re.compile(
         r"""
         ^\s*
-        (?!(?:module|else|begin|end|if|for|while|case|always|assign|task|initial|function)\b)
+        (?!(?:module|else|begin|end|if|for|while|case|unique|priority|always|assign|task|initial|function|repeat)\b)
         ([A-Za-z_]\w*)
         \s*
         (?:\#
