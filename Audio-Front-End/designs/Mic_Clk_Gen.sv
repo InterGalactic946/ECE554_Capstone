@@ -1,3 +1,4 @@
+`timescale 1ns / 1ps
 // ------------------------------------------------------------
 // Module: Mic_Clk_Gen
 // Description: The Mic_Clk_Gen generates the microphone clock
@@ -9,7 +10,9 @@
 // Author: Srivibhav Jonnalagadda
 // Date: 03-23-2026
 // ------------------------------------------------------------
-module Mic_Clk_Gen (
+module Mic_Clk_Gen #(
+    parameter int unsigned SYS_CLK_HZ = 50_000_000
+) (
     input logic clk_i,
     input logic rst_i,
     input logic volt_on_i,
@@ -23,6 +26,7 @@ module Mic_Clk_Gen (
   /////////////////////////////////////////////////
   // Declare any internal signals as type logic //
   ///////////////////////////////////////////////
+  logic clk_sleep, clk_low_pwr, clk_std, clk_ult;
   logic [1:0] clk_sel;
   logic clk_en, pll_locked, clk_ctrl_en;
 
@@ -30,7 +34,9 @@ module Mic_Clk_Gen (
   // Submodule instances //
   ////////////////////////
   // Instantiate the FSM to control b/w transitions.
-  Mic_Mode_Fsm iMIC_FSM (
+  Mic_Mode_Fsm #(
+      .SYS_CLK_HZ(SYS_CLK_HZ)
+  ) iMIC_FSM (
       .clk_i(clk_i),
       .rst_i(rst_i),
       .volt_on_i(volt_on_i),
@@ -64,7 +70,7 @@ module Mic_Clk_Gen (
       .inclk0x(clk_sleep),
       .inclk1x(clk_low_pwr),
       .inclk2x(clk_std),
-      .inclk3x(clk_ultra),
+      .inclk3x(clk_ult),
       .clkselect(clk_sel),
       .ena(clk_ctrl_en),
 

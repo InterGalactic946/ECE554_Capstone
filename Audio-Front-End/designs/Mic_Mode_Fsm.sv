@@ -1,6 +1,7 @@
+`timescale 1ns / 1ps
 // ------------------------------------------------------------
 // Module: Mic_Mode_Fsm
-// Description: The Mic_Mode_Fsm controls the microphone’s
+// Description: The Mic_Mode_Fsm controls the microphone's
 //              operating mode by selecting the correct clock
 //              and sequencing transitions. It enforces required
 //              timing delays for power-up, wake-up, and mode
@@ -18,7 +19,8 @@ module Mic_Mode_Fsm (
     // Minimum voltage threshold reached for mic to power on.
     input logic volt_on_i,
 
-    // Requested mode: (mode_req_i[2] -> enable, else off)
+    // Requested mode:
+    // If volt_on_i is high and mode_req_i[2] is low, the mic remains in SLEEP.
     // 00 = sleep
     // 01 = low-power
     // 10 = standard
@@ -37,7 +39,7 @@ module Mic_Mode_Fsm (
     output logic data_val_o
 );
 
-  // Paramters for DUT.
+  // Parameters for DUT.
   parameter int unsigned SYS_CLK_HZ = 50_000_000;
   parameter bit FAST_SIM = 1'b0;
   parameter int unsigned FAST_SIM_DIV = 50_000;
@@ -66,7 +68,7 @@ module Mic_Mode_Fsm (
         scale_cycles  = (scaled_cycles == 0) ? 1 : scaled_cycles;
       end
     end
-  endfunction
+  endfunction : scale_cycles
 
   localparam int unsigned POWERUP_CYCLES = scale_cycles(POWERUP_CYCLES_REAL);
   localparam int unsigned WAKEUP_CYCLES = scale_cycles(WAKEUP_CYCLES_REAL);
@@ -75,7 +77,6 @@ module Mic_Mode_Fsm (
 
   // Maximum counter width is decided by power up cycle count.
   localparam int unsigned WAIT_COUNTER_W = $clog2(POWERUP_CYCLES + 1);
-
 
   ////////////////////////////////////////
   // Declare state types as enumerated //
@@ -108,88 +109,127 @@ module Mic_Mode_Fsm (
   ///////////////////////////////////////////////
   logic [WAIT_COUNTER_W-1:0] wait_cntr, wait_cycles;
   logic set_fsm_busy, fsm_busy, clr_fsm_busy;  // Indicates the FSM is busy processing a mode_req.
-  logic trans_comp, tmr_empty;
-  mode_t prev_mode, mode, nxt_mode, final_mode;
-  logic load, dec;  // Asserts load for 1 pulse to latch counter val, dec asserted till cntr == 0.
-  logic inc_cnt, clr_cnt;  // Switch counter signals to ensure smooth switching between clks.
-  logic mic_en, en, dis;  // Enables or disables the clken.
+  logic settled_trans_comp, pending_trans_comp, tmr_empty;
+  mode_t mode, nxt_mode;  // Holds the last fully settled mic mode.
+  mode_t pending_mode, nxt_pending_mode;  // Holds the mode currently being applied to the clock.
+  mode_t req_mode;  // Holds the combinational physical request decoded from voltage and mode_req_i.
+  mode_t final_mode;  // Holds the final requested mode that the FSM is working toward.
+  logic load_mode, clr_mode;
+  logic load_pending_mode, clr_pending_mode;
+  logic load, dec;  // Asserts load for 1 pulse to latch counter value, dec counts till cntr == 0.
+  logic en, dis;  // Enables or disables the clock enable output.
   logic set_data_val, clr_data_val;
   state_t state, nxt_state;
   //////////////////////////////////////////////
 
-  // Keep track of mode mic was in throughout runtime, intially we assume
-  // mic is OFF upon reset.
+  // Keep track of the last fully settled microphone mode.
   always_ff @(posedge clk_i) begin
     if (rst_i) begin
       mode <= OFF_SLEEP;
-      prev_mode <= OFF_SLEEP;
-    end else begin
+    end else if (clr_mode) begin
+      mode <= OFF_SLEEP;
+    end else if (load_mode) begin
       mode <= nxt_mode;
-      prev_mode <= mode;
     end
   end
 
-  // We completed a transaction when we reached the final mode.
-  assign trans_comp = mode == final_mode;
+  // Keep track of the mode currently being driven onto the microphone clock path.
+  always_ff @(posedge clk_i) begin
+    if (rst_i) begin
+      pending_mode <= OFF_SLEEP;
+    end else if (clr_pending_mode) begin
+      pending_mode <= OFF_SLEEP;
+    end else if (load_pending_mode) begin
+      pending_mode <= nxt_pending_mode;
+    end
+  end
+
+  // We completed a transaction when the settled mode reached the final request.
+  assign settled_trans_comp = (mode == final_mode);
+
+  // We are on the final transition leg when the pending mode is the final request.
+  assign pending_trans_comp = (pending_mode == final_mode);
+
+  // Decode the requested physical mic mode. With power applied, a disabled
+  // request still maps to SLEEP because the datasheet defines sleep as VDD high
+  // with a low-frequency microphone clock.
+  always_comb begin
+    if (!volt_on_i) begin
+      req_mode = OFF_SLEEP;
+    end else if (!mode_req_i[2]) begin
+      req_mode = ON_SLEEP;
+    end else begin
+      req_mode = mode_t'(mode_req_i);
+    end
+  end
 
   // Latch the mode requested as the final mode to ensure we reach the final
   // mode even during intermediate transitions, e.g., OFF -> ULT requires
   // OFF -> STD -> ULT only if FSM is done with a prior transaction.
   always_ff @(posedge clk_i) begin
-    if (rst_i) final_mode <= OFF_SLEEP;
-    else if (!fsm_busy) final_mode <= mode_t'(mode_req_i);
+    if (rst_i) begin
+      final_mode <= OFF_SLEEP;
+    end else if (!fsm_busy) begin
+      final_mode <= req_mode;
+    end
   end
-
-  // Treat mic as enabled only if bit 2 is high.
-  assign mic_en = final_mode[2];
 
   // Count down from the loaded value till it reaches 0 when dec is asserted, otherwise
   // latch the value meant to be counted.
   always_ff @(posedge clk_i) begin
-    if (rst_i) wait_cntr <= '0;
-    else if (load) wait_cntr <= wait_cycles;
-    else if (dec & !tmr_empty) wait_cntr <= wait_cntr - 1'b1;
+    if (rst_i) begin
+      wait_cntr <= '0;
+    end else if (load) begin
+      wait_cntr <= wait_cycles;
+    end else if (dec & ~tmr_empty) begin
+      wait_cntr <= wait_cntr - 1'b1;
+    end
   end
 
   // Counter is empty when we have reached 0.
-  assign tmr_empty = wait_cntr == '0;
+  assign tmr_empty = (wait_cntr == '0);
 
   // Output the clk_en based on dis/en.
   always_ff @(posedge clk_i) begin
-    if (rst_i) clk_en_o <= 1'b0;
-    else if (dis) clk_en_o <= 1'b0;
-    else if (en & mic_en) clk_en_o <= 1'b1;
+    if (rst_i) begin
+      clk_en_o <= 1'b0;
+    end else if (dis) begin
+      clk_en_o <= 1'b0;
+    end else if (en) begin
+      clk_en_o <= 1'b1;
+    end
   end
 
-  // Output the clk_select (curr_mode) based on the current mode.
+  // Output the settled mode as status and the pending mode as the clock-select request.
   assign curr_mode_o = mode[1:0];
-  assign clk_sel_o   = curr_mode_o;
+  assign clk_sel_o   = pending_mode[1:0];
 
   // ====================================================================
   // Functions to help manage state transitions and mode change requests
   // ====================================================================
-  function automatic logic is_active_mode(input mode_t mode);
+  function automatic logic is_active_mode(input mode_t mic_mode);
     begin
-      is_active_mode = (mode == ON_LOW_PWR) || (mode == ON_STD) || (mode == ON_ULT);
+      is_active_mode = (mic_mode == ON_LOW_PWR) || (mic_mode == ON_STD) || (mic_mode == ON_ULT);
     end
-  endfunction
+  endfunction : is_active_mode
 
-  // Computes the next mode and wait cycles according to the current mode and final mode requested.
-  function automatic void comp_nxt_mode_config(input mode_t mode, input mode_t final_mode,
-                                               output mode_t nxt_mode,
-                                               output logic [WAIT_COUNTER_W-1:0] wait_cycles);
+  // Computes the next pending mode and wait cycles according to the current settled mode
+  // and final mode requested.
+  function automatic void comp_pending_mode_config(
+      input mode_t mode, input mode_t final_mode, output mode_t pending_mode_cfg,
+      output logic [WAIT_COUNTER_W-1:0] wait_cycles_cfg);
     begin
-      nxt_mode = mode;
-      wait_cycles = MODECHANGE_CYCLES;
+      pending_mode_cfg = mode;
+      wait_cycles_cfg  = MODECHANGE_CYCLES;
 
       unique case (mode)
         ON_SLEEP: begin
-          nxt_mode = final_mode;
-          wait_cycles = WAKEUP_CYCLES;
+          pending_mode_cfg = final_mode;
+          wait_cycles_cfg  = WAKEUP_CYCLES;
 
           unique case (final_mode)
             ON_SLEEP: begin
-              wait_cycles = '0;
+              wait_cycles_cfg = '0;
             end
 
             ON_LOW_PWR: begin  // No action
@@ -199,26 +239,26 @@ module Mic_Mode_Fsm (
             end
 
             ON_ULT: begin  // Ensure ULT goes to STD first from SLEEP.
-              nxt_mode = ON_STD;
+              pending_mode_cfg = ON_STD;
             end
 
             default: begin  // OFF state
-              wait_cycles = MODECHANGE_CYCLES;
+              wait_cycles_cfg = MODECHANGE_CYCLES;
             end
           endcase
         end
 
         ON_LOW_PWR: begin
-          nxt_mode = final_mode;
-          wait_cycles = MODECHANGE_CYCLES;
+          pending_mode_cfg = final_mode;
+          wait_cycles_cfg  = MODECHANGE_CYCLES;
 
           unique case (final_mode)
             ON_SLEEP: begin
-              wait_cycles = FALLASLEEP_CYCLES;
+              wait_cycles_cfg = FALLASLEEP_CYCLES;
             end
 
             ON_LOW_PWR: begin
-              wait_cycles = '0;
+              wait_cycles_cfg = '0;
             end
 
             ON_STD: begin  // No action
@@ -233,19 +273,19 @@ module Mic_Mode_Fsm (
         end
 
         ON_STD: begin
-          nxt_mode = final_mode;
-          wait_cycles = MODECHANGE_CYCLES;
+          pending_mode_cfg = final_mode;
+          wait_cycles_cfg  = MODECHANGE_CYCLES;
 
           unique case (final_mode)
             ON_SLEEP: begin
-              wait_cycles = FALLASLEEP_CYCLES;
+              wait_cycles_cfg = FALLASLEEP_CYCLES;
             end
 
             ON_LOW_PWR: begin  // No action
             end
 
             ON_STD: begin
-              wait_cycles = '0;
+              wait_cycles_cfg = '0;
             end
 
             ON_ULT: begin  // No action
@@ -257,12 +297,12 @@ module Mic_Mode_Fsm (
         end
 
         ON_ULT: begin
-          nxt_mode = final_mode;
-          wait_cycles = MODECHANGE_CYCLES;
+          pending_mode_cfg = final_mode;
+          wait_cycles_cfg  = MODECHANGE_CYCLES;
 
           unique case (final_mode)
             ON_SLEEP: begin
-              wait_cycles = FALLASLEEP_CYCLES;
+              wait_cycles_cfg = FALLASLEEP_CYCLES;
             end
 
             ON_LOW_PWR: begin  // No action
@@ -272,7 +312,7 @@ module Mic_Mode_Fsm (
             end
 
             ON_ULT: begin  // No action
-              wait_cycles = '0;
+              wait_cycles_cfg = '0;
             end
 
             default: begin  // OFF state - no action
@@ -281,8 +321,8 @@ module Mic_Mode_Fsm (
         end
 
         default: begin  // OFF states
-          nxt_mode = final_mode;
-          wait_cycles = POWERUP_CYCLES;
+          pending_mode_cfg = final_mode;
+          wait_cycles_cfg  = POWERUP_CYCLES;
 
           unique case (final_mode)
             ON_SLEEP: begin  // No action
@@ -295,57 +335,71 @@ module Mic_Mode_Fsm (
             end
 
             ON_ULT: begin  // Ensure ULT goes to STD first from OFF.
-              nxt_mode = ON_STD;
+              pending_mode_cfg = ON_STD;
             end
 
             default: begin  // OFF - stay in OFF.
-              wait_cycles = '0;
+              wait_cycles_cfg = '0;
             end
           endcase
         end
       endcase
     end
-  endfunction
+  endfunction : comp_pending_mode_config
 
   /////////////////////////////////////
   // Implements State Machine Logic //
   ///////////////////////////////////
   always_ff @(posedge clk_i) begin
-    if (rst_i) state <= IDLE;
-    else state <= nxt_state;
+    if (rst_i) begin
+      state <= IDLE;
+    end else begin
+      state <= nxt_state;
+    end
   end
 
   // Ensures the busy signal is set accordingly.
   always_ff @(posedge clk_i) begin
-    if (rst_i) fsm_busy <= 1'b0;
-    else if (clr_fsm_busy) fsm_busy <= 1'b0;
-    else if (set_fsm_busy) fsm_busy <= 1'b1;
+    if (rst_i) begin
+      fsm_busy <= 1'b0;
+    end else if (clr_fsm_busy) begin
+      fsm_busy <= 1'b0;
+    end else if (set_fsm_busy) begin
+      fsm_busy <= 1'b1;
+    end
   end
 
-  // Output data valid when reached final mode requested.
+  // Output data valid only when the newly settled mode is active.
   always_ff @(posedge clk_i) begin
-    if (rst_i) data_val_o <= 1'b0;
-    else if (clr_data_val) data_val_o <= 1'b0;
-    else if (set_data_val) data_val_o <= is_active_mode(mode);
+    if (rst_i) begin
+      data_val_o <= 1'b0;
+    end else if (clr_data_val) begin
+      data_val_o <= 1'b0;
+    end else if (set_data_val) begin
+      data_val_o <= is_active_mode(nxt_mode);
+    end
   end
 
   //////////////////////////////////////////////////////////////////////////////////////////
-  // Implements the combinational state transition and output logic of the state machine.//
+  // Implements the combinational state transition and output logic of the state machine. //
   ////////////////////////////////////////////////////////////////////////////////////////
   always_comb begin
     nxt_state = state;
     nxt_mode = mode;
+    nxt_pending_mode = pending_mode;
     wait_cycles = '0;
     clr_fsm_busy = 1'b0;
     set_fsm_busy = 1'b0;
+    load_mode = 1'b0;
+    clr_mode = 1'b0;
+    load_pending_mode = 1'b0;
+    clr_pending_mode = 1'b0;
     load = 1'b0;
     dec = 1'b0;
     en = 1'b0;
     dis = 1'b0;
     set_data_val = 1'b0;
     clr_data_val = 1'b0;
-    inc_cnt = 1'b0;
-    clr_cnt = 1'b0;
 
     case (state)
       CLK_DIS: begin
@@ -353,8 +407,9 @@ module Mic_Mode_Fsm (
         nxt_state = CLK_SEL;
       end
 
-      CLK_SEL: begin  // Passthrough state to ensure we select the correct clock to output.
-        nxt_state = CLK_EN;
+      CLK_SEL: begin
+        // Enable the clock only if required to otherwise don't.
+        nxt_state = (pending_mode[2]) ? CLK_EN : WAIT;
       end
 
       CLK_EN: begin
@@ -364,30 +419,40 @@ module Mic_Mode_Fsm (
 
       WAIT: begin
         if (volt_on_i) begin  // Ensure brownout did not occur.
-          if (pll_locked_i) begin  // Ensure clk is locked before counting.
+          // OFF-mode transitions do not require a valid PLL lock because the
+          // clock stays disabled on that transition leg.
+          if (~pending_mode[2] | pll_locked_i) begin
             dec = 1'b1;
 
             // Only go to the RUN state if we reached the final mode after waiting,
-            // else wait again to finish intermediate transition.
-            if (tmr_empty & trans_comp) begin
+            // else wait again to finish an intermediate transition.
+            if (tmr_empty & pending_trans_comp) begin
+              load_mode = 1'b1;
+              nxt_mode = pending_mode;
               clr_fsm_busy = 1'b1;
               set_data_val = 1'b1;
               nxt_state = RUN;
             end else if (tmr_empty) begin
-              // Get the nxt mode config.
-              comp_nxt_mode_config(mode, final_mode, nxt_mode, wait_cycles);
+              // First settle into the completed pending mode.
+              load_mode = 1'b1;
+              nxt_mode  = pending_mode;
 
-              // load the next counter to wait for.
+              // Then compute the next pending mode based on the newly settled mode.
+              comp_pending_mode_config(pending_mode, final_mode, nxt_pending_mode, wait_cycles);
+              load_pending_mode = 1'b1;
+
+              // Load the next counter to wait for.
               load = 1'b1;
 
               // Disable the old clock, enable the new clock.
               nxt_state = CLK_DIS;
             end
           end else begin
-            // Ensure we start over the counter if we lost lock based on the previous mode we were in.
-            comp_nxt_mode_config(prev_mode, final_mode, nxt_mode, wait_cycles);
+            // Ensure we start over the counter using the current settled mode if we lost lock.
+            comp_pending_mode_config(mode, final_mode, nxt_pending_mode, wait_cycles);
+            load_pending_mode = 1'b1;
 
-            // load the next counter to wait for.
+            // Load the next counter to wait for.
             load = 1'b1;
 
             // Disable the old clock, enable the new clock.
@@ -398,7 +463,8 @@ module Mic_Mode_Fsm (
           dis = 1'b1;
           clr_data_val = 1'b1;
           clr_fsm_busy = 1'b1;
-          nxt_mode = OFF_SLEEP;
+          clr_mode = 1'b1;
+          clr_pending_mode = 1'b1;
           nxt_state = IDLE;
         end
       end
@@ -406,17 +472,18 @@ module Mic_Mode_Fsm (
       RUN: begin
         if (volt_on_i) begin
           if (pll_locked_i) begin
-            if (!trans_comp) begin
+            if (!settled_trans_comp) begin
               // Clear the data_valid signal.
               clr_data_val = 1'b1;
 
               // Set the busy signal.
               set_fsm_busy = 1'b1;
 
-              // Go to the new requested mode.
-              comp_nxt_mode_config(mode, final_mode, nxt_mode, wait_cycles);
+              // Compute the pending mode to begin driving while we wait to settle.
+              comp_pending_mode_config(mode, final_mode, nxt_pending_mode, wait_cycles);
+              load_pending_mode = 1'b1;
 
-              // load the next counter to wait for.
+              // Load the counter value computed.
               load = 1'b1;
 
               // Disable the old clock, enable the new clock.
@@ -426,13 +493,14 @@ module Mic_Mode_Fsm (
             // Clear the data_valid signal.
             clr_data_val = 1'b1;
 
-            // Ensure we start over the counter if we lost lock based on the previous mode we were in.
-            comp_nxt_mode_config(prev_mode, final_mode, nxt_mode, wait_cycles);
+            // Re-drive the settled mode and wait for the clock path to become trustworthy again.
+            comp_pending_mode_config(mode, final_mode, nxt_pending_mode, wait_cycles);
+            load_pending_mode = 1'b1;
 
             // Set the busy signal.
             set_fsm_busy = 1'b1;
 
-            // load the next counter to wait for.
+            // Load the counter value computed.
             load = 1'b1;
 
             // Disable the old clock, enable the new clock.
@@ -443,19 +511,22 @@ module Mic_Mode_Fsm (
           dis = 1'b1;
           clr_data_val = 1'b1;
           clr_fsm_busy = 1'b1;
-          nxt_mode = OFF_SLEEP;
+          clr_mode = 1'b1;
+          clr_pending_mode = 1'b1;
           nxt_state = IDLE;
         end
       end
 
       default: begin  // IDLE
-        // Wait till power is steady and mic is enabled.
-        if (volt_on_i & mic_en) begin
+        // Start a transaction whenever the decoded physical request differs
+        // from the current settled mic mode.
+        if (!settled_trans_comp) begin
           // FSM is now busy.
           set_fsm_busy = 1'b1;
 
-          // Get the nxt mode config.
-          comp_nxt_mode_config(mode, final_mode, nxt_mode, wait_cycles);
+          // Get the first pending mode config.
+          comp_pending_mode_config(mode, final_mode, nxt_pending_mode, wait_cycles);
+          load_pending_mode = 1'b1;
 
           // Load the counter value computed.
           load = 1'b1;

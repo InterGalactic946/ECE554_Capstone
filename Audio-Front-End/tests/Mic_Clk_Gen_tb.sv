@@ -1,0 +1,531 @@
+`timescale 1ns / 1ps
+// ------------------------------------------------------------
+// Testbench: Mic_Clk_Gen_tb
+// Description: Verifies Mic_Clk_Gen behavior in conjunction
+//              with the mic model. This bench models VDD as a
+//              real-valued supply and derives volt_on_i from
+//              the 1.62 V threshold used by the microphone.
+//              It also checks edge cases such as threshold
+//              chatter, brownouts, and direct ultrasonic
+//              requests while reading left/right mic data from
+//              the shared PDM line.
+// Author: Srivibhav Jonnalagadda
+// Date: 03-24-2026
+// ------------------------------------------------------------
+module Mic_Clk_Gen_tb ();
+
+  localparam int unsigned SYS_CLK_HZ = 50_000_000;
+  localparam real VDD_ON_THRESHOLD_V = 1.62;
+  localparam int unsigned FSM_MARGIN_CYCLES = 8;
+  localparam int unsigned CLOCK_ACTIVITY_OBSERVE_CYCLES = 800;
+  localparam int unsigned SAMPLE_TIMEOUT_CYCLES = 5_000_000;
+
+  /////////////////////////////
+  // Stimulus of type logic //
+  ///////////////////////////
+  logic clk_i;
+  logic rst_i;
+  logic volt_on_i;
+  logic [2:0] mode_req_i;
+  logic data_val_o;
+  tri data;
+  logic [1:0] curr_mode_o;
+  logic mic_clk_o;
+  real vdd_v;
+  int error_count;
+
+  ////////////////////////////////////////////////////
+  // Data capture state for left/right microphones //
+  //////////////////////////////////////////////////
+  int mic_clk_edge_count;
+  int left_sample_count, right_sample_count;
+  int left_toggle_count, right_toggle_count;
+  logic left_prev_bit, right_prev_bit;
+  logic left_prev_valid, right_prev_valid;
+
+  // ============================================================
+  // Timing helpers copied from the DUT for predictable checking.
+  // These are the full datasheet-based wait counts at SYS_CLK_HZ.
+  // ============================================================
+  localparam int unsigned POWERUP_CYCLES = (SYS_CLK_HZ * 50) / 1000;
+  localparam int unsigned WAKEUP_CYCLES = (SYS_CLK_HZ * 15) / 1000;
+  localparam int unsigned MODECHANGE_CYCLES = (SYS_CLK_HZ * 10) / 1000;
+  localparam int unsigned FALLASLEEP_CYCLES = (SYS_CLK_HZ * 10) / 1000;
+
+  // Convert the analog-style supply to the digital power-good input used by the DUT.
+  always_comb begin
+    volt_on_i = (vdd_v >= VDD_ON_THRESHOLD_V);
+  end
+
+  // 50 MHz reference clock for the clock generator.
+  always #10 clk_i = ~clk_i;
+
+  // Track that the generated mic clock is alive or quiescent as expected.
+  always @(posedge mic_clk_o or negedge mic_clk_o) begin
+    mic_clk_edge_count += 1;
+  end
+
+  // Sample the left microphone on falling mic-clock edges.
+  always @(negedge mic_clk_o) begin
+    if (data_val_o) begin
+      #1;
+      if ((data === 1'b0) || (data === 1'b1)) begin
+        left_sample_count += 1;
+
+        if (left_prev_valid && (data != left_prev_bit)) begin
+          left_toggle_count += 1;
+        end
+
+        left_prev_bit   = data;
+        left_prev_valid = 1'b1;
+      end
+    end
+  end
+
+  // Sample the right microphone on rising mic-clock edges.
+  always @(posedge mic_clk_o) begin
+    if (data_val_o) begin
+      #1;
+      if ((data === 1'b0) || (data === 1'b1)) begin
+        right_sample_count += 1;
+
+        if (right_prev_valid && (data != right_prev_bit)) begin
+          right_toggle_count += 1;
+        end
+
+        right_prev_bit   = data;
+        right_prev_valid = 1'b1;
+      end
+    end
+  end
+
+  // Instantiate Clock Generator
+  Mic_Clk_Gen #(
+      .SYS_CLK_HZ(SYS_CLK_HZ)
+  ) iCLK_GEN (
+      .clk_i(clk_i),
+      .rst_i(rst_i),
+      .volt_on_i(volt_on_i),
+      .mode_req_i(mode_req_i),
+
+      .data_val_o (data_val_o),
+      .curr_mode_o(curr_mode_o),
+      .mic_clk_o  (mic_clk_o)
+  );
+
+  // Instantiate left mic.
+  SPH0641LU4H_1_model iMIC_MODEL_L (
+      .vdd_i(volt_on_i),
+      .clock_i(mic_clk_o),
+      .select_i(1'b0),
+
+      .data_o(data)
+  );
+
+  // Instantiate right mic.
+  SPH0641LU4H_1_model iMIC_MODEL_R (
+      .vdd_i(volt_on_i),
+      .clock_i(mic_clk_o),
+      .select_i(1'b1),
+
+      .data_o(data)
+  );
+
+  //////////////////
+  // TB utilities //
+  ////////////////
+  task automatic wait_n_negedges(input int unsigned num_edges);
+    repeat (num_edges) @(negedge clk_i);
+  endtask : wait_n_negedges
+
+  task automatic clear_capture_state();
+    begin
+      left_sample_count = 0;
+      right_sample_count = 0;
+      left_toggle_count = 0;
+      right_toggle_count = 0;
+      left_prev_bit = 1'b0;
+      right_prev_bit = 1'b0;
+      left_prev_valid = 1'b0;
+      right_prev_valid = 1'b0;
+    end
+  endtask : clear_capture_state
+
+  task automatic set_vdd(input real new_vdd_v);
+    begin
+      vdd_v = new_vdd_v;
+      #1;
+    end
+  endtask : set_vdd
+
+  task automatic wait_n_mic_edges(input int unsigned num_edges);
+    int unsigned edge_idx;
+    begin
+      for (edge_idx = 0; edge_idx < num_edges; edge_idx += 1) begin
+        @(posedge mic_clk_o or negedge mic_clk_o);
+      end
+    end
+  endtask : wait_n_mic_edges
+
+  task automatic ramp_vdd(input real start_v, input real stop_v, input real step_v,
+                          input int unsigned settle_cycles_per_step);
+    real vdd_step;
+    begin
+      vdd_step = start_v;
+      set_vdd(vdd_step);
+
+      if (stop_v >= start_v) begin
+        while (vdd_step < stop_v) begin
+          wait_n_negedges(settle_cycles_per_step);
+          vdd_step = vdd_step + step_v;
+
+          if (vdd_step > stop_v) begin
+            vdd_step = stop_v;
+          end
+
+          set_vdd(vdd_step);
+        end
+      end else begin
+        while (vdd_step > stop_v) begin
+          wait_n_negedges(settle_cycles_per_step);
+          vdd_step = vdd_step - step_v;
+
+          if (vdd_step < stop_v) begin
+            vdd_step = stop_v;
+          end
+
+          set_vdd(vdd_step);
+        end
+      end
+    end
+  endtask : ramp_vdd
+
+  task automatic expect_clock_quiet(input int unsigned observe_cycles, input string label);
+    int start_edge_count;
+    begin
+      start_edge_count = mic_clk_edge_count;
+      wait_n_negedges(observe_cycles);
+
+      if (mic_clk_edge_count != start_edge_count) begin
+        $error("ERROR: mic_clk_o toggled unexpectedly during %s!", label);
+        error_count += 1;
+      end
+    end
+  endtask : expect_clock_quiet
+
+  task automatic expect_clock_activity(input int unsigned observe_cycles, input string label);
+    int start_edge_count;
+    begin
+      start_edge_count = mic_clk_edge_count;
+      wait_n_negedges(observe_cycles);
+
+      if (mic_clk_edge_count == start_edge_count) begin
+        $error("ERROR: mic_clk_o did not toggle during %s!", label);
+        error_count += 1;
+      end
+    end
+  endtask : expect_clock_activity
+
+  task automatic wait_for_dual_channel_samples(input int unsigned samples_per_channel,
+                                               input int unsigned timeout_cycles,
+                                               input string label);
+    int unsigned waited_cycles;
+    begin
+      waited_cycles = 0;
+
+      while (((left_sample_count < samples_per_channel) ||
+              (right_sample_count < samples_per_channel)) &&
+             (waited_cycles < timeout_cycles)) begin
+        @(negedge clk_i);
+        waited_cycles += 1;
+      end
+
+      if ((left_sample_count < samples_per_channel) ||
+          (right_sample_count < samples_per_channel)) begin
+        $error("ERROR: Timed out waiting for left/right mic samples during %s!", label);
+        error_count += 1;
+      end
+
+    end
+  endtask : wait_for_dual_channel_samples
+
+  task automatic check_bus_high_z(input int unsigned edge_pairs, input string label);
+    int unsigned pair_idx;
+    begin
+      for (pair_idx = 0; pair_idx < edge_pairs; pair_idx += 1) begin
+        @(posedge mic_clk_o);
+        #1;
+        if (data !== 1'bz) begin
+          $error("ERROR: Shared data bus was not high-Z on a right-channel edge during %s!", label);
+          error_count += 1;
+        end
+
+        @(negedge mic_clk_o);
+        #1;
+        if (data !== 1'bz) begin
+          $error("ERROR: Shared data bus was not high-Z on a left-channel edge during %s!", label);
+          error_count += 1;
+        end
+      end
+    end
+  endtask : check_bus_high_z
+
+  initial begin
+    error_count = 0;
+    mic_clk_edge_count = 0;
+    clear_capture_state();
+
+    clk_i = 1'b0;
+    rst_i = 1'b1;
+    mode_req_i = 3'h0;
+    vdd_v = 0.0;
+
+    wait_n_negedges(5);
+    rst_i = 1'b0;
+
+    // TEST 1: Below-threshold VDD should keep the mic path OFF.
+    @(negedge clk_i) begin
+      mode_req_i = 3'h6;
+      set_vdd(1.55);
+    end
+
+    wait_n_negedges(POWERUP_CYCLES + FSM_MARGIN_CYCLES);
+
+    if (volt_on_i !== 1'b0) begin
+      $error("ERROR: volt_on_i asserted below the 1.62 V threshold!");
+      error_count += 1;
+    end
+
+    if (data_val_o !== 1'b0) begin
+      $error("ERROR: data_val_o went high while VDD was below threshold!");
+      error_count += 1;
+    end
+
+    expect_clock_quiet(CLOCK_ACTIVITY_OBSERVE_CYCLES, "below-threshold VDD");
+
+    // TEST 2: With power present, a disabled request should map to SLEEP.
+    @(negedge clk_i) begin
+      mode_req_i = 3'h0;
+    end
+
+    ramp_vdd(1.55, 1.72, 0.03, 2);
+    wait_n_negedges(POWERUP_CYCLES + FSM_MARGIN_CYCLES);
+
+    if (volt_on_i !== 1'b1) begin
+      $error("ERROR: volt_on_i did not assert after VDD crossed the threshold!");
+      error_count += 1;
+    end
+
+    if (curr_mode_o !== 2'h0) begin
+      $error("ERROR: curr_mode_o is not SLEEP after powering up with a disabled request!");
+      error_count += 1;
+    end
+
+    if (data_val_o !== 1'b0) begin
+      $error("ERROR: data_val_o is not low in SLEEP mode!");
+      error_count += 1;
+    end
+
+    expect_clock_activity(CLOCK_ACTIVITY_OBSERVE_CYCLES, "sleep mode after a disabled request");
+    wait_n_mic_edges(4);
+    check_bus_high_z(6, "sleep mode");
+
+    // TEST 3: Wake into STANDARD mode and read data from both microphones.
+    clear_capture_state();
+    @(negedge clk_i) mode_req_i = 3'h6;
+
+    wait_n_negedges(WAKEUP_CYCLES + FSM_MARGIN_CYCLES);
+
+    if (curr_mode_o !== 2'h2) begin
+      $error("ERROR: curr_mode_o is not STANDARD after requesting STANDARD mode!");
+      error_count += 1;
+    end
+
+    if (data_val_o !== 1'b1) begin
+      $error("ERROR: data_val_o is not high after entering STANDARD mode!");
+      error_count += 1;
+    end
+
+    wait_for_dual_channel_samples(24, SAMPLE_TIMEOUT_CYCLES, "STANDARD mode");
+
+    // TEST 4: Brownout mid-transition should clear the mic path safely.
+    clear_capture_state();
+    @(negedge clk_i) mode_req_i = 3'h7;
+
+    wait_n_negedges((MODECHANGE_CYCLES / 2) + 2);
+    ramp_vdd(vdd_v, 1.55, 0.04, 1);
+    wait_n_negedges(FSM_MARGIN_CYCLES);
+
+    if (volt_on_i !== 1'b0) begin
+      $error("ERROR: volt_on_i did not drop after a brownout!");
+      error_count += 1;
+    end
+
+    if (data_val_o !== 1'b0) begin
+      $error("ERROR: data_val_o did not clear after a brownout!");
+      error_count += 1;
+    end
+
+    expect_clock_quiet(CLOCK_ACTIVITY_OBSERVE_CYCLES, "brownout recovery");
+
+    // TEST 5: Threshold chatter should not prevent eventual recovery into LOW-POWER mode.
+    clear_capture_state();
+    @(negedge clk_i) mode_req_i = 3'h5;
+
+    set_vdd(1.60);
+    wait_n_negedges(2);
+    set_vdd(1.63);
+    wait_n_negedges(2);
+    set_vdd(1.61);
+    wait_n_negedges(2);
+    set_vdd(1.68);
+
+    wait_n_negedges(POWERUP_CYCLES + FSM_MARGIN_CYCLES);
+
+    if (curr_mode_o !== 2'h1) begin
+      $error("ERROR: curr_mode_o is not LOW-POWER after threshold chatter recovery!");
+      error_count += 1;
+    end
+
+    if (data_val_o !== 1'b1) begin
+      $error("ERROR: data_val_o is not high after threshold chatter recovery!");
+      error_count += 1;
+    end
+
+    wait_for_dual_channel_samples(24, SAMPLE_TIMEOUT_CYCLES, "LOW-POWER recovery");
+
+    // TEST 6: Direct OFF->ULTRASONIC request should still produce valid stereo data.
+    clear_capture_state();
+    @(negedge clk_i) begin
+      mode_req_i = 3'h7;
+      set_vdd(0.0);
+    end
+
+    wait_n_negedges(FSM_MARGIN_CYCLES);
+    ramp_vdd(0.0, 1.80, 0.06, 2);
+    wait_n_negedges(POWERUP_CYCLES + MODECHANGE_CYCLES + FSM_MARGIN_CYCLES);
+
+    if (curr_mode_o !== 2'h3) begin
+      $error("ERROR: curr_mode_o is not ULTRASONIC after OFF->ULTRASONIC sequencing!");
+      error_count += 1;
+    end
+
+    if (data_val_o !== 1'b1) begin
+      $error("ERROR: data_val_o is not high after OFF->ULTRASONIC sequencing!");
+      error_count += 1;
+    end
+
+    wait_for_dual_channel_samples(24, SAMPLE_TIMEOUT_CYCLES, "OFF->ULTRASONIC");
+
+    // TEST 7: A powered disabled request should return to SLEEP and release the PDM bus.
+    clear_capture_state();
+    @(negedge clk_i) mode_req_i = 3'h0;
+
+    wait_n_negedges(FALLASLEEP_CYCLES + FSM_MARGIN_CYCLES);
+
+    if (curr_mode_o !== 2'h0) begin
+      $error("ERROR: curr_mode_o is not SLEEP after a powered disabled request!");
+      error_count += 1;
+    end
+
+    if (data_val_o !== 1'b0) begin
+      $error("ERROR: data_val_o is not low after returning to SLEEP!");
+      error_count += 1;
+    end
+
+    expect_clock_activity(CLOCK_ACTIVITY_OBSERVE_CYCLES, "sleep after disabling while powered");
+    wait_n_mic_edges(4);
+    check_bus_high_z(6, "sleep after disabling while powered");
+
+    if (error_count == 0) begin
+      $display("YAHOO!! All tests passed.");
+    end else begin
+      $display("ERROR: %0d test(s) failed.", error_count);
+    end
+
+    $finish();
+  end
+
+endmodule
+
+// ------------------------------------------------------------
+// Module: Mic_Clk_Pll
+// Description: Behavioral PLL stub for Mic_Clk_Gen_tb. It
+//              generates legal mic clock frequencies for each
+//              operating mode and asserts locked shortly after
+//              reset deasserts.
+// ------------------------------------------------------------
+module Mic_Clk_Pll (
+    input  logic refclk,
+    input  logic rst,
+    output logic outclk_1,
+    output logic outclk_3,
+    output logic outclk_4,
+    output logic outclk_5,
+    output logic locked
+);
+
+  localparam realtime SLEEP_HALF_PERIOD_NS = 5000.0;  // 100 kHz
+  localparam realtime LOW_PWR_HALF_PERIOD_NS = 1250.0;  // 400 kHz
+  localparam realtime STD_HALF_PERIOD_NS = 250.0;  // 2.0 MHz
+  localparam realtime ULT_HALF_PERIOD_NS = 125.0;  // 4.0 MHz
+
+  initial begin
+    outclk_1 = 1'b0;
+    forever #(SLEEP_HALF_PERIOD_NS) outclk_1 = ~outclk_1;
+  end
+
+  initial begin
+    outclk_3 = 1'b0;
+    forever #(LOW_PWR_HALF_PERIOD_NS) outclk_3 = ~outclk_3;
+  end
+
+  initial begin
+    outclk_4 = 1'b0;
+    forever #(STD_HALF_PERIOD_NS) outclk_4 = ~outclk_4;
+  end
+
+  initial begin
+    outclk_5 = 1'b0;
+    forever #(ULT_HALF_PERIOD_NS) outclk_5 = ~outclk_5;
+  end
+
+  always_ff @(posedge refclk or posedge rst) begin
+    if (rst) begin
+      locked <= 1'b0;
+    end else begin
+      locked <= 1'b1;
+    end
+  end
+
+endmodule
+
+// ------------------------------------------------------------
+// Module: Mic_Clk_Ctrl
+// Description: Behavioral clock mux/gate stub for Mic_Clk_Gen_tb.
+// ------------------------------------------------------------
+module Mic_Clk_Ctrl (
+    input logic inclk3x,
+    input logic inclk2x,
+    input logic inclk1x,
+    input logic inclk0x,
+    input logic [1:0] clkselect,
+    input logic ena,
+    output logic outclk
+);
+
+  always_comb begin
+    if (!ena) begin
+      outclk = 1'b0;
+    end else begin
+      unique case (clkselect)
+        2'b00:   outclk = inclk0x;
+        2'b01:   outclk = inclk1x;
+        2'b10:   outclk = inclk2x;
+        2'b11:   outclk = inclk3x;
+        default: outclk = 1'b0;
+      endcase
+    end
+  end
+
+endmodule

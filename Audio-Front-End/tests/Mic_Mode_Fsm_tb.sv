@@ -1,3 +1,4 @@
+`timescale 1ns / 1ps
 // ------------------------------------------------------------
 // Testbench: Mic_Mode_Fsm_tb
 // Description: Verifies Mic_Mode_Fsm behavior ensuring all
@@ -116,8 +117,8 @@ module Mic_Mode_Fsm_tb ();
       end
     end
 
-    // TEST 2: Assert volt_on_i and mode_req as disabled. Ensure after a long time,
-    // we are still in IDLE.
+    // TEST 2: Assert volt_on_i with a disabled request. With power present, the
+    // mic should still power into SLEEP mode.
     @(negedge clk_i) begin
       pll_locked_i = 1'b1;
       volt_on_i = 1'b1;
@@ -127,23 +128,23 @@ module Mic_Mode_Fsm_tb ();
     wait_n_negedges(POWERUP_CYCLES + FSM_MARGIN_CYCLES);
 
     @(negedge clk_i) begin
-      if (clk_en_o !== 1'b0) begin
-        $error("ERROR: clk_en_o is not low when mic is disabled!");
+      if (clk_en_o !== 1'b1) begin
+        $error("ERROR: clk_en_o is not high when a disabled request maps to SLEEP!");
         error_count += 1;
       end
 
       if (clk_sel_o !== 2'h0) begin
-        $error("ERROR: clk_sel_o changed even though the mic stayed disabled!");
+        $error("ERROR: clk_sel_o is not 2'b00 when a disabled request maps to SLEEP!");
         error_count += 1;
       end
 
       if (curr_mode_o !== 2'h0) begin
-        $error("ERROR: curr_mode_o changed even though the mic stayed disabled!");
+        $error("ERROR: curr_mode_o is not 2'b00 when a disabled request maps to SLEEP!");
         error_count += 1;
       end
 
       if (data_val_o !== 1'b0) begin
-        $error("ERROR: data_val_o is not low when mic is disabled!");
+        $error("ERROR: data_val_o is not low when a disabled request maps to SLEEP!");
         error_count += 1;
       end
     end
@@ -186,8 +187,8 @@ module Mic_Mode_Fsm_tb ();
         error_count += 1;
       end
 
-      if (curr_mode_o !== 2'h1) begin
-        $error("ERROR: curr_mode_o did not switch to LOW-POWER during wake-up!");
+      if (curr_mode_o !== 2'h0) begin
+        $error("ERROR: curr_mode_o did not remain at the settled SLEEP mode during wake-up!");
         error_count += 1;
       end
 
@@ -232,8 +233,8 @@ module Mic_Mode_Fsm_tb ();
         error_count += 1;
       end
 
-      if (curr_mode_o !== 2'h2) begin
-        $error("ERROR: curr_mode_o did not switch to STANDARD during the mode change!");
+      if (curr_mode_o !== 2'h1) begin
+        $error("ERROR: curr_mode_o did not remain at the settled LOW-POWER mode during the mode change!");
         error_count += 1;
       end
 
@@ -278,8 +279,8 @@ module Mic_Mode_Fsm_tb ();
         error_count += 1;
       end
 
-      if (curr_mode_o !== 2'h3) begin
-        $error("ERROR: curr_mode_o did not switch to ULTRASONIC during the mode change!");
+      if (curr_mode_o !== 2'h2) begin
+        $error("ERROR: curr_mode_o did not remain at the settled STANDARD mode during the mode change!");
         error_count += 1;
       end
 
@@ -324,8 +325,8 @@ module Mic_Mode_Fsm_tb ();
         error_count += 1;
       end
 
-      if (curr_mode_o !== 2'h0) begin
-        $error("ERROR: curr_mode_o did not switch to SLEEP during the fall-asleep transition!");
+      if (curr_mode_o !== 2'h3) begin
+        $error("ERROR: curr_mode_o did not remain at the settled ULTRASONIC mode during the fall-asleep transition!");
         error_count += 1;
       end
 
@@ -371,9 +372,9 @@ module Mic_Mode_Fsm_tb ();
         error_count += 1;
       end
 
-      if (curr_mode_o !== 2'h2) begin
+      if (curr_mode_o !== 2'h0) begin
         $error(
-            "ERROR: curr_mode_o did not pass through STANDARD during the SLEEP to ULTRASONIC transition!");
+            "ERROR: curr_mode_o did not remain at the settled SLEEP mode during the first leg of the SLEEP to ULTRASONIC transition!");
         error_count += 1;
       end
 
@@ -407,35 +408,65 @@ module Mic_Mode_Fsm_tb ();
       end
     end
 
-    // TEST 9: Disable the microphone and verify the clock is shut off.
+    // TEST 9: A disabled request with power present should return the mic to SLEEP.
     @(negedge clk_i) mode_req_i = 3'h0;
 
-    wait_n_negedges(MODECHANGE_CYCLES + FSM_MARGIN_CYCLES);
+    wait_n_negedges(FALLASLEEP_CYCLES + FSM_MARGIN_CYCLES);
 
     @(negedge clk_i) begin
       if (clk_sel_o !== 2'h0) begin
-        $error("ERROR: clk_sel_o is not 2'b00 after disabling the microphone!");
+        $error("ERROR: clk_sel_o is not 2'b00 after applying a disabled request!");
         error_count += 1;
       end
 
       if (curr_mode_o !== 2'h0) begin
-        $error("ERROR: curr_mode_o is not 2'b00 after disabling the microphone!");
+        $error("ERROR: curr_mode_o is not 2'b00 after applying a disabled request!");
         error_count += 1;
       end
 
-      if (clk_en_o !== 1'b0) begin
-        $error("ERROR: clk_en_o is not low after disabling the microphone!");
+      if (clk_en_o !== 1'b1) begin
+        $error("ERROR: clk_en_o is not high after a disabled request returns the mic to SLEEP!");
         error_count += 1;
       end
 
       if (data_val_o !== 1'b0) begin
-        $error("ERROR: data_val_o is not low after disabling the microphone!");
+        $error("ERROR: data_val_o is not low after a disabled request returns the mic to SLEEP!");
         error_count += 1;
       end
     end
 
-    // TEST 10: Verify OFF to ULTRASONIC goes through STANDARD first.
-    @(negedge clk_i) mode_req_i = 3'h7;
+    // TEST 10: Remove power to enter OFF, then verify OFF to ULTRASONIC goes
+    // through STANDARD first after power returns.
+    @(negedge clk_i) volt_on_i = 1'b0;
+
+    wait_n_negedges(FSM_MARGIN_CYCLES);
+
+    @(negedge clk_i) begin
+      if (clk_sel_o !== 2'h0) begin
+        $error("ERROR: clk_sel_o is not 2'b00 after removing power for an OFF transition!");
+        error_count += 1;
+      end
+
+      if (curr_mode_o !== 2'h0) begin
+        $error("ERROR: curr_mode_o is not 2'b00 after removing power for an OFF transition!");
+        error_count += 1;
+      end
+
+      if (clk_en_o !== 1'b0) begin
+        $error("ERROR: clk_en_o is not low after removing power for an OFF transition!");
+        error_count += 1;
+      end
+
+      if (data_val_o !== 1'b0) begin
+        $error("ERROR: data_val_o is not low after removing power for an OFF transition!");
+        error_count += 1;
+      end
+    end
+
+    @(negedge clk_i) begin
+      volt_on_i  = 1'b1;
+      mode_req_i = 3'h7;
+    end
 
     wait_n_negedges((POWERUP_CYCLES / 2) + 2);
 
@@ -446,9 +477,9 @@ module Mic_Mode_Fsm_tb ();
         error_count += 1;
       end
 
-      if (curr_mode_o !== 2'h2) begin
+      if (curr_mode_o !== 2'h0) begin
         $error(
-            "ERROR: curr_mode_o did not pass through STANDARD during the OFF to ULTRASONIC transition!");
+            "ERROR: curr_mode_o did not remain at the settled OFF mode during the first leg of the OFF to ULTRASONIC transition!");
         error_count += 1;
       end
 
