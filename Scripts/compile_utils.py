@@ -397,8 +397,27 @@ def build_dependency_graph():
 
     # Matches module instantiations. For example: 'my_module u1 (...);'
     MODULE_INST_RE = re.compile(
-        r'^\s*(?!module\b)(?!else\b)(?!begin\b)(?!end\b)(?!if\b)(?!for\b)(?!while\b)(?!case\b)(?!always\b)(?!assign\b)(?!task\b)([A-Za-z_]\w*)\s*(?:#\([^)]*\))?\s+[A-Za-z_]\w*\s*(?:\[[^\]]*\])?\s*\(.*?\)\s*;', 
-        re.MULTILINE | re.DOTALL
+        r"""
+        ^\s*
+        (?!(?:module|else|begin|end|if|for|while|case|always|assign|task|initial|function)\b)
+        ([A-Za-z_]\w*)
+        \s*
+        (?:\#
+            \(
+                (?:[^()]|\([^()]*\))*
+            \)
+            \s*
+        )?
+        \s+
+        [A-Za-z_]\w*
+        \s*
+        (?:\[[^\]]*\]\s*)?
+        \(
+            .*?
+        \)
+        \s*;
+        """,
+        re.MULTILINE | re.DOTALL | re.VERBOSE
     )
 
     # Matches package import statements. For example: 'import my_package::*;'.

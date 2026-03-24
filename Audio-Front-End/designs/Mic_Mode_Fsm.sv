@@ -37,8 +37,10 @@ module Mic_Mode_Fsm (
     output logic data_val_o
 );
 
-  // System clock frequency of the FPGA in Hz.
+  // Paramters for DUT.
   parameter int unsigned SYS_CLK_HZ = 50_000_000;
+  parameter bit FAST_SIM = 1'b0;
+  parameter int unsigned FAST_SIM_DIV = 50_000;
 
   // ============================================================
   // Datasheet timing
@@ -47,10 +49,29 @@ module Mic_Mode_Fsm (
   // Mode chg = 10 ms
   // Sleep in = 10 ms (from active to sleep)
   // ============================================================
-  localparam int unsigned POWERUP_CYCLES = (SYS_CLK_HZ * 50) / 1000;
-  localparam int unsigned WAKEUP_CYCLES = (SYS_CLK_HZ * 15) / 1000;
-  localparam int unsigned MODECHANGE_CYCLES = (SYS_CLK_HZ * 10) / 1000;
-  localparam int unsigned FALLASLEEP_CYCLES = (SYS_CLK_HZ * 10) / 1000;
+  localparam int unsigned POWERUP_CYCLES_REAL = (SYS_CLK_HZ * 50) / 1000;
+  localparam int unsigned WAKEUP_CYCLES_REAL = (SYS_CLK_HZ * 15) / 1000;
+  localparam int unsigned MODECHANGE_CYCLES_REAL = (SYS_CLK_HZ * 10) / 1000;
+  localparam int unsigned FALLASLEEP_CYCLES_REAL = (SYS_CLK_HZ * 10) / 1000;
+
+  // Ensure we scale cycle count appropriately based on FAST_SIM_DIV.
+  function automatic int unsigned scale_cycles(input int unsigned cycles);
+    int unsigned scaled_cycles;
+    begin
+      if (!FAST_SIM) begin
+        scale_cycles = cycles;
+      end else begin
+        // Round up during fast simulation so a shortened delay never becomes 0 cycles.
+        scaled_cycles = (cycles + FAST_SIM_DIV - 1) / FAST_SIM_DIV;
+        scale_cycles  = (scaled_cycles == 0) ? 1 : scaled_cycles;
+      end
+    end
+  endfunction
+
+  localparam int unsigned POWERUP_CYCLES = scale_cycles(POWERUP_CYCLES_REAL);
+  localparam int unsigned WAKEUP_CYCLES = scale_cycles(WAKEUP_CYCLES_REAL);
+  localparam int unsigned MODECHANGE_CYCLES = scale_cycles(MODECHANGE_CYCLES_REAL);
+  localparam int unsigned FALLASLEEP_CYCLES = scale_cycles(FALLASLEEP_CYCLES_REAL);
 
   // Maximum counter width is decided by power up cycle count.
   localparam int unsigned WAIT_COUNTER_W = $clog2(POWERUP_CYCLES + 1);
@@ -373,8 +394,11 @@ module Mic_Mode_Fsm (
             nxt_state = CLK_DIS;
           end
         end else begin
-          // Go back to idle, resetting the mode back to OFF.
-          nxt_mode  = OFF_SLEEP;
+          // Brownout: drive the outputs back to a safe OFF state.
+          dis = 1'b1;
+          clr_data_val = 1'b1;
+          clr_fsm_busy = 1'b1;
+          nxt_mode = OFF_SLEEP;
           nxt_state = IDLE;
         end
       end
@@ -415,8 +439,10 @@ module Mic_Mode_Fsm (
             nxt_state = CLK_DIS;
           end
         end else begin
-          // Go back to idle, resetting the mode back to OFF.
+          // Brownout: drive the outputs back to a safe OFF state.
+          dis = 1'b1;
           clr_data_val = 1'b1;
+          clr_fsm_busy = 1'b1;
           nxt_mode = OFF_SLEEP;
           nxt_state = IDLE;
         end
