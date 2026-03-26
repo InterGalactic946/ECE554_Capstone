@@ -1,69 +1,74 @@
 `timescale 1ns / 1ps
 // ------------------------------------------------------------
 // Testbench: SPH0641LU4H_1_model_tb
-// Description: Smoke test for the behavioral SPH0641LU4H-1
+// Description: Bring up test for the behavioral SPH0641LU4H-1
 //              microphone model using only the datasheet pins.
+// Author: Srivibhav Jonnalagadda
+// Date: 03-26-2026
 // ------------------------------------------------------------
 module SPH0641LU4H_1_model_tb ();
 
+  /////////////////////////////
+  // Stimulus of type logic //
+  ///////////////////////////
   int   error_count;
   int   half_period_ns;
+  logic vdd;
+  logic clk;
+  logic select;
+  tri   data;
 
-  logic vdd_i;
-  logic clock_i;
-  logic select_i;
-  tri   data_o;
-
+  // Test parameters.
   localparam int unsigned FAST_SIM_DIV = 1_000;
 
   SPH0641LU4H_1_model #(
       .FAST_SIM(1'b1),
       .FAST_SIM_DIV(FAST_SIM_DIV)
   ) iDUT (
-      .vdd_i(vdd_i),
-      .clock_i(clock_i),
-      .select_i(select_i),
-      .data_o(data_o)
+      .vdd_i(vdd),
+      .clock_i(clk),
+      .select_i(select),
+      .data_o(data)
   );
 
   task automatic wait_n_posedges(input int unsigned num_edges);
-    repeat (num_edges) @(posedge clock_i);
+    repeat (num_edges) @(posedge clk);
   endtask
 
   initial begin
     error_count = 0;
-    vdd_i = 1'b0;
-    clock_i = 1'b0;
-    select_i = 1'b1;
+    vdd = 1'b0;
+    clk = 1'b0;
+    select = 1'b1;
     half_period_ns = 4_000;
 
     // TEST 1: Power-down keeps DATA high-Z.
     wait_n_posedges(4);
 
-    if (data_o !== 1'bz) begin
+    if (data !== 1'bz) begin
       $error("ERROR: data_o is not high-Z when the microphone is powered down!");
       error_count += 1;
     end
 
     // TEST 2: Power-up with a sleep clock keeps DATA high-Z.
-    vdd_i = 1'b1;
+    vdd = 1'b1;
     wait_n_posedges(16);
 
-    if (data_o !== 1'bz) begin
+    if (data !== 1'bz) begin
       $error("ERROR: data_o is not high-Z in SLEEP mode!");
       error_count += 1;
     end
 
     // TEST 3: Direct power-up into ULTRASONIC is treated as illegal and stays high-Z.
-    vdd_i = 1'b0;
+    vdd = 1'b0;
     wait_n_posedges(4);
     half_period_ns = 156;
-    vdd_i = 1'b1;
+    vdd = 1'b1;
     wait_n_posedges(24);
 
-    @(posedge clock_i);
+    @(posedge clk);
     #1;
-    if (data_o !== 1'bz) begin
+    if (data !== 1'bz) begin
       $error("ERROR: data_o should stay high-Z after illegal direct ULTRASONIC power-up!");
       error_count += 1;
     end
@@ -72,17 +77,17 @@ module SPH0641LU4H_1_model_tb ();
     half_period_ns = 400;
     wait_n_posedges(96);
 
-    @(posedge clock_i);
+    @(posedge clk);
     #1;
-    if (data_o === 1'bz) begin
+    if (data === 1'bz) begin
       $error(
           "ERROR: data_o did not recover on the selected rising edge after returning to STANDARD mode!");
       error_count += 1;
     end
 
-    @(negedge clock_i);
+    @(negedge clk);
     #1;
-    if (data_o !== 1'bz) begin
+    if (data !== 1'bz) begin
       $error(
           "ERROR: data_o should return to high-Z on the non-selected falling edge in STANDARD mode!");
       error_count += 1;
@@ -92,34 +97,34 @@ module SPH0641LU4H_1_model_tb ();
     half_period_ns = 1_000;
     wait_n_posedges(24);
 
-    @(posedge clock_i);
+    @(posedge clk);
     #1;
-    if (data_o === 1'bz) begin
+    if (data === 1'bz) begin
       $error("ERROR: data_o is still high-Z on the selected rising edge in LOW-POWER mode!");
       error_count += 1;
     end
 
-    @(negedge clock_i);
+    @(negedge clk);
     #1;
-    if (data_o !== 1'bz) begin
+    if (data !== 1'bz) begin
       $error("ERROR: data_o should return to high-Z on the non-selected falling edge!");
       error_count += 1;
     end
 
     // TEST 6: Flip SELECT and ensure DATA moves to the falling edge.
-    select_i = 1'b0;
+    select = 1'b0;
     wait_n_posedges(4);
 
-    @(posedge clock_i);
+    @(posedge clk);
     #1;
-    if (data_o !== 1'bz) begin
+    if (data !== 1'bz) begin
       $error("ERROR: data_o should stay high-Z on the rising edge after SELECT goes low!");
       error_count += 1;
     end
 
-    @(negedge clock_i);
+    @(negedge clk);
     #1;
-    if (data_o === 1'bz) begin
+    if (data === 1'bz) begin
       $error("ERROR: data_o is still high-Z on the selected falling edge after SELECT goes low!");
       error_count += 1;
     end
@@ -128,32 +133,31 @@ module SPH0641LU4H_1_model_tb ();
     half_period_ns = 156;
     wait_n_posedges(40);
 
-    @(negedge clock_i);
+    @(negedge clk);
     #1;
-    if (data_o === 1'bz) begin
+    if (data === 1'bz) begin
       $error("ERROR: data_o is high-Z on the selected falling edge in ULTRASONIC mode!");
       error_count += 1;
     end
 
     // TEST 8: Power-down returns DATA to high-Z immediately.
-    vdd_i = 1'b0;
+    vdd = 1'b0;
     #1;
 
-    if (data_o !== 1'bz) begin
+    if (data !== 1'bz) begin
       $error("ERROR: data_o is not high-Z after power-down!");
       error_count += 1;
     end
 
     if (error_count == 0) begin
-      $display("YAHOO!! Mic model smoke test passed.");
+      $display("YAHOO!! SPH0641LU4H_1_model bring up test passed.");
     end else begin
-      $error("ERROR: %0d mic model smoke test(s) failed.", error_count);
+      $error("ERROR: %0d SPH0641LU4H_1_model bring up test(s) failed.", error_count);
     end
 
     $stop();
   end
 
-  always begin
-    #(half_period_ns) clock_i = ~clock_i;
-  end
+  always #(half_period_ns) clk = ~clk;
+
 endmodule

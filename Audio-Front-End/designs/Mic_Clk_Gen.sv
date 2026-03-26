@@ -27,8 +27,9 @@ module Mic_Clk_Gen #(
   // Declare any internal signals as type logic //
   ///////////////////////////////////////////////
   logic clk_sleep, clk_low_pwr, clk_std, clk_ult;
+  logic clk_en, pll_locked, clk_ctrl_en, clk_rdy;
   logic [1:0] clk_sel;
-  logic clk_en, pll_locked, clk_ctrl_en;
+  ///////////////////////////////////////////////
 
   //////////////////////////
   // Submodule instances //
@@ -42,6 +43,7 @@ module Mic_Clk_Gen #(
       .volt_on_i(volt_on_i),
       .mode_req_i(mode_req_i),
       .pll_locked_i(pll_locked),
+      .clk_rdy_i(clk_rdy),
 
       .clk_en_o (clk_en),
       .clk_sel_o(clk_sel),
@@ -65,15 +67,20 @@ module Mic_Clk_Gen #(
   // Enable condition for the output clock.
   assign clk_ctrl_en = clk_en & pll_locked;
 
-  // Instantaiate the clk_ctrl block to choose one out of four clocks.
+  // Instantiate clock mux.
   Mic_Clk_Ctrl iCLK_CTRL (
-      .inclk0x(clk_sleep),
-      .inclk1x(clk_low_pwr),
-      .inclk2x(clk_std),
-      .inclk3x(clk_ult),
-      .clkselect(clk_sel),
-      .ena(clk_ctrl_en),
+      .clk_i(clk_i),
+      .rst_i(rst_i),
 
-      .outclk(mic_clk_o)
+      .clk0_i   (clk_sleep),
+      .clk1_i   (clk_low_pwr),
+      .clk2_i   (clk_std),
+      .clk3_i   (clk_ult),
+      .clk_sel_i(clk_sel),
+      .en_i     (clk_ctrl_en),
+
+      .clk_o    (mic_clk_o),
+      .clk_rdy_o(clk_rdy)
   );
+
 endmodule

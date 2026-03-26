@@ -59,7 +59,7 @@ module SPH0641LU4H_1_model #(
   } mic_mode_t;
 
   ///////////////////////////////////////////////////////////
-  // Declare internal state and control signals as logic   //
+  // Declare internal state and control signals as logic  //
   /////////////////////////////////////////////////////////
   state_t state, nxt_state;  // Holds the current mic-model state machine state.
   mic_mode_t mode, nxt_mode;  // Holds the current settled microphone mode.
@@ -93,7 +93,7 @@ module SPH0641LU4H_1_model #(
   function automatic int unsigned scale_cycles(input int unsigned cycles);
     int unsigned scaled_cycles;
     begin
-      if (!FAST_SIM || (FAST_SIM_DIV == 0)) begin
+      if (!FAST_SIM || (FAST_SIM_DIV === 0)) begin
         scale_cycles = cycles;
       end else begin
         scaled_cycles = (cycles + FAST_SIM_DIV - 1) / FAST_SIM_DIV;
@@ -105,7 +105,7 @@ module SPH0641LU4H_1_model #(
   // Checks if the mic is in an active operating mode.
   function automatic bit is_active_mode(input mic_mode_t mic_mode);
     begin
-      is_active_mode = (mic_mode == MODE_LOW_PWR) || (mic_mode == MODE_STD) || (mic_mode == MODE_ULT);
+      is_active_mode = (mic_mode === MODE_LOW_PWR) || (mic_mode === MODE_STD) || (mic_mode === MODE_ULT);
     end
   endfunction : is_active_mode
 
@@ -174,8 +174,8 @@ module SPH0641LU4H_1_model #(
                                                input mic_mode_t to_mode);
     begin
       is_illegal_transition =
-          ((from_mode == MODE_OFF) || (from_mode == MODE_SLEEP)) &&
-          (to_mode == MODE_ULT);
+          ((from_mode === MODE_OFF) || (from_mode === MODE_SLEEP)) &&
+          (to_mode === MODE_ULT);
     end
   endfunction : is_illegal_transition
 
@@ -215,9 +215,9 @@ module SPH0641LU4H_1_model #(
           unique case (to_mode)
             MODE_OFF:     wait_ns = 0.0;  // Powered-down mode is entered by removing VDD.
             MODE_SLEEP:   wait_ns = FALLASLEEP_TIME_NS;
-            MODE_LOW_PWR: wait_ns = (from_mode == MODE_LOW_PWR) ? 0.0 : MODECHANGE_TIME_NS;
-            MODE_STD:     wait_ns = (from_mode == MODE_STD) ? 0.0 : MODECHANGE_TIME_NS;
-            MODE_ULT:     wait_ns = (from_mode == MODE_ULT) ? 0.0 : MODECHANGE_TIME_NS;
+            MODE_LOW_PWR: wait_ns = (from_mode === MODE_LOW_PWR) ? 0.0 : MODECHANGE_TIME_NS;
+            MODE_STD:     wait_ns = (from_mode === MODE_STD) ? 0.0 : MODECHANGE_TIME_NS;
+            MODE_ULT:     wait_ns = (from_mode === MODE_ULT) ? 0.0 : MODECHANGE_TIME_NS;
             default:      wait_ns = 0.0;
           endcase
         end
@@ -264,7 +264,7 @@ module SPH0641LU4H_1_model #(
 
   // DATA may only be driven once the mic is settled in RUN state and the settled
   // mode is one of the active operating modes.
-  assign model_active = (state == RUN) && is_active_mode(mode);
+  assign model_active = (state === RUN) && is_active_mode(mode);
 
   /////////////////////////////////////
   // Implements State Machine Logic //
@@ -295,7 +295,7 @@ module SPH0641LU4H_1_model #(
   end
 
   // Counter is empty when we have reached 0.
-  assign tmr_empty = (wait_cntr == 0);
+  assign tmr_empty = (wait_cntr === 0);
 
   // Holds whether an illegal transition warning has already been reported.
   always_ff @(posedge clock_i or negedge vdd_i) begin
@@ -370,7 +370,7 @@ module SPH0641LU4H_1_model #(
             nxt_pending_mode = requested_mode;
             wait_cycles = transition_cycles(mode, requested_mode, clock_period_ns);
 
-            if (wait_cycles == 0) begin
+            if (wait_cycles === 0) begin
               nxt_mode  = requested_mode;  // Immediate transitions become settled right away.
               nxt_state = RUN;
             end else begin
@@ -390,17 +390,17 @@ module SPH0641LU4H_1_model #(
             nxt_pending_mode = MODE_INVALID;  // No legal pending destination while faulted.
             set_warning = 1'b1;  // Report the illegal transition once.
             nxt_state = FAULT;
-          end else if (requested_mode != pending_mode) begin
+          end else if (requested_mode !== pending_mode) begin
             nxt_pending_mode = requested_mode;
             wait_cycles = transition_cycles(mode, requested_mode, clock_period_ns);
 
-            if (wait_cycles == 0) begin
+            if (wait_cycles === 0) begin
               nxt_mode  = requested_mode;  // Immediate transitions do not need WAIT state.
               nxt_state = RUN;
             end else begin
               load = 1'b1;  // Restart the settle timer for the new request.
             end
-          end else if (wait_cntr == 1) begin
+          end else if (wait_cntr === 1) begin
             dec = 1'b1;  // Consume the final wait cycle.
             nxt_mode = pending_mode;  // The pending mode becomes the new settled mode now.
             nxt_state = RUN;
@@ -416,7 +416,7 @@ module SPH0641LU4H_1_model #(
       RUN: begin
         // Monitor the measured clock continuously. Any mode request change restarts the
         // transition timing from the current settled mode.
-        if (request_valid && (requested_mode != mode)) begin
+        if (request_valid && (requested_mode !== mode)) begin
           if (illegal_transition) begin
             nxt_mode = MODE_INVALID;  // Illegal direct ULT entry forces a faulted mic mode.
             nxt_pending_mode = MODE_INVALID;  // No legal pending destination while faulted.
@@ -426,7 +426,7 @@ module SPH0641LU4H_1_model #(
             nxt_pending_mode = requested_mode;
             wait_cycles = transition_cycles(mode, requested_mode, clock_period_ns);
 
-            if (wait_cycles == 0) begin
+            if (wait_cycles === 0) begin
               nxt_mode = requested_mode;  // Immediate transitions update the settled mode directly.
             end else begin
               load = 1'b1;  // Load the settle timer for the requested mode change.
@@ -439,12 +439,12 @@ module SPH0641LU4H_1_model #(
       FAULT: begin
         // Stay faulted until the applied clock returns to a legal non-ultrasonic mode.
         // This keeps DATA high-Z after illegal direct OFF/SLEEP -> ULT entry.
-        if (request_valid && (requested_mode != MODE_INVALID) && (requested_mode != MODE_ULT)) begin
+        if (request_valid && (requested_mode !== MODE_INVALID) && (requested_mode !== MODE_ULT)) begin
           clr_warning = 1'b1;  // Allow a future illegal request to be reported again.
           nxt_pending_mode = requested_mode;
           wait_cycles = transition_cycles(MODE_INVALID, requested_mode, clock_period_ns);
 
-          if (wait_cycles == 0) begin
+          if (wait_cycles === 0) begin
             nxt_mode  = requested_mode;  // Recover immediately if no wait is required.
             nxt_state = RUN;
           end else begin
@@ -482,9 +482,8 @@ module SPH0641LU4H_1_model #(
   // 4. Drive the carry-out bit as the next 1-bit PDM output.  //
   //                                                           //
   // This is still a behavioral source, not an acoustic MEMS   //
-  // model, but it is a true time-varying PDM stream instead   //
-  // of the older constant-density test pattern.               //
-  /////////////////////////////////////////////////////////////
+  // model, but it is a true time-varying PDM stream.          //
+  ///////////////////////////////////////////////////////////////
   always @(posedge clock_i or negedge clock_i or negedge vdd_i) begin : data_drive_proc
     logic [16:0] pdm_sum;
     logic [15:0] phase_next;

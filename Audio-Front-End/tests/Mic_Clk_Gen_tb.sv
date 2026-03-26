@@ -3,7 +3,7 @@
 // Testbench: Mic_Clk_Gen_tb
 // Description: Verifies Mic_Clk_Gen behavior in conjunction
 //              with the mic model. This bench models VDD as a
-//              real-valued supply and derives volt_on_i from
+//              real-valued supply and derives volt_on from
 //              the 1.62 V threshold used by the microphone.
 //              It also checks edge cases such as threshold
 //              chatter, brownouts, and direct ultrasonic
@@ -16,21 +16,21 @@ module Mic_Clk_Gen_tb ();
 
   localparam int unsigned SYS_CLK_HZ = 50_000_000;
   localparam real VDD_ON_THRESHOLD_V = 1.62;
-  localparam int unsigned FSM_MARGIN_CYCLES = 8;
+  localparam int unsigned FSM_MARGIN_CYCLES = 1024;
   localparam int unsigned CLOCK_ACTIVITY_OBSERVE_CYCLES = 800;
   localparam int unsigned SAMPLE_TIMEOUT_CYCLES = 5_000_000;
 
   /////////////////////////////
   // Stimulus of type logic //
   ///////////////////////////
-  logic clk_i;
-  logic rst_i;
-  logic volt_on_i;
-  logic [2:0] mode_req_i;
-  logic data_val_o;
+  logic clk;
+  logic rst;
+  logic volt_on;
+  logic [2:0] mode_req;
+  logic data_val;
   tri data;
-  logic [1:0] curr_mode_o;
-  logic mic_clk_o;
+  logic [1:0] curr_mode;
+  logic mic_clk;
   real vdd_v;
   int error_count;
 
@@ -54,20 +54,20 @@ module Mic_Clk_Gen_tb ();
 
   // Convert the analog-style supply to the digital power-good input used by the DUT.
   always_comb begin
-    volt_on_i = (vdd_v >= VDD_ON_THRESHOLD_V);
+    volt_on = (vdd_v >= VDD_ON_THRESHOLD_V);
   end
 
   // 50 MHz reference clock for the clock generator.
-  always #10 clk_i = ~clk_i;
+  always #10 clk = ~clk;
 
   // Track that the generated mic clock is alive or quiescent as expected.
-  always @(posedge mic_clk_o or negedge mic_clk_o) begin
+  always @(posedge mic_clk or negedge mic_clk) begin
     mic_clk_edge_count += 1;
   end
 
   // Sample the left microphone on falling mic-clock edges.
-  always @(negedge mic_clk_o) begin
-    if (data_val_o) begin
+  always @(negedge mic_clk) begin
+    if (data_val) begin
       #1;
       if ((data === 1'b0) || (data === 1'b1)) begin
         left_sample_count += 1;
@@ -83,8 +83,8 @@ module Mic_Clk_Gen_tb ();
   end
 
   // Sample the right microphone on rising mic-clock edges.
-  always @(posedge mic_clk_o) begin
-    if (data_val_o) begin
+  always @(posedge mic_clk) begin
+    if (data_val) begin
       #1;
       if ((data === 1'b0) || (data === 1'b1)) begin
         right_sample_count += 1;
@@ -103,20 +103,20 @@ module Mic_Clk_Gen_tb ();
   Mic_Clk_Gen #(
       .SYS_CLK_HZ(SYS_CLK_HZ)
   ) iCLK_GEN (
-      .clk_i(clk_i),
-      .rst_i(rst_i),
-      .volt_on_i(volt_on_i),
-      .mode_req_i(mode_req_i),
+      .clk_i(clk),
+      .rst_i(rst),
+      .volt_on_i(volt_on),
+      .mode_req_i(mode_req),
 
-      .data_val_o (data_val_o),
-      .curr_mode_o(curr_mode_o),
-      .mic_clk_o  (mic_clk_o)
+      .data_val_o (data_val),
+      .curr_mode_o(curr_mode),
+      .mic_clk_o  (mic_clk)
   );
 
   // Instantiate left mic.
   SPH0641LU4H_1_model iMIC_MODEL_L (
-      .vdd_i(volt_on_i),
-      .clock_i(mic_clk_o),
+      .vdd_i(volt_on),
+      .clock_i(mic_clk),
       .select_i(1'b0),
 
       .data_o(data)
@@ -124,18 +124,18 @@ module Mic_Clk_Gen_tb ();
 
   // Instantiate right mic.
   SPH0641LU4H_1_model iMIC_MODEL_R (
-      .vdd_i(volt_on_i),
-      .clock_i(mic_clk_o),
+      .vdd_i(volt_on),
+      .clock_i(mic_clk),
       .select_i(1'b1),
 
       .data_o(data)
   );
 
-  //////////////////
+  ///////////////////
   // TB utilities //
-  ////////////////
+  /////////////////
   task automatic wait_n_negedges(input int unsigned num_edges);
-    repeat (num_edges) @(negedge clk_i);
+    repeat (num_edges) @(negedge clk);
   endtask : wait_n_negedges
 
   task automatic clear_capture_state();
@@ -162,7 +162,7 @@ module Mic_Clk_Gen_tb ();
     int unsigned edge_idx;
     begin
       for (edge_idx = 0; edge_idx < num_edges; edge_idx += 1) begin
-        @(posedge mic_clk_o or negedge mic_clk_o);
+        @(posedge mic_clk or negedge mic_clk);
       end
     end
   endtask : wait_n_mic_edges
@@ -236,7 +236,7 @@ module Mic_Clk_Gen_tb ();
       while (((left_sample_count < samples_per_channel) ||
               (right_sample_count < samples_per_channel)) &&
              (waited_cycles < timeout_cycles)) begin
-        @(negedge clk_i);
+        @(negedge clk);
         waited_cycles += 1;
       end
 
@@ -253,14 +253,14 @@ module Mic_Clk_Gen_tb ();
     int unsigned pair_idx;
     begin
       for (pair_idx = 0; pair_idx < edge_pairs; pair_idx += 1) begin
-        @(posedge mic_clk_o);
+        @(posedge mic_clk);
         #1;
         if (data !== 1'bz) begin
           $error("ERROR: Shared data bus was not high-Z on a right-channel edge during %s!", label);
           error_count += 1;
         end
 
-        @(negedge mic_clk_o);
+        @(negedge mic_clk);
         #1;
         if (data !== 1'bz) begin
           $error("ERROR: Shared data bus was not high-Z on a left-channel edge during %s!", label);
@@ -275,28 +275,28 @@ module Mic_Clk_Gen_tb ();
     mic_clk_edge_count = 0;
     clear_capture_state();
 
-    clk_i = 1'b0;
-    rst_i = 1'b1;
-    mode_req_i = 3'h0;
+    clk = 1'b0;
+    rst = 1'b1;
+    mode_req = 3'h0;
     vdd_v = 0.0;
 
     wait_n_negedges(5);
-    rst_i = 1'b0;
+    rst = 1'b0;
 
     // TEST 1: Below-threshold VDD should keep the mic path OFF.
-    @(negedge clk_i) begin
-      mode_req_i = 3'h6;
+    @(negedge clk) begin
+      mode_req = 3'h6;
       set_vdd(1.55);
     end
 
     wait_n_negedges(POWERUP_CYCLES + FSM_MARGIN_CYCLES);
 
-    if (volt_on_i !== 1'b0) begin
+    if (volt_on !== 1'b0) begin
       $error("ERROR: volt_on_i asserted below the 1.62 V threshold!");
       error_count += 1;
     end
 
-    if (data_val_o !== 1'b0) begin
+    if (data_val !== 1'b0) begin
       $error("ERROR: data_val_o went high while VDD was below threshold!");
       error_count += 1;
     end
@@ -304,24 +304,24 @@ module Mic_Clk_Gen_tb ();
     expect_clock_quiet(CLOCK_ACTIVITY_OBSERVE_CYCLES, "below-threshold VDD");
 
     // TEST 2: With power present, a disabled request should map to SLEEP.
-    @(negedge clk_i) begin
-      mode_req_i = 3'h0;
+    @(negedge clk) begin
+      mode_req = 3'h0;
     end
 
     ramp_vdd(1.55, 1.72, 0.03, 2);
     wait_n_negedges(POWERUP_CYCLES + FSM_MARGIN_CYCLES);
 
-    if (volt_on_i !== 1'b1) begin
+    if (volt_on !== 1'b1) begin
       $error("ERROR: volt_on_i did not assert after VDD crossed the threshold!");
       error_count += 1;
     end
 
-    if (curr_mode_o !== 2'h0) begin
+    if (curr_mode !== 2'h0) begin
       $error("ERROR: curr_mode_o is not SLEEP after powering up with a disabled request!");
       error_count += 1;
     end
 
-    if (data_val_o !== 1'b0) begin
+    if (data_val !== 1'b0) begin
       $error("ERROR: data_val_o is not low in SLEEP mode!");
       error_count += 1;
     end
@@ -332,16 +332,16 @@ module Mic_Clk_Gen_tb ();
 
     // TEST 3: Wake into STANDARD mode and read data from both microphones.
     clear_capture_state();
-    @(negedge clk_i) mode_req_i = 3'h6;
+    @(negedge clk) mode_req = 3'h6;
 
     wait_n_negedges(WAKEUP_CYCLES + FSM_MARGIN_CYCLES);
 
-    if (curr_mode_o !== 2'h2) begin
+    if (curr_mode !== 2'h2) begin
       $error("ERROR: curr_mode_o is not STANDARD after requesting STANDARD mode!");
       error_count += 1;
     end
 
-    if (data_val_o !== 1'b1) begin
+    if (data_val !== 1'b1) begin
       $error("ERROR: data_val_o is not high after entering STANDARD mode!");
       error_count += 1;
     end
@@ -350,18 +350,18 @@ module Mic_Clk_Gen_tb ();
 
     // TEST 4: Brownout mid-transition should clear the mic path safely.
     clear_capture_state();
-    @(negedge clk_i) mode_req_i = 3'h7;
+    @(negedge clk) mode_req = 3'h7;
 
     wait_n_negedges((MODECHANGE_CYCLES / 2) + 2);
     ramp_vdd(vdd_v, 1.55, 0.04, 1);
     wait_n_negedges(FSM_MARGIN_CYCLES);
 
-    if (volt_on_i !== 1'b0) begin
+    if (volt_on !== 1'b0) begin
       $error("ERROR: volt_on_i did not drop after a brownout!");
       error_count += 1;
     end
 
-    if (data_val_o !== 1'b0) begin
+    if (data_val !== 1'b0) begin
       $error("ERROR: data_val_o did not clear after a brownout!");
       error_count += 1;
     end
@@ -370,7 +370,7 @@ module Mic_Clk_Gen_tb ();
 
     // TEST 5: Threshold chatter should not prevent eventual recovery into LOW-POWER mode.
     clear_capture_state();
-    @(negedge clk_i) mode_req_i = 3'h5;
+    @(negedge clk) mode_req = 3'h5;
 
     set_vdd(1.60);
     wait_n_negedges(2);
@@ -382,12 +382,12 @@ module Mic_Clk_Gen_tb ();
 
     wait_n_negedges(POWERUP_CYCLES + FSM_MARGIN_CYCLES);
 
-    if (curr_mode_o !== 2'h1) begin
+    if (curr_mode !== 2'h1) begin
       $error("ERROR: curr_mode_o is not LOW-POWER after threshold chatter recovery!");
       error_count += 1;
     end
 
-    if (data_val_o !== 1'b1) begin
+    if (data_val !== 1'b1) begin
       $error("ERROR: data_val_o is not high after threshold chatter recovery!");
       error_count += 1;
     end
@@ -396,8 +396,8 @@ module Mic_Clk_Gen_tb ();
 
     // TEST 6: Direct OFF->ULTRASONIC request should still produce valid stereo data.
     clear_capture_state();
-    @(negedge clk_i) begin
-      mode_req_i = 3'h7;
+    @(negedge clk) begin
+      mode_req = 3'h7;
       set_vdd(0.0);
     end
 
@@ -405,12 +405,12 @@ module Mic_Clk_Gen_tb ();
     ramp_vdd(0.0, 1.80, 0.06, 2);
     wait_n_negedges(POWERUP_CYCLES + MODECHANGE_CYCLES + FSM_MARGIN_CYCLES);
 
-    if (curr_mode_o !== 2'h3) begin
+    if (curr_mode !== 2'h3) begin
       $error("ERROR: curr_mode_o is not ULTRASONIC after OFF->ULTRASONIC sequencing!");
       error_count += 1;
     end
 
-    if (data_val_o !== 1'b1) begin
+    if (data_val !== 1'b1) begin
       $error("ERROR: data_val_o is not high after OFF->ULTRASONIC sequencing!");
       error_count += 1;
     end
@@ -419,16 +419,16 @@ module Mic_Clk_Gen_tb ();
 
     // TEST 7: A powered disabled request should return to SLEEP and release the PDM bus.
     clear_capture_state();
-    @(negedge clk_i) mode_req_i = 3'h0;
+    @(negedge clk) mode_req = 3'h0;
 
     wait_n_negedges(FALLASLEEP_CYCLES + FSM_MARGIN_CYCLES);
 
-    if (curr_mode_o !== 2'h0) begin
+    if (curr_mode !== 2'h0) begin
       $error("ERROR: curr_mode_o is not SLEEP after a powered disabled request!");
       error_count += 1;
     end
 
-    if (data_val_o !== 1'b0) begin
+    if (data_val !== 1'b0) begin
       $error("ERROR: data_val_o is not low after returning to SLEEP!");
       error_count += 1;
     end
@@ -443,7 +443,7 @@ module Mic_Clk_Gen_tb ();
       $display("ERROR: %0d test(s) failed.", error_count);
     end
 
-    $finish();
+    $stop();
   end
 
 endmodule
@@ -472,25 +472,12 @@ module Mic_Clk_Pll (
 
   initial begin
     outclk_1 = 1'b0;
-    forever #(SLEEP_HALF_PERIOD_NS) outclk_1 = ~outclk_1;
-  end
-
-  initial begin
     outclk_3 = 1'b0;
-    forever #(LOW_PWR_HALF_PERIOD_NS) outclk_3 = ~outclk_3;
-  end
-
-  initial begin
     outclk_4 = 1'b0;
-    forever #(STD_HALF_PERIOD_NS) outclk_4 = ~outclk_4;
-  end
-
-  initial begin
     outclk_5 = 1'b0;
-    forever #(ULT_HALF_PERIOD_NS) outclk_5 = ~outclk_5;
   end
 
-  always_ff @(posedge refclk or posedge rst) begin
+  always_ff @(posedge refclk) begin
     if (rst) begin
       locked <= 1'b0;
     end else begin
@@ -498,34 +485,9 @@ module Mic_Clk_Pll (
     end
   end
 
-endmodule
-
-// ------------------------------------------------------------
-// Module: Mic_Clk_Ctrl
-// Description: Behavioral clock mux/gate stub for Mic_Clk_Gen_tb.
-// ------------------------------------------------------------
-module Mic_Clk_Ctrl (
-    input logic inclk3x,
-    input logic inclk2x,
-    input logic inclk1x,
-    input logic inclk0x,
-    input logic [1:0] clkselect,
-    input logic ena,
-    output logic outclk
-);
-
-  always_comb begin
-    if (!ena) begin
-      outclk = 1'b0;
-    end else begin
-      unique case (clkselect)
-        2'b00:   outclk = inclk0x;
-        2'b01:   outclk = inclk1x;
-        2'b10:   outclk = inclk2x;
-        2'b11:   outclk = inclk3x;
-        default: outclk = 1'b0;
-      endcase
-    end
-  end
+  always #(SLEEP_HALF_PERIOD_NS) outclk_1 = ~outclk_1;
+  always #(LOW_PWR_HALF_PERIOD_NS) outclk_3 = ~outclk_3;
+  always #(STD_HALF_PERIOD_NS) outclk_4 = ~outclk_4;
+  always #(ULT_HALF_PERIOD_NS) outclk_5 = ~outclk_5;
 
 endmodule
