@@ -1,0 +1,817 @@
+Analysis & Synthesis report for DE1_SOC_Linux_FB
+Thu Mar 26 20:35:38 2026
+Quartus Prime Version 24.1std.0 Build 1077 03/04/2025 SC Lite Edition
+
+
+---------------------
+; Table of Contents ;
+---------------------
+  1. Legal Notice
+  2. Analysis & Synthesis Summary
+  3. Analysis & Synthesis Settings
+  4. Parallel Compilation
+  5. Analysis & Synthesis Messages
+  6. Analysis & Synthesis Suppressed Messages
+
+
+
+----------------
+; Legal Notice ;
+----------------
+Copyright (C) 2025  Altera Corporation. All rights reserved.
+Your use of Altera Corporation's design tools, logic functions 
+and other software and tools, and any partner logic 
+functions, and any output files from any of the foregoing 
+(including device programming or simulation files), and any 
+associated documentation or information are expressly subject 
+to the terms and conditions of the Altera Program License 
+Subscription Agreement, the Altera Quartus Prime License Agreement,
+the Altera IP License Agreement, or other applicable license
+agreement, including, without limitation, that your use is for
+the sole purpose of programming logic devices manufactured by
+Altera and sold by Altera or its authorized distributors.  Please
+refer to the Altera Software License Subscription Agreements 
+on the Quartus Prime software download page.
+
+
+
++-------------------------------------------------------------------------------+
+; Analysis & Synthesis Summary                                                  ;
++-----------------------------+-------------------------------------------------+
+; Analysis & Synthesis Status ; Failed - Thu Mar 26 20:35:38 2026               ;
+; Quartus Prime Version       ; 24.1std.0 Build 1077 03/04/2025 SC Lite Edition ;
+; Revision Name               ; DE1_SOC_Linux_FB                                ;
+; Top-level Entity Name       ; DE1_SOC_Linux_FB                                ;
+; Family                      ; Cyclone V                                       ;
+; Logic utilization (in ALMs) ; N/A until Partition Merge                       ;
+; Total registers             ; N/A until Partition Merge                       ;
+; Total pins                  ; N/A until Partition Merge                       ;
+; Total virtual pins          ; N/A until Partition Merge                       ;
+; Total block memory bits     ; N/A until Partition Merge                       ;
+; Total PLLs                  ; N/A until Partition Merge                       ;
+; Total DLLs                  ; N/A until Partition Merge                       ;
++-----------------------------+-------------------------------------------------+
+
+
++---------------------------------------------------------------------------------------------------------------------------+
+; Analysis & Synthesis Settings                                                                                             ;
++---------------------------------------------------------------------------------+--------------------+--------------------+
+; Option                                                                          ; Setting            ; Default Value      ;
++---------------------------------------------------------------------------------+--------------------+--------------------+
+; Device                                                                          ; 5CSEMA5F31C6       ;                    ;
+; Top-level entity name                                                           ; DE1_SOC_Linux_FB   ; DE1_SOC_Linux_FB   ;
+; Family name                                                                     ; Cyclone V          ; Cyclone V          ;
+; Optimization Technique                                                          ; Speed              ; Balanced           ;
+; Use smart compilation                                                           ; Off                ; Off                ;
+; Enable parallel Assembler and Timing Analyzer during compilation                ; On                 ; On                 ;
+; Enable compact report table                                                     ; Off                ; Off                ;
+; Restructure Multiplexers                                                        ; Auto               ; Auto               ;
+; MLAB Add Timing Constraints For Mixed-Port Feed-Through Mode Setting Don't Care ; Off                ; Off                ;
+; Create Debugging Nodes for IP Cores                                             ; Off                ; Off                ;
+; Preserve fewer node names                                                       ; On                 ; On                 ;
+; Intel FPGA IP Evaluation Mode                                                   ; Enable             ; Enable             ;
+; Verilog Version                                                                 ; Verilog_2001       ; Verilog_2001       ;
+; VHDL Version                                                                    ; VHDL_1993          ; VHDL_1993          ;
+; State Machine Processing                                                        ; Auto               ; Auto               ;
+; Safe State Machine                                                              ; Off                ; Off                ;
+; Extract Verilog State Machines                                                  ; On                 ; On                 ;
+; Extract VHDL State Machines                                                     ; On                 ; On                 ;
+; Ignore Verilog initial constructs                                               ; Off                ; Off                ;
+; Iteration limit for constant Verilog loops                                      ; 5000               ; 5000               ;
+; Iteration limit for non-constant Verilog loops                                  ; 250                ; 250                ;
+; Add Pass-Through Logic to Inferred RAMs                                         ; On                 ; On                 ;
+; Infer RAMs from Raw Logic                                                       ; On                 ; On                 ;
+; Parallel Synthesis                                                              ; On                 ; On                 ;
+; DSP Block Balancing                                                             ; Auto               ; Auto               ;
+; NOT Gate Push-Back                                                              ; On                 ; On                 ;
+; Power-Up Don't Care                                                             ; On                 ; On                 ;
+; Remove Redundant Logic Cells                                                    ; Off                ; Off                ;
+; Remove Duplicate Registers                                                      ; On                 ; On                 ;
+; Ignore CARRY Buffers                                                            ; Off                ; Off                ;
+; Ignore CASCADE Buffers                                                          ; Off                ; Off                ;
+; Ignore GLOBAL Buffers                                                           ; Off                ; Off                ;
+; Ignore ROW GLOBAL Buffers                                                       ; Off                ; Off                ;
+; Ignore LCELL Buffers                                                            ; Off                ; Off                ;
+; Ignore SOFT Buffers                                                             ; On                 ; On                 ;
+; Limit AHDL Integers to 32 Bits                                                  ; Off                ; Off                ;
+; Carry Chain Length                                                              ; 70                 ; 70                 ;
+; Auto Carry Chains                                                               ; On                 ; On                 ;
+; Auto Open-Drain Pins                                                            ; On                 ; On                 ;
+; Perform WYSIWYG Primitive Resynthesis                                           ; Off                ; Off                ;
+; Auto ROM Replacement                                                            ; On                 ; On                 ;
+; Auto RAM Replacement                                                            ; On                 ; On                 ;
+; Auto DSP Block Replacement                                                      ; On                 ; On                 ;
+; Auto Shift Register Replacement                                                 ; Auto               ; Auto               ;
+; Allow Shift Register Merging across Hierarchies                                 ; Auto               ; Auto               ;
+; Auto Clock Enable Replacement                                                   ; On                 ; On                 ;
+; Strict RAM Replacement                                                          ; Off                ; Off                ;
+; Allow Synchronous Control Signals                                               ; On                 ; On                 ;
+; Force Use of Synchronous Clear Signals                                          ; Off                ; Off                ;
+; Auto Resource Sharing                                                           ; Off                ; Off                ;
+; Allow Any RAM Size For Recognition                                              ; Off                ; Off                ;
+; Allow Any ROM Size For Recognition                                              ; Off                ; Off                ;
+; Allow Any Shift Register Size For Recognition                                   ; Off                ; Off                ;
+; Use LogicLock Constraints during Resource Balancing                             ; On                 ; On                 ;
+; Ignore translate_off and synthesis_off directives                               ; Off                ; Off                ;
+; Timing-Driven Synthesis                                                         ; On                 ; On                 ;
+; Report Parameter Settings                                                       ; On                 ; On                 ;
+; Report Source Assignments                                                       ; On                 ; On                 ;
+; Report Connectivity Checks                                                      ; On                 ; On                 ;
+; Ignore Maximum Fan-Out Assignments                                              ; Off                ; Off                ;
+; Synchronization Register Chain Length                                           ; 3                  ; 3                  ;
+; Power Optimization During Synthesis                                             ; Normal compilation ; Normal compilation ;
+; HDL message level                                                               ; Level2             ; Level2             ;
+; Suppress Register Optimization Related Messages                                 ; Off                ; Off                ;
+; Number of Removed Registers Reported in Synthesis Report                        ; 5000               ; 5000               ;
+; Number of Swept Nodes Reported in Synthesis Report                              ; 5000               ; 5000               ;
+; Number of Inverted Registers Reported in Synthesis Report                       ; 100                ; 100                ;
+; Clock MUX Protection                                                            ; On                 ; On                 ;
+; Auto Gated Clock Conversion                                                     ; Off                ; Off                ;
+; Block Design Naming                                                             ; Auto               ; Auto               ;
+; SDC constraint protection                                                       ; Off                ; Off                ;
+; Synthesis Effort                                                                ; Auto               ; Auto               ;
+; Shift Register Replacement - Allow Asynchronous Clear Signal                    ; On                 ; On                 ;
+; Pre-Mapping Resynthesis Optimization                                            ; Off                ; Off                ;
+; Analysis & Synthesis Message Level                                              ; Medium             ; Medium             ;
+; Disable Register Merging Across Hierarchies                                     ; Auto               ; Auto               ;
+; Resource Aware Inference For Block RAM                                          ; On                 ; On                 ;
+; Automatic Parallel Synthesis                                                    ; On                 ; On                 ;
+; Partial Reconfiguration Bitstream ID                                            ; Off                ; Off                ;
++---------------------------------------------------------------------------------+--------------------+--------------------+
+
+
++------------------------------------------+
+; Parallel Compilation                     ;
++----------------------------+-------------+
+; Processors                 ; Number      ;
++----------------------------+-------------+
+; Number detected on machine ; 20          ;
+; Maximum allowed            ; 14          ;
+;                            ;             ;
+; Average used               ; 1.00        ;
+; Maximum used               ; 1           ;
+;                            ;             ;
+; Usage by Processor         ; % Time Used ;
+;     Processor 1            ; 100.0%      ;
++----------------------------+-------------+
+
+
++-------------------------------+
+; Analysis & Synthesis Messages ;
++-------------------------------+
+Info: *******************************************************************
+Info: Running Quartus Prime Analysis & Synthesis
+    Info: Version 24.1std.0 Build 1077 03/04/2025 SC Lite Edition
+    Info: Processing started: Thu Mar 26 20:34:20 2026
+Info: Command: quartus_map --read_settings_files=on --write_settings_files=off DE1_SOC_Linux_FB -c DE1_SOC_Linux_FB
+Warning (18236): Number of processors has not been specified which may cause overloading on shared machines.  Set the global assignment NUM_PARALLEL_PROCESSORS in your QSF to an appropriate value for best performance.
+Info (20030): Parallel compilation is enabled and will use 14 of the 14 processors detected
+Info (12248): Elaborating Platform Designer system entity "soc_system.qsys"
+Info (12250): 2026.03.26.20:34:30 Progress: Loading DE1_SOC_Linux_FB/soc_system.qsys
+Info (12250): 2026.03.26.20:34:31 Progress: Reading input file
+Info (12250): 2026.03.26.20:34:31 Progress: Adding alt_vip_cl_cvo_0 [alt_vip_cl_cvo 24.1]
+Info (12250): 2026.03.26.20:34:31 Progress: Parameterizing module alt_vip_cl_cvo_0
+Info (12250): 2026.03.26.20:34:31 Progress: Adding alt_vip_cl_vfb_0 [alt_vip_cl_vfb 24.1]
+Info (12250): 2026.03.26.20:34:31 Progress: Parameterizing module alt_vip_cl_vfb_0
+Info (12250): 2026.03.26.20:34:31 Progress: Adding button_pio [altera_avalon_pio 24.1]
+Info (12250): 2026.03.26.20:34:31 Progress: Parameterizing module button_pio
+Info (12250): 2026.03.26.20:34:31 Progress: Adding clk_0 [clock_source 24.1]
+Info (12250): 2026.03.26.20:34:31 Progress: Parameterizing module clk_0
+Info (12250): 2026.03.26.20:34:31 Progress: Adding clock_bridge_0 [altera_clock_bridge 24.1]
+Info (12250): 2026.03.26.20:34:31 Progress: Parameterizing module clock_bridge_0
+Info (12250): 2026.03.26.20:34:31 Progress: Adding dipsw_pio [altera_avalon_pio 24.1]
+Info (12250): 2026.03.26.20:34:31 Progress: Parameterizing module dipsw_pio
+Info (12250): 2026.03.26.20:34:31 Progress: Adding hps_0 [altera_hps 24.1]
+Info (12250): 2026.03.26.20:34:31 Progress: Parameterizing module hps_0
+Info (12250): 2026.03.26.20:34:31 Progress: Adding intr_capturer_0 [intr_capturer 100.99.98.97]
+Info (12250): 2026.03.26.20:34:32 Progress: Parameterizing module intr_capturer_0
+Info (12250): 2026.03.26.20:34:32 Progress: Adding jtag_uart [altera_avalon_jtag_uart 24.1]
+Info (12250): 2026.03.26.20:34:32 Progress: Parameterizing module jtag_uart
+Info (12250): 2026.03.26.20:34:32 Progress: Adding led_pio [altera_avalon_pio 24.1]
+Info (12250): 2026.03.26.20:34:32 Progress: Parameterizing module led_pio
+Info (12250): 2026.03.26.20:34:32 Progress: Adding master_non_sec [altera_jtag_avalon_master 24.1]
+Info (12250): 2026.03.26.20:34:32 Progress: Parameterizing module master_non_sec
+Info (12250): 2026.03.26.20:34:32 Progress: Adding master_secure [altera_jtag_avalon_master 24.1]
+Info (12250): 2026.03.26.20:34:32 Progress: Parameterizing module master_secure
+Info (12250): 2026.03.26.20:34:32 Progress: Adding onchip_memory2_0 [altera_avalon_onchip_memory2 24.1]
+Info (12250): 2026.03.26.20:34:32 Progress: Parameterizing module onchip_memory2_0
+Info (12250): 2026.03.26.20:34:32 Progress: Adding sysid_qsys [altera_avalon_sysid_qsys 24.1]
+Info (12250): 2026.03.26.20:34:32 Progress: Parameterizing module sysid_qsys
+Info (12250): 2026.03.26.20:34:32 Progress: Building connections
+Info (12250): 2026.03.26.20:34:32 Progress: Parameterizing connections
+Info (12250): 2026.03.26.20:34:32 Progress: Validating
+Info (12250): 2026.03.26.20:34:40 Progress: Done reading input file
+Info (12250): Soc_system.alt_vip_cl_vfb_0: Buffer 3 frames, storage required is 9216 kB (0x00000000 to 0x00900000)
+Info (12250): Soc_system.button_pio: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info (12250): Soc_system.dipsw_pio: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info (12250): Soc_system.hps_0: HPS Main PLL counter settings: n = 0  m = 73
+Info (12250): Soc_system.hps_0: HPS peripherial PLL counter settings: n = 0  m = 39
+Warning (12251): Soc_system.hps_0: "Configuration/HPS-to-FPGA user 0 clock frequency" (desired_cfg_clk_mhz) requested 100.0 MHz, but only achieved 97.368421 MHz
+Warning (12251): Soc_system.hps_0: "QSPI clock frequency" (desired_qspi_clk_mhz) requested 400.0 MHz, but only achieved 370.0 MHz
+Warning (12251): Soc_system.hps_0: 1 or more output clock frequencies cannot be achieved precisely, consider revising desired output clock frequencies.
+Warning (12251): Soc_system.hps_0: HPS model no longer supports simulation for HPS FPGA Bridges.
+Info (12250): Soc_system.hps_0: Ensure that valid Cortex A9 boot code is available to the HPS system when enabling boot from FPGA and h2f_axi_master interface is connecting to slave component start at address 0x0.
+Info (12250): Soc_system.jtag_uart: JTAG UART IP input clock need to be at least double (2x) the operating frequency of JTAG TCK on board
+Info (12250): Soc_system.sysid_qsys: System ID is not assigned automatically. Edit the System ID parameter to provide a unique ID
+Info (12250): Soc_system.sysid_qsys: Time stamp will be automatically updated when this component is generated.
+Warning (12251): Soc_system.hps_0: hps_0.f2h_boot_from_fpga must be exported, or connected to a matching conduit.
+Info (12250): Soc_system: Generating "soc_system" for QUARTUS_SYNTH
+Info (12250): Inserting clock-crossing logic between cmd_demux.src1 and cmd_mux_001.sink0
+Info (12250): Inserting clock-crossing logic between cmd_demux_001.src1 and cmd_mux_001.sink1
+Info (12250): Inserting clock-crossing logic between rsp_demux_001.src0 and rsp_mux.sink1
+Info (12250): Inserting clock-crossing logic between rsp_demux_001.src1 and rsp_mux_001.sink1
+Warning (12251): Hps_0.f2h_irq0: Cannot connect clock for irq_mapper.sender
+Warning (12251): Hps_0.f2h_irq0: Cannot connect reset for irq_mapper.sender
+Warning (12251): Hps_0.f2h_irq1: Cannot connect clock for irq_mapper_001.sender
+Warning (12251): Hps_0.f2h_irq1: Cannot connect reset for irq_mapper_001.sender
+Info (12250): Alt_vip_cl_cvo_0: "soc_system" instantiated alt_vip_cl_cvo "alt_vip_cl_cvo_0"
+Info (12250): Alt_vip_cl_vfb_0: "soc_system" instantiated alt_vip_cl_vfb "alt_vip_cl_vfb_0"
+Info (12250): Button_pio: Starting RTL generation for module 'soc_system_button_pio'
+Info (12250): Button_pio:   Generation command is [exec cmd /c {set LC_ALL=C&& C:/intelfpga_lite/24.1std/quartus/bin64/perl/bin/perl.exe -I C:/intelfpga_lite/24.1std/quartus/bin64/perl/lib -I C:/intelfpga_lite/24.1std/quartus/sopc_builder/bin/europa -I C:/intelfpga_lite/24.1std/quartus/sopc_builder/bin -I C:/intelfpga_lite/24.1std/quartus/../ip/altera/sopc_builder_ip/common -I C:/intelfpga_lite/24.1std/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio -- C:/intelfpga_lite/24.1std/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio/generate_rtl.pl --name=soc_system_button_pio --dir=C:/Users/deapen/AppData/Local/Temp/alt0539_9201803486817520324.dir/0002_button_pio_gen/ --quartus_dir=C:/intelfpga_lite/24.1std/quartus --verilog --config=C:/Users/deapen/AppData/Local/Temp/alt0539_9201803486817520324.dir/0002_button_pio_gen//soc_system_button_pio_component_configuration.pl --do_build_sim=0}]
+Info (12250): Button_pio: Done RTL generation for module 'soc_system_button_pio'
+Info (12250): Button_pio: "soc_system" instantiated altera_avalon_pio "button_pio"
+Info (12250): Dipsw_pio: Starting RTL generation for module 'soc_system_dipsw_pio'
+Info (12250): Dipsw_pio:   Generation command is [exec cmd /c {set LC_ALL=C&& C:/intelfpga_lite/24.1std/quartus/bin64/perl/bin/perl.exe -I C:/intelfpga_lite/24.1std/quartus/bin64/perl/lib -I C:/intelfpga_lite/24.1std/quartus/sopc_builder/bin/europa -I C:/intelfpga_lite/24.1std/quartus/sopc_builder/bin -I C:/intelfpga_lite/24.1std/quartus/../ip/altera/sopc_builder_ip/common -I C:/intelfpga_lite/24.1std/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio -- C:/intelfpga_lite/24.1std/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio/generate_rtl.pl --name=soc_system_dipsw_pio --dir=C:/Users/deapen/AppData/Local/Temp/alt0539_9201803486817520324.dir/0003_dipsw_pio_gen/ --quartus_dir=C:/intelfpga_lite/24.1std/quartus --verilog --config=C:/Users/deapen/AppData/Local/Temp/alt0539_9201803486817520324.dir/0003_dipsw_pio_gen//soc_system_dipsw_pio_component_configuration.pl --do_build_sim=0}]
+Info (12250): Dipsw_pio: Done RTL generation for module 'soc_system_dipsw_pio'
+Info (12250): Dipsw_pio: "soc_system" instantiated altera_avalon_pio "dipsw_pio"
+Info (12250): Hps_0: "Running  for module: hps_0"
+Info (12250): Hps_0: HPS Main PLL counter settings: n = 0  m = 73
+Info (12250): Hps_0: HPS peripherial PLL counter settings: n = 0  m = 39
+Warning (12251): Hps_0: "Configuration/HPS-to-FPGA user 0 clock frequency" (desired_cfg_clk_mhz) requested 100.0 MHz, but only achieved 97.368421 MHz
+Warning (12251): Hps_0: "QSPI clock frequency" (desired_qspi_clk_mhz) requested 400.0 MHz, but only achieved 370.0 MHz
+Warning (12251): Hps_0: 1 or more output clock frequencies cannot be achieved precisely, consider revising desired output clock frequencies.
+Warning (12251): Hps_0: HPS model no longer supports simulation for HPS FPGA Bridges.
+Info (12250): Hps_0: Ensure that valid Cortex A9 boot code is available to the HPS system when enabling boot from FPGA and h2f_axi_master interface is connecting to slave component start at address 0x0.
+Info (12250): Hps_0: "soc_system" instantiated altera_hps "hps_0"
+Info (12250): Intr_capturer_0: "soc_system" instantiated intr_capturer "intr_capturer_0"
+Info (12250): Jtag_uart: "soc_system" instantiated altera_avalon_jtag_uart "jtag_uart"
+Info (12250): Led_pio: Starting RTL generation for module 'soc_system_led_pio'
+Info (12250): Led_pio:   Generation command is [exec cmd /c {set LC_ALL=C&& C:/intelfpga_lite/24.1std/quartus/bin64/perl/bin/perl.exe -I C:/intelfpga_lite/24.1std/quartus/bin64/perl/lib -I C:/intelfpga_lite/24.1std/quartus/sopc_builder/bin/europa -I C:/intelfpga_lite/24.1std/quartus/sopc_builder/bin -I C:/intelfpga_lite/24.1std/quartus/../ip/altera/sopc_builder_ip/common -I C:/intelfpga_lite/24.1std/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio -- C:/intelfpga_lite/24.1std/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio/generate_rtl.pl --name=soc_system_led_pio --dir=C:/Users/deapen/AppData/Local/Temp/alt0539_9201803486817520324.dir/0006_led_pio_gen/ --quartus_dir=C:/intelfpga_lite/24.1std/quartus --verilog --config=C:/Users/deapen/AppData/Local/Temp/alt0539_9201803486817520324.dir/0006_led_pio_gen//soc_system_led_pio_component_configuration.pl --do_build_sim=0}]
+Info (12250): Led_pio: Done RTL generation for module 'soc_system_led_pio'
+Info (12250): Led_pio: "soc_system" instantiated altera_avalon_pio "led_pio"
+Info (12250): Master_non_sec: "soc_system" instantiated altera_jtag_avalon_master "master_non_sec"
+Info (12250): Onchip_memory2_0: Starting RTL generation for module 'soc_system_onchip_memory2_0'
+Info (12250): Onchip_memory2_0:   Generation command is [exec cmd /c {set LC_ALL=C&& C:/intelfpga_lite/24.1std/quartus/bin64/perl/bin/perl.exe -I C:/intelfpga_lite/24.1std/quartus/bin64/perl/lib -I C:/intelfpga_lite/24.1std/quartus/sopc_builder/bin/europa -I C:/intelfpga_lite/24.1std/quartus/sopc_builder/bin -I C:/intelfpga_lite/24.1std/quartus/../ip/altera/sopc_builder_ip/common -I C:/intelfpga_lite/24.1std/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2 -- C:/intelfpga_lite/24.1std/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2/generate_rtl.pl --name=soc_system_onchip_memory2_0 --dir=C:/Users/deapen/AppData/Local/Temp/alt0539_9201803486817520324.dir/0007_onchip_memory2_0_gen/ --quartus_dir=C:/intelfpga_lite/24.1std/quartus --verilog --config=C:/Users/deapen/AppData/Local/Temp/alt0539_9201803486817520324.dir/0007_onchip_memory2_0_gen//soc_system_onchip_memory2_0_component_configuration.pl --do_build_sim=0}]
+Info (12250): Onchip_memory2_0: Done RTL generation for module 'soc_system_onchip_memory2_0'
+Info (12250): Onchip_memory2_0: "soc_system" instantiated altera_avalon_onchip_memory2 "onchip_memory2_0"
+Info (12250): Sysid_qsys: "soc_system" instantiated altera_avalon_sysid_qsys "sysid_qsys"
+Info (12250): Avalon_st_adapter: Inserting error_adapter: error_adapter_0
+Info (12250): Avalon_st_adapter_001: Inserting error_adapter: error_adapter_0
+Info (12250): Avalon_st_adapter_002: Inserting error_adapter: error_adapter_0
+Info (12250): Avalon_st_adapter_003: Inserting error_adapter: error_adapter_0
+Info (12250): Avalon_st_adapter_004: Inserting error_adapter: error_adapter_0
+Info (12250): Avalon_st_adapter_005: Inserting error_adapter: error_adapter_0
+Info (12250): Avalon_st_adapter_006: Inserting error_adapter: error_adapter_0
+Info (12250): Avalon_st_adapter_007: Inserting error_adapter: error_adapter_0
+Info (12250): Mm_interconnect_0: "soc_system" instantiated altera_mm_interconnect "mm_interconnect_0"
+Info (12250): Mm_interconnect_1: "soc_system" instantiated altera_mm_interconnect "mm_interconnect_1"
+Info (12250): Irq_mapper: "soc_system" instantiated altera_irq_mapper "irq_mapper"
+Info (12250): Irq_mapper_001: "soc_system" instantiated altera_irq_mapper "irq_mapper_001"
+Info (12250): Irq_synchronizer: "soc_system" instantiated altera_irq_clock_crosser "irq_synchronizer"
+Info (12250): Rst_controller: "soc_system" instantiated altera_reset_controller "rst_controller"
+Info (12250): Video_in: "alt_vip_cl_cvo_0" instantiated alt_vip_video_input_bridge "video_in"
+Info (12250): Scheduler: "alt_vip_cl_cvo_0" instantiated alt_vip_cvo_scheduler "scheduler"
+Info (12250): Sop_align: "alt_vip_cl_cvo_0" instantiated alt_vip_pip_sop_realign "sop_align"
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/common/alt_vip_common_pkg.sv
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_event_packet_decode/src_hdl/alt_vip_common_event_packet_decode.sv
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_event_packet_encode/src_hdl/alt_vip_common_event_packet_encode.sv
+Info (12250): Cvo_core: "alt_vip_cl_cvo_0" instantiated alt_vip_cvo_core "cvo_core"
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/common/alt_vip_common_pkg.sv
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_event_packet_encode/src_hdl/alt_vip_common_event_packet_encode.sv
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_event_packet_decode/src_hdl/alt_vip_common_event_packet_decode.sv
+Info (12250): Rd_ctrl: "alt_vip_cl_vfb_0" instantiated alt_vip_vfb_rd_ctrl "rd_ctrl"
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/common/alt_vip_common_pkg.sv
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_event_packet_decode/src_hdl/alt_vip_common_event_packet_decode.sv
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_event_packet_encode/src_hdl/alt_vip_common_event_packet_encode.sv
+Info (12250): Video_out: "alt_vip_cl_vfb_0" instantiated alt_vip_video_output_bridge "video_out"
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/common/alt_vip_common_pkg.sv
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_event_packet_decode/src_hdl/alt_vip_common_event_packet_decode.sv
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_event_packet_encode/src_hdl/alt_vip_common_event_packet_encode.sv
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_sop_align/src_hdl/alt_vip_common_sop_align.sv
+Info (12250): Pkt_trans_rd: "alt_vip_cl_vfb_0" instantiated alt_vip_packet_transfer "pkt_trans_rd"
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/common/alt_vip_common_pkg.sv
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_event_packet_decode/src_hdl/alt_vip_common_event_packet_decode.sv
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_event_packet_encode/src_hdl/alt_vip_common_event_packet_encode.sv
+Info (12250): Sync_ctrl: "alt_vip_cl_vfb_0" instantiated alt_vip_vfb_sync_ctrl "sync_ctrl"
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/common/alt_vip_common_pkg.sv
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_event_packet_decode/src_hdl/alt_vip_common_event_packet_decode.sv
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_event_packet_encode/src_hdl/alt_vip_common_event_packet_encode.sv
+Info (12250): Fpga_interfaces: "hps_0" instantiated altera_interface_generator "fpga_interfaces"
+Info (12250): Hps_io: "hps_0" instantiated altera_hps_io "hps_io"
+Info (12250): Jtag_phy_embedded_in_jtag_master: "master_non_sec" instantiated altera_jtag_dc_streaming "jtag_phy_embedded_in_jtag_master"
+Info (12250): Timing_adt: "master_non_sec" instantiated timing_adapter "timing_adt"
+Info (12250): Fifo: "master_non_sec" instantiated altera_avalon_sc_fifo "fifo"
+Info (12250): B2p: "master_non_sec" instantiated altera_avalon_st_bytes_to_packets "b2p"
+Info (12250): P2b: "master_non_sec" instantiated altera_avalon_st_packets_to_bytes "p2b"
+Info (12250): Transacto: "master_non_sec" instantiated altera_avalon_packets_to_master "transacto"
+Info (12250): B2p_adapter: "master_non_sec" instantiated channel_adapter "b2p_adapter"
+Info (12250): P2b_adapter: "master_non_sec" instantiated channel_adapter "p2b_adapter"
+Info (12250): Master_non_sec_master_translator: "mm_interconnect_0" instantiated altera_merlin_master_translator "master_non_sec_master_translator"
+Info (12250): Jtag_uart_avalon_jtag_slave_translator: "mm_interconnect_0" instantiated altera_merlin_slave_translator "jtag_uart_avalon_jtag_slave_translator"
+Info (12250): Hps_0_h2f_lw_axi_master_agent: "mm_interconnect_0" instantiated altera_merlin_axi_master_ni "hps_0_h2f_lw_axi_master_agent"
+Info (12250): Master_non_sec_master_agent: "mm_interconnect_0" instantiated altera_merlin_master_agent "master_non_sec_master_agent"
+Info (12250): Jtag_uart_avalon_jtag_slave_agent: "mm_interconnect_0" instantiated altera_merlin_slave_agent "jtag_uart_avalon_jtag_slave_agent"
+Info (12250): Router: "mm_interconnect_0" instantiated altera_merlin_router "router"
+Info (12250): Router_002: "mm_interconnect_0" instantiated altera_merlin_router "router_002"
+Info (12250): Router_003: "mm_interconnect_0" instantiated altera_merlin_router "router_003"
+Info (12250): Router_004: "mm_interconnect_0" instantiated altera_merlin_router "router_004"
+Info (12250): Router_010: "mm_interconnect_0" instantiated altera_merlin_router "router_010"
+Info (12250): Hps_0_h2f_lw_axi_master_wr_limiter: "mm_interconnect_0" instantiated altera_merlin_traffic_limiter "hps_0_h2f_lw_axi_master_wr_limiter"
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_avalon_sc_fifo.v
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_avalon_st_pipeline_base.v
+Info (12250): Jtag_uart_avalon_jtag_slave_burst_adapter: "mm_interconnect_0" instantiated altera_merlin_burst_adapter "jtag_uart_avalon_jtag_slave_burst_adapter"
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_merlin_address_alignment.sv
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_avalon_st_pipeline_stage.sv
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_avalon_st_pipeline_base.v
+Info (12250): Cmd_demux: "mm_interconnect_0" instantiated altera_merlin_demultiplexer "cmd_demux"
+Info (12250): Cmd_demux_002: "mm_interconnect_0" instantiated altera_merlin_demultiplexer "cmd_demux_002"
+Info (12250): Cmd_mux: "mm_interconnect_0" instantiated altera_merlin_multiplexer "cmd_mux"
+Info (12250): Cmd_mux_001: "mm_interconnect_0" instantiated altera_merlin_multiplexer "cmd_mux_001"
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_merlin_arbitrator.sv
+Info (12250): Cmd_mux_007: "mm_interconnect_0" instantiated altera_merlin_multiplexer "cmd_mux_007"
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_merlin_arbitrator.sv
+Info (12250): Rsp_demux: "mm_interconnect_0" instantiated altera_merlin_demultiplexer "rsp_demux"
+Info (12250): Rsp_demux_001: "mm_interconnect_0" instantiated altera_merlin_demultiplexer "rsp_demux_001"
+Info (12250): Rsp_demux_006: "mm_interconnect_0" instantiated altera_merlin_demultiplexer "rsp_demux_006"
+Info (12250): Rsp_demux_007: "mm_interconnect_0" instantiated altera_merlin_demultiplexer "rsp_demux_007"
+Info (12250): Rsp_mux: "mm_interconnect_0" instantiated altera_merlin_multiplexer "rsp_mux"
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_merlin_arbitrator.sv
+Info (12250): Rsp_mux_002: "mm_interconnect_0" instantiated altera_merlin_multiplexer "rsp_mux_002"
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_merlin_arbitrator.sv
+Info (12250): Crosser: "mm_interconnect_0" instantiated altera_avalon_st_handshake_clock_crosser "crosser"
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_avalon_st_clock_crosser.v
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_avalon_st_pipeline_base.v
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_std_synchronizer_nocut.v
+Info (12250): Avalon_st_adapter: "mm_interconnect_0" instantiated altera_avalon_st_adapter "avalon_st_adapter"
+Info (12250): Hps_0_f2h_axi_slave_agent: "mm_interconnect_1" instantiated altera_merlin_axi_slave_ni "hps_0_f2h_axi_slave_agent"
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_merlin_burst_uncompressor.sv
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_avalon_sc_fifo.v
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_merlin_address_alignment.sv
+Info (12250): Router: "mm_interconnect_1" instantiated altera_merlin_router "router"
+Info (12250): Router_001: "mm_interconnect_1" instantiated altera_merlin_router "router_001"
+Info (12250): Router_002: "mm_interconnect_1" instantiated altera_merlin_router "router_002"
+Info (12250): Cmd_demux: "mm_interconnect_1" instantiated altera_merlin_demultiplexer "cmd_demux"
+Info (12250): Cmd_mux: "mm_interconnect_1" instantiated altera_merlin_multiplexer "cmd_mux"
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_merlin_arbitrator.sv
+Info (12250): Rsp_mux: "mm_interconnect_1" instantiated altera_merlin_multiplexer "rsp_mux"
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_merlin_arbitrator.sv
+Info (12250): Master_secure_master_cmd_width_adapter: "mm_interconnect_1" instantiated altera_merlin_width_adapter "master_secure_master_cmd_width_adapter"
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_merlin_address_alignment.sv
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_merlin_burst_uncompressor.sv
+Info (12250): Vid_front: "video_in" instantiated alt_vip_video_input_bridge_resp "vid_front"
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/common/alt_vip_common_pkg.sv
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_event_packet_decode/src_hdl/alt_vip_common_event_packet_decode.sv
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_event_packet_encode/src_hdl/alt_vip_common_event_packet_encode.sv
+Info (12250): Vid_back: "video_in" instantiated alt_vip_video_input_bridge_cmd "vid_back"
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/common/alt_vip_common_pkg.sv
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_event_packet_decode/src_hdl/alt_vip_common_event_packet_decode.sv
+Info (12250): Reusing file I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_event_packet_encode/src_hdl/alt_vip_common_event_packet_encode.sv
+Error (12252): Border: Error during execution of script generate_hps_sdram.tcl: seq: Error during execution of "{C:/intelfpga_lite/24.1std/quartus/../nios2eds/Nios II Command Shell.bat} make all 2>> stderr.txt": child process exited abnormally
+Error (12252): Border: Error during execution of script generate_hps_sdram.tcl: seq: Execution of command "{C:/intelfpga_lite/24.1std/quartus/../nios2eds/Nios II Command Shell.bat} make all 2>> stderr.txt" failed
+Error (12252): Border: Error during execution of script generate_hps_sdram.tcl: seq: child process exited abnormally
+Error (12252): Border: Error during execution of script generate_hps_sdram.tcl: seq: add_fileset_file: No such file C:/Users/deapen/AppData/Local/Temp/alt0539_8977214687748239410.dir/0004_seq_gen/hps_AC_ROM.hex
+Error (12252): Border: Error during execution of script generate_hps_sdram.tcl: Generation stopped, 3 or more modules remaining
+Error (12252): Border: Execution of script generate_hps_sdram.tcl failed
+Error (12252): Border: 2026.03.26.20:35:10 Info:
+Error (12252): Border: ********************************************************************************************************************
+Error (12252): Border: 
+Error (12252): Border: Use qsys-generate for a simpler command-line interface for generating IP.
+Error (12252): Border: 
+Error (12252): Border: Run ip-generate with switch --remove-qsys-generate-warning to prevent this notice from appearing in subsequent runs.
+Error (12252): Border: 
+Error (12252): Border: ********************************************************************************************************************
+Warning (12251): Ignored parameter assignment device=5CSEMA5F31C6
+Warning (12251): Ignored parameter assignment extended_family_support=true
+Warning (12251): Hps_sdram: 'Quick' simulation modes are NOT timing accurate. Some simulation memory models may issue warnings or errors
+Warning (12251): Hps_sdram.seq: This module has no ports or interfaces
+Warning (12251): Hps_sdram.p0: p0.scc must be exported, or connected to a matching conduit.
+Warning (12251): Hps_sdram.as: as.afi_init_cal_req must be exported, or connected to a matching conduit.
+Warning (12251): Hps_sdram.as: as.tracking must be exported, or connected to a matching conduit.
+Warning (12251): Hps_sdram.c0: c0.status must be exported, or connected to a matching conduit.
+Warning (12251): Hps_sdram.p0: p0.avl must be connected to an Avalon-MM master
+Info (12250): Hps_sdram: Generating "hps_sdram" for QUARTUS_SYNTH
+Info (12250): Pll: "hps_sdram" instantiated altera_mem_if_hps_pll "pll"
+Info (12250): P0: Generating clock pair generator
+Info (12250): P0: Generating hps_sdram_p0_altdqdqs
+Info (12250): P0:
+Info (12250): P0: *****************************
+Info (12250): P0:
+Info (12250): P0: Remember to run the hps_sdram_p0_pin_assignments.tcl
+Info (12250): P0: script after running Synthesis and before Fitting.
+Info (12250): P0:
+Info (12250): P0: *****************************
+Info (12250): P0:
+Info (12250): P0: "hps_sdram" instantiated altera_mem_if_ddr3_hard_phy_core "p0"
+Error (12252): Border: 2026.03.26.20:35:20 Error: seq: Error during execution of "{C:/intelfpga_lite/24.1std/quartus/../nios2eds/Nios II Command Shell.bat} make all 2>> stderr.txt": child process exited abnormally
+Error (12252): Border: 2026.03.26.20:35:20 Error: seq: Execution of command "{C:/intelfpga_lite/24.1std/quartus/../nios2eds/Nios II Command Shell.bat} make all 2>> stderr.txt" failed
+Error (12252): Border: 2026.03.26.20:35:20 Error: seq: child process exited abnormally
+Error (12252): Border: 2026.03.26.20:35:20 Error: seq: add_fileset_file: No such file C:/Users/deapen/AppData/Local/Temp/alt0539_8977214687748239410.dir/0004_seq_gen/hps_AC_ROM.hex
+Error (12252): Border: while executing
+Error (12252): Border: "add_fileset_file $file_name [::alt_mem_if::util::hwtcl_utils::get_file_type $file_name 0] PATH $file_pathname"
+Error (12252): Border: ("foreach" body line 4)
+Error (12252): Border: invoked from within
+Error (12252): Border: "foreach file_pathname $return_files_sw {
+Error (12252): Border:         _dprint 1 "Preparing to add $file_pathname"
+Error (12252): Border:         set file_name [file tail $file_pathname]
+Error (12252): Border:         add_fileset_file $..."
+Error (12252): Border: (procedure "generate_sw" line 18)
+Error (12252): Border: invoked from within
+Error (12252): Border: "generate_sw $name $fileset"
+Error (12252): Border: ("if" then script line 4)
+Error (12252): Border: invoked from within
+Error (12252): Border: "if {[string compare -nocase $fileset QUARTUS_SYNTH] == 0} {
+Error (12252): Border:         set top_level_file "altera_mem_if_hhp_qseq_synth_top.v"
+Error (12252): Border:         add_fileset_file $top_level_fi..."
+Error (12252): Border: (procedure "generate_files" line 4)
+Error (12252): Border: invoked from within
+Error (12252): Border: "generate_files $name QUARTUS_SYNTH"
+Error (12252): Border: (procedure "generate_synth" line 3)
+Error (12252): Border: invoked from within
+Error (12252): Border: "generate_synth altera_mem_if_hhp_qseq_synth_top"
+Info (12250): Seq: "hps_sdram" instantiated altera_mem_if_hhp_ddr3_qseq "seq"
+Error (12252): Border: 2026.03.26.20:35:20 Error: Generation stopped, 3 or more modules remaining
+Info (12250): Hps_sdram: Done "hps_sdram" with 7 modules, 33 files
+Info (12250): Border: "hps_io" instantiated altera_interface_generator "border"
+Error (12252): Generation stopped, 1 or more modules remaining
+Info (12250): Soc_system: Done "soc_system" with 73 modules, 179 files
+Info (12249): Finished elaborating Platform Designer system entity "soc_system.qsys"
+Info (12021): Found 1 design units, including 1 entities, in source file test_data_write.sv
+    Info (12023): Found entity 1: test_data_write File: I:/ECE554/DE1_SOC_Linux_FB/test_data_write.sv Line: 1
+Info (12021): Found 1 design units, including 1 entities, in source file vga_pll.v
+    Info (12023): Found entity 1: vga_pll File: I:/ECE554/DE1_SOC_Linux_FB/vga_pll.v Line: 8
+Info (12021): Found 1 design units, including 1 entities, in source file vga_pll/vga_pll_0002.v
+    Info (12023): Found entity 1: vga_pll_0002 File: I:/ECE554/DE1_SOC_Linux_FB/vga_pll/vga_pll_0002.v Line: 2
+Info (12021): Found 1 design units, including 1 entities, in source file ip/debounce/debounce.v
+    Info (12023): Found entity 1: debounce File: I:/ECE554/DE1_SOC_Linux_FB/ip/debounce/debounce.v Line: 13
+Info (12021): Found 1 design units, including 1 entities, in source file de1_soc_linux_fb.v
+    Info (12023): Found entity 1: DE1_SOC_Linux_FB File: I:/ECE554/DE1_SOC_Linux_FB/DE1_SOC_Linux_FB.v Line: 36
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/soc_system.v
+    Info (12023): Found entity 1: soc_system File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/soc_system.v Line: 6
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altdq_dqs2_acv_connect_to_hard_phy_cyclonev.sv
+    Info (12023): Found entity 1: altdq_dqs2_acv_connect_to_hard_phy_cyclonev File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altdq_dqs2_acv_connect_to_hard_phy_cyclonev.sv Line: 19
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_avalon_jtag_uart.sv
+    Info (12023): Found entity 1: altera_avalon_jtag_uart File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_avalon_jtag_uart.sv Line: 22
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_avalon_jtag_uart_log_module.sv
+    Info (12023): Found entity 1: altera_avalon_jtag_uart_log_module File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_avalon_jtag_uart_log_module.sv Line: 22
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_avalon_jtag_uart_scfifo_r.sv
+    Info (12023): Found entity 1: altera_avalon_jtag_uart_scfifo_r File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_avalon_jtag_uart_scfifo_r.sv Line: 22
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_avalon_jtag_uart_scfifo_w.sv
+    Info (12023): Found entity 1: altera_avalon_jtag_uart_scfifo_w File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_avalon_jtag_uart_scfifo_w.sv Line: 22
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_avalon_jtag_uart_sim_scfifo_r.sv
+    Info (12023): Found entity 1: altera_avalon_jtag_uart_sim_scfifo_r File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_avalon_jtag_uart_sim_scfifo_r.sv Line: 22
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_avalon_jtag_uart_sim_scfifo_w.sv
+    Info (12023): Found entity 1: altera_avalon_jtag_uart_sim_scfifo_w File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_avalon_jtag_uart_sim_scfifo_w.sv Line: 22
+Info (12021): Found 7 design units, including 7 entities, in source file db/ip/soc_system/submodules/altera_avalon_packets_to_master.v
+    Info (12023): Found entity 1: altera_avalon_packets_to_master File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_avalon_packets_to_master.v Line: 22
+    Info (12023): Found entity 2: packets_to_fifo File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_avalon_packets_to_master.v Line: 142
+    Info (12023): Found entity 3: fifo_buffer_single_clock_fifo File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_avalon_packets_to_master.v Line: 512
+    Info (12023): Found entity 4: fifo_buffer_scfifo_with_controls File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_avalon_packets_to_master.v Line: 573
+    Info (12023): Found entity 5: fifo_buffer File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_avalon_packets_to_master.v Line: 627
+    Info (12023): Found entity 6: fifo_to_packet File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_avalon_packets_to_master.v Line: 697
+    Info (12023): Found entity 7: packets_to_master File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_avalon_packets_to_master.v Line: 851
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_avalon_sc_fifo.v
+    Info (12023): Found entity 1: altera_avalon_sc_fifo File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_avalon_sc_fifo.v Line: 21
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_avalon_st_bytes_to_packets.v
+    Info (12023): Found entity 1: altera_avalon_st_bytes_to_packets File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_avalon_st_bytes_to_packets.v Line: 19
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_avalon_st_clock_crosser.v
+    Info (12023): Found entity 1: altera_avalon_st_clock_crosser File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_avalon_st_clock_crosser.v Line: 22
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_avalon_st_handshake_clock_crosser.v
+    Info (12023): Found entity 1: altera_avalon_st_handshake_clock_crosser File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_avalon_st_handshake_clock_crosser.v Line: 24
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_avalon_st_idle_inserter.v
+    Info (12023): Found entity 1: altera_avalon_st_idle_inserter File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_avalon_st_idle_inserter.v Line: 19
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_avalon_st_idle_remover.v
+    Info (12023): Found entity 1: altera_avalon_st_idle_remover File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_avalon_st_idle_remover.v Line: 19
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_avalon_st_jtag_interface.v
+    Info (12023): Found entity 1: altera_avalon_st_jtag_interface File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_avalon_st_jtag_interface.v Line: 20
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_avalon_st_packets_to_bytes.v
+    Info (12023): Found entity 1: altera_avalon_st_packets_to_bytes File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_avalon_st_packets_to_bytes.v Line: 19
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_avalon_st_pipeline_base.v
+    Info (12023): Found entity 1: altera_avalon_st_pipeline_base File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_avalon_st_pipeline_base.v Line: 22
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_avalon_st_pipeline_stage.sv
+    Info (12023): Found entity 1: altera_avalon_st_pipeline_stage File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_avalon_st_pipeline_stage.sv Line: 22
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_default_burst_converter.sv
+    Info (12023): Found entity 1: altera_default_burst_converter File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_default_burst_converter.sv Line: 30
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_incr_burst_converter.sv
+    Info (12023): Found entity 1: altera_incr_burst_converter File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_incr_burst_converter.sv Line: 28
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_irq_clock_crosser.sv
+    Info (12023): Found entity 1: altera_irq_clock_crosser File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_irq_clock_crosser.sv Line: 21
+Info (12021): Found 3 design units, including 3 entities, in source file db/ip/soc_system/submodules/altera_jtag_dc_streaming.v
+    Info (12023): Found entity 1: altera_jtag_control_signal_crosser File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_jtag_dc_streaming.v Line: 30
+    Info (12023): Found entity 2: altera_jtag_src_crosser File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_jtag_dc_streaming.v Line: 72
+    Info (12023): Found entity 3: altera_jtag_dc_streaming File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_jtag_dc_streaming.v Line: 135
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_jtag_sld_node.v
+    Info (12023): Found entity 1: altera_jtag_sld_node File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_jtag_sld_node.v Line: 17
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_jtag_streaming.v
+    Info (12023): Found entity 1: altera_jtag_streaming File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_jtag_streaming.v Line: 18
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_mem_if_hhp_qseq_synth_top.v
+    Info (12023): Found entity 1: altera_mem_if_hhp_qseq_synth_top File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_mem_if_hhp_qseq_synth_top.v Line: 15
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_merlin_address_alignment.sv
+    Info (12023): Found entity 1: altera_merlin_address_alignment File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_merlin_address_alignment.sv Line: 26
+Info (12021): Found 2 design units, including 2 entities, in source file db/ip/soc_system/submodules/altera_merlin_arbitrator.sv
+    Info (12023): Found entity 1: altera_merlin_arbitrator File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_merlin_arbitrator.sv Line: 103
+    Info (12023): Found entity 2: altera_merlin_arb_adder File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_merlin_arbitrator.sv Line: 228
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_merlin_axi_master_ni.sv
+    Info (12023): Found entity 1: altera_merlin_axi_master_ni File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_merlin_axi_master_ni.sv Line: 27
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_merlin_axi_slave_ni.sv
+    Info (12023): Found entity 1: altera_merlin_axi_slave_ni File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_merlin_axi_slave_ni.sv Line: 22
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_merlin_burst_adapter.sv
+    Info (12023): Found entity 1: altera_merlin_burst_adapter File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_merlin_burst_adapter.sv Line: 21
+Info (12021): Found 5 design units, including 5 entities, in source file db/ip/soc_system/submodules/altera_merlin_burst_adapter_13_1.sv
+    Info (12023): Found entity 1: altera_merlin_burst_adapter_burstwrap_increment File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_merlin_burst_adapter_13_1.sv Line: 40
+    Info (12023): Found entity 2: altera_merlin_burst_adapter_adder File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_merlin_burst_adapter_13_1.sv Line: 55
+    Info (12023): Found entity 3: altera_merlin_burst_adapter_subtractor File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_merlin_burst_adapter_13_1.sv Line: 77
+    Info (12023): Found entity 4: altera_merlin_burst_adapter_min File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_merlin_burst_adapter_13_1.sv Line: 98
+    Info (12023): Found entity 5: altera_merlin_burst_adapter_13_1 File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_merlin_burst_adapter_13_1.sv Line: 264
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_merlin_burst_adapter_new.sv
+    Info (12023): Found entity 1: altera_merlin_burst_adapter_new File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_merlin_burst_adapter_new.sv Line: 25
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_merlin_burst_adapter_uncmpr.sv
+    Info (12023): Found entity 1: altera_merlin_burst_adapter_uncompressed_only File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_merlin_burst_adapter_uncmpr.sv Line: 39
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_merlin_burst_uncompressor.sv
+    Info (12023): Found entity 1: altera_merlin_burst_uncompressor File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_merlin_burst_uncompressor.sv Line: 40
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_merlin_master_agent.sv
+    Info (12023): Found entity 1: altera_merlin_master_agent File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_merlin_master_agent.sv Line: 28
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_merlin_master_translator.sv
+    Info (12023): Found entity 1: altera_merlin_master_translator File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_merlin_master_translator.sv Line: 32
+Info (12021): Found 2 design units, including 2 entities, in source file db/ip/soc_system/submodules/altera_merlin_reorder_memory.sv
+    Info (12023): Found entity 1: altera_merlin_reorder_memory File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_merlin_reorder_memory.sv Line: 28
+    Info (12023): Found entity 2: memory_pointer_controller File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_merlin_reorder_memory.sv Line: 185
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_merlin_slave_agent.sv
+    Info (12023): Found entity 1: altera_merlin_slave_agent File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_merlin_slave_agent.sv Line: 34
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_merlin_slave_translator.sv
+    Info (12023): Found entity 1: altera_merlin_slave_translator File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_merlin_slave_translator.sv Line: 35
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_merlin_traffic_limiter.sv
+    Info (12023): Found entity 1: altera_merlin_traffic_limiter File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_merlin_traffic_limiter.sv Line: 49
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_merlin_width_adapter.sv
+    Info (12023): Found entity 1: altera_merlin_width_adapter File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_merlin_width_adapter.sv Line: 25
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_reset_controller.v
+    Info (12023): Found entity 1: altera_reset_controller File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_reset_controller.v Line: 42
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_reset_synchronizer.v
+    Info (12023): Found entity 1: altera_reset_synchronizer File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_reset_synchronizer.v Line: 24
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_std_synchronizer_nocut.v
+    Info (12023): Found entity 1: altera_std_synchronizer_nocut File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_std_synchronizer_nocut.v Line: 44
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/altera_wrap_burst_converter.sv
+    Info (12023): Found entity 1: altera_wrap_burst_converter File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/altera_wrap_burst_converter.sv Line: 27
+Info (12021): Found 1 design units, including 0 entities, in source file db/ip/soc_system/submodules/common/alt_vip_common_pkg.sv
+    Info (12022): Found design unit 1: alt_vip_common_pkg (SystemVerilog) (soc_system) File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/common/alt_vip_common_pkg.sv Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/hps_sdram.v
+    Info (12023): Found entity 1: hps_sdram File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/hps_sdram.v Line: 9
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/hps_sdram_p0.sv
+    Info (12023): Found entity 1: hps_sdram_p0 File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/hps_sdram_p0.sv Line: 18
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/hps_sdram_p0_acv_hard_addr_cmd_pads.v
+    Info (12023): Found entity 1: hps_sdram_p0_acv_hard_addr_cmd_pads File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/hps_sdram_p0_acv_hard_addr_cmd_pads.v Line: 17
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/hps_sdram_p0_acv_hard_io_pads.v
+    Info (12023): Found entity 1: hps_sdram_p0_acv_hard_io_pads File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/hps_sdram_p0_acv_hard_io_pads.v Line: 17
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/hps_sdram_p0_acv_hard_memphy.v
+    Info (12023): Found entity 1: hps_sdram_p0_acv_hard_memphy File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/hps_sdram_p0_acv_hard_memphy.v Line: 21
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/hps_sdram_p0_acv_ldc.v
+    Info (12023): Found entity 1: hps_sdram_p0_acv_ldc File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/hps_sdram_p0_acv_ldc.v Line: 17
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/hps_sdram_p0_altdqdqs.v
+    Info (12023): Found entity 1: hps_sdram_p0_altdqdqs File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/hps_sdram_p0_altdqdqs.v Line: 17
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/hps_sdram_p0_clock_pair_generator.v
+    Info (12023): Found entity 1: hps_sdram_p0_clock_pair_generator File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/hps_sdram_p0_clock_pair_generator.v Line: 29
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/hps_sdram_p0_generic_ddio.v
+    Info (12023): Found entity 1: hps_sdram_p0_generic_ddio File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/hps_sdram_p0_generic_ddio.v Line: 17
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/hps_sdram_p0_iss_probe.v
+    Info (12023): Found entity 1: hps_sdram_p0_iss_probe File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/hps_sdram_p0_iss_probe.v Line: 17
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/hps_sdram_p0_phy_csr.sv
+    Info (12023): Found entity 1: hps_sdram_p0_phy_csr File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/hps_sdram_p0_phy_csr.sv Line: 31
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/hps_sdram_p0_reset.v
+    Info (12023): Found entity 1: hps_sdram_p0_reset File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/hps_sdram_p0_reset.v Line: 18
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/hps_sdram_p0_reset_sync.v
+    Info (12023): Found entity 1: hps_sdram_p0_reset_sync File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/hps_sdram_p0_reset_sync.v Line: 17
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/hps_sdram_pll.sv
+    Info (12023): Found entity 1: hps_sdram_pll File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/hps_sdram_pll.sv Line: 25
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/intr_capturer.v
+    Info (12023): Found entity 1: intr_capturer File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/intr_capturer.v Line: 1
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/modules/alt_vip_common_clock_crossing_bridge_grey/src_hdl/alt_vip_common_clock_crossing_bridge_grey.sv
+    Info (12023): Found entity 1: alt_vip_common_clock_crossing_bridge_grey File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_clock_crossing_bridge_grey/src_hdl/alt_vip_common_clock_crossing_bridge_grey.sv Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/modules/alt_vip_common_dc_mixed_widths_fifo/src_hdl/alt_vip_common_dc_mixed_widths_fifo.sv
+    Info (12023): Found entity 1: alt_vip_common_dc_mixed_widths_fifo File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_dc_mixed_widths_fifo/src_hdl/alt_vip_common_dc_mixed_widths_fifo.sv Line: 18
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/modules/alt_vip_common_delay/src_hdl/alt_vip_common_delay.sv
+    Info (12023): Found entity 1: alt_vip_common_delay File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_delay/src_hdl/alt_vip_common_delay.sv Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/modules/alt_vip_common_event_packet_decode/src_hdl/alt_vip_common_event_packet_decode.sv
+    Info (12023): Found entity 1: alt_vip_common_event_packet_decode File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_event_packet_decode/src_hdl/alt_vip_common_event_packet_decode.sv Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/modules/alt_vip_common_event_packet_encode/src_hdl/alt_vip_common_event_packet_encode.sv
+    Info (12023): Found entity 1: alt_vip_common_event_packet_encode File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_event_packet_encode/src_hdl/alt_vip_common_event_packet_encode.sv Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/modules/alt_vip_common_fifo/src_hdl/alt_vip_common_fifo.v
+    Info (12023): Found entity 1: alt_vip_common_fifo File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_fifo/src_hdl/alt_vip_common_fifo.v Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/modules/alt_vip_common_fifo2/src_hdl/alt_vip_common_fifo2.sv
+    Info (12023): Found entity 1: alt_vip_common_fifo2 File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_fifo2/src_hdl/alt_vip_common_fifo2.sv Line: 24
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/modules/alt_vip_common_frame_counter/src_hdl/alt_vip_common_frame_counter.v
+    Info (12023): Found entity 1: alt_vip_common_frame_counter File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_frame_counter/src_hdl/alt_vip_common_frame_counter.v Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/modules/alt_vip_common_generic_step_count/src_hdl/alt_vip_common_generic_step_count.v
+    Info (12023): Found entity 1: alt_vip_common_generic_step_count File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_generic_step_count/src_hdl/alt_vip_common_generic_step_count.v Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/modules/alt_vip_common_message_pipeline_stage/src_hdl/alt_vip_common_message_pipeline_stage.sv
+    Info (12023): Found entity 1: alt_vip_common_message_pipeline_stage File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_message_pipeline_stage/src_hdl/alt_vip_common_message_pipeline_stage.sv Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/modules/alt_vip_common_sample_counter/src_hdl/alt_vip_common_sample_counter.v
+    Info (12023): Found entity 1: alt_vip_common_sample_counter File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_sample_counter/src_hdl/alt_vip_common_sample_counter.v Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/modules/alt_vip_common_sop_align/src_hdl/alt_vip_common_sop_align.sv
+    Info (12023): Found entity 1: alt_vip_common_sop_align File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_sop_align/src_hdl/alt_vip_common_sop_align.sv Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/modules/alt_vip_common_sync/src_hdl/alt_vip_common_sync.v
+    Info (12023): Found entity 1: alt_vip_common_sync File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_sync/src_hdl/alt_vip_common_sync.v Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/modules/alt_vip_common_sync_generation/src_hdl/alt_vip_common_sync_generation.v
+    Info (12023): Found entity 1: alt_vip_common_sync_generation File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_sync_generation/src_hdl/alt_vip_common_sync_generation.v Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/modules/alt_vip_common_to_binary/src_hdl/alt_vip_common_to_binary.v
+    Info (12023): Found entity 1: alt_vip_common_to_binary File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_to_binary/src_hdl/alt_vip_common_to_binary.v Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/modules/alt_vip_common_trigger_sync/src_hdl/alt_vip_common_trigger_sync.v
+    Info (12023): Found entity 1: alt_vip_common_trigger_sync File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_trigger_sync/src_hdl/alt_vip_common_trigger_sync.v Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/modules/alt_vip_common_video_packet_decode/src_hdl/alt_vip_common_latency_1_to_latency_0.sv
+    Info (12023): Found entity 1: alt_vip_common_latency_1_to_latency_0 File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_video_packet_decode/src_hdl/alt_vip_common_latency_1_to_latency_0.sv Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/modules/alt_vip_common_video_packet_decode/src_hdl/alt_vip_common_video_packet_decode.sv
+    Info (12023): Found entity 1: alt_vip_common_video_packet_decode File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_video_packet_decode/src_hdl/alt_vip_common_video_packet_decode.sv Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/modules/alt_vip_common_video_packet_encode/src_hdl/alt_vip_common_latency_0_to_latency_1.sv
+    Info (12023): Found entity 1: alt_vip_common_latency_0_to_latency_1 File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_video_packet_encode/src_hdl/alt_vip_common_latency_0_to_latency_1.sv Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/modules/alt_vip_common_video_packet_encode/src_hdl/alt_vip_common_video_packet_empty.sv
+    Info (12023): Found entity 1: alt_vip_common_video_packet_empty File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_video_packet_encode/src_hdl/alt_vip_common_video_packet_empty.sv Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/modules/alt_vip_common_video_packet_encode/src_hdl/alt_vip_common_video_packet_encode.sv
+    Info (12023): Found entity 1: alt_vip_common_video_packet_encode File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_video_packet_encode/src_hdl/alt_vip_common_video_packet_encode.sv Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/soc_system_alt_vip_cl_cvo_0.v
+    Info (12023): Found entity 1: soc_system_alt_vip_cl_cvo_0 File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_alt_vip_cl_cvo_0.v Line: 9
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/soc_system_alt_vip_cl_cvo_0_video_in.v
+    Info (12023): Found entity 1: soc_system_alt_vip_cl_cvo_0_video_in File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_alt_vip_cl_cvo_0_video_in.v Line: 9
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/soc_system_alt_vip_cl_vfb_0.v
+    Info (12023): Found entity 1: soc_system_alt_vip_cl_vfb_0 File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_alt_vip_cl_vfb_0.v Line: 9
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/soc_system_button_pio.v
+    Info (12023): Found entity 1: soc_system_button_pio File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_button_pio.v Line: 21
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/soc_system_dipsw_pio.v
+    Info (12023): Found entity 1: soc_system_dipsw_pio File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_dipsw_pio.v Line: 21
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/soc_system_hps_0.v
+    Info (12023): Found entity 1: soc_system_hps_0 File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_hps_0.v Line: 9
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/soc_system_hps_0_fpga_interfaces.sv
+    Info (12023): Found entity 1: soc_system_hps_0_fpga_interfaces File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_hps_0_fpga_interfaces.sv Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/soc_system_hps_0_hps_io.v
+    Info (12023): Found entity 1: soc_system_hps_0_hps_io File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_hps_0_hps_io.v Line: 9
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/soc_system_hps_0_hps_io_border.sv
+    Info (12023): Found entity 1: soc_system_hps_0_hps_io_border File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_hps_0_hps_io_border.sv Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/soc_system_irq_mapper.sv
+    Info (12023): Found entity 1: soc_system_irq_mapper File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_irq_mapper.sv Line: 31
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/soc_system_irq_mapper_001.sv
+    Info (12023): Found entity 1: soc_system_irq_mapper_001 File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_irq_mapper_001.sv Line: 31
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/soc_system_led_pio.v
+    Info (12023): Found entity 1: soc_system_led_pio File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_led_pio.v Line: 21
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/soc_system_master_non_sec.v
+    Info (12023): Found entity 1: soc_system_master_non_sec File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_master_non_sec.v Line: 9
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/soc_system_master_non_sec_b2p_adapter.sv
+    Info (12023): Found entity 1: soc_system_master_non_sec_b2p_adapter File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_master_non_sec_b2p_adapter.sv Line: 55
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/soc_system_master_non_sec_p2b_adapter.sv
+    Info (12023): Found entity 1: soc_system_master_non_sec_p2b_adapter File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_master_non_sec_p2b_adapter.sv Line: 55
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/soc_system_master_non_sec_timing_adt.sv
+    Info (12023): Found entity 1: soc_system_master_non_sec_timing_adt File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_master_non_sec_timing_adt.sv Line: 60
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/soc_system_mm_interconnect_0.v
+    Info (12023): Found entity 1: soc_system_mm_interconnect_0 File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_mm_interconnect_0.v Line: 9
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/soc_system_mm_interconnect_0_avalon_st_adapter.v
+    Info (12023): Found entity 1: soc_system_mm_interconnect_0_avalon_st_adapter File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_mm_interconnect_0_avalon_st_adapter.v Line: 9
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/soc_system_mm_interconnect_0_cmd_demux.sv
+    Info (12023): Found entity 1: soc_system_mm_interconnect_0_cmd_demux File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_mm_interconnect_0_cmd_demux.sv Line: 43
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/soc_system_mm_interconnect_0_cmd_demux_002.sv
+    Info (12023): Found entity 1: soc_system_mm_interconnect_0_cmd_demux_002 File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_mm_interconnect_0_cmd_demux_002.sv Line: 43
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/soc_system_mm_interconnect_0_cmd_mux.sv
+    Info (12023): Found entity 1: soc_system_mm_interconnect_0_cmd_mux File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_mm_interconnect_0_cmd_mux.sv Line: 51
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/soc_system_mm_interconnect_0_cmd_mux_001.sv
+    Info (12023): Found entity 1: soc_system_mm_interconnect_0_cmd_mux_001 File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_mm_interconnect_0_cmd_mux_001.sv Line: 51
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/soc_system_mm_interconnect_0_cmd_mux_007.sv
+    Info (12023): Found entity 1: soc_system_mm_interconnect_0_cmd_mux_007 File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_mm_interconnect_0_cmd_mux_007.sv Line: 51
+Info (12021): Found 2 design units, including 2 entities, in source file db/ip/soc_system/submodules/soc_system_mm_interconnect_0_router.sv
+    Info (12023): Found entity 1: soc_system_mm_interconnect_0_router_default_decode File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_mm_interconnect_0_router.sv Line: 45
+    Info (12023): Found entity 2: soc_system_mm_interconnect_0_router File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_mm_interconnect_0_router.sv Line: 84
+Info (12021): Found 2 design units, including 2 entities, in source file db/ip/soc_system/submodules/soc_system_mm_interconnect_0_router_002.sv
+    Info (12023): Found entity 1: soc_system_mm_interconnect_0_router_002_default_decode File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_mm_interconnect_0_router_002.sv Line: 45
+    Info (12023): Found entity 2: soc_system_mm_interconnect_0_router_002 File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_mm_interconnect_0_router_002.sv Line: 84
+Info (12021): Found 2 design units, including 2 entities, in source file db/ip/soc_system/submodules/soc_system_mm_interconnect_0_router_003.sv
+    Info (12023): Found entity 1: soc_system_mm_interconnect_0_router_003_default_decode File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_mm_interconnect_0_router_003.sv Line: 45
+    Info (12023): Found entity 2: soc_system_mm_interconnect_0_router_003 File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_mm_interconnect_0_router_003.sv Line: 84
+Info (12021): Found 2 design units, including 2 entities, in source file db/ip/soc_system/submodules/soc_system_mm_interconnect_0_router_004.sv
+    Info (12023): Found entity 1: soc_system_mm_interconnect_0_router_004_default_decode File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_mm_interconnect_0_router_004.sv Line: 45
+    Info (12023): Found entity 2: soc_system_mm_interconnect_0_router_004 File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_mm_interconnect_0_router_004.sv Line: 84
+Info (12021): Found 2 design units, including 2 entities, in source file db/ip/soc_system/submodules/soc_system_mm_interconnect_0_router_010.sv
+    Info (12023): Found entity 1: soc_system_mm_interconnect_0_router_010_default_decode File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_mm_interconnect_0_router_010.sv Line: 45
+    Info (12023): Found entity 2: soc_system_mm_interconnect_0_router_010 File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_mm_interconnect_0_router_010.sv Line: 84
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/soc_system_mm_interconnect_0_rsp_demux.sv
+    Info (12023): Found entity 1: soc_system_mm_interconnect_0_rsp_demux File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_mm_interconnect_0_rsp_demux.sv Line: 43
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/soc_system_mm_interconnect_0_rsp_demux_001.sv
+    Info (12023): Found entity 1: soc_system_mm_interconnect_0_rsp_demux_001 File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_mm_interconnect_0_rsp_demux_001.sv Line: 43
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/soc_system_mm_interconnect_0_rsp_demux_006.sv
+    Info (12023): Found entity 1: soc_system_mm_interconnect_0_rsp_demux_006 File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_mm_interconnect_0_rsp_demux_006.sv Line: 43
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/soc_system_mm_interconnect_0_rsp_demux_007.sv
+    Info (12023): Found entity 1: soc_system_mm_interconnect_0_rsp_demux_007 File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_mm_interconnect_0_rsp_demux_007.sv Line: 43
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/soc_system_mm_interconnect_0_rsp_mux.sv
+    Info (12023): Found entity 1: soc_system_mm_interconnect_0_rsp_mux File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_mm_interconnect_0_rsp_mux.sv Line: 51
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/soc_system_mm_interconnect_0_rsp_mux_002.sv
+    Info (12023): Found entity 1: soc_system_mm_interconnect_0_rsp_mux_002 File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_mm_interconnect_0_rsp_mux_002.sv Line: 51
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/soc_system_mm_interconnect_1.v
+    Info (12023): Found entity 1: soc_system_mm_interconnect_1 File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_mm_interconnect_1.v Line: 9
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/soc_system_mm_interconnect_1_cmd_demux.sv
+    Info (12023): Found entity 1: soc_system_mm_interconnect_1_cmd_demux File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_mm_interconnect_1_cmd_demux.sv Line: 43
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/soc_system_mm_interconnect_1_cmd_mux.sv
+    Info (12023): Found entity 1: soc_system_mm_interconnect_1_cmd_mux File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_mm_interconnect_1_cmd_mux.sv Line: 51
+Info (12021): Found 2 design units, including 2 entities, in source file db/ip/soc_system/submodules/soc_system_mm_interconnect_1_router.sv
+    Info (12023): Found entity 1: soc_system_mm_interconnect_1_router_default_decode File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_mm_interconnect_1_router.sv Line: 45
+    Info (12023): Found entity 2: soc_system_mm_interconnect_1_router File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_mm_interconnect_1_router.sv Line: 84
+Info (12021): Found 2 design units, including 2 entities, in source file db/ip/soc_system/submodules/soc_system_mm_interconnect_1_router_001.sv
+    Info (12023): Found entity 1: soc_system_mm_interconnect_1_router_001_default_decode File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_mm_interconnect_1_router_001.sv Line: 45
+    Info (12023): Found entity 2: soc_system_mm_interconnect_1_router_001 File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_mm_interconnect_1_router_001.sv Line: 84
+Info (12021): Found 2 design units, including 2 entities, in source file db/ip/soc_system/submodules/soc_system_mm_interconnect_1_router_002.sv
+    Info (12023): Found entity 1: soc_system_mm_interconnect_1_router_002_default_decode File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_mm_interconnect_1_router_002.sv Line: 45
+    Info (12023): Found entity 2: soc_system_mm_interconnect_1_router_002 File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_mm_interconnect_1_router_002.sv Line: 84
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/soc_system_mm_interconnect_1_rsp_mux.sv
+    Info (12023): Found entity 1: soc_system_mm_interconnect_1_rsp_mux File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_mm_interconnect_1_rsp_mux.sv Line: 51
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/soc_system_onchip_memory2_0.v
+    Info (12023): Found entity 1: soc_system_onchip_memory2_0 File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_onchip_memory2_0.v Line: 21
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/soc_system_sysid_qsys.v
+    Info (12023): Found entity 1: soc_system_sysid_qsys File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/soc_system_sysid_qsys.v Line: 34
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/src_hdl/alt_vip_cvo_calculate_mode.v
+    Info (12023): Found entity 1: alt_vip_cvo_calculate_mode File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/src_hdl/alt_vip_cvo_calculate_mode.v Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/src_hdl/alt_vip_cvo_core.sv
+    Info (12023): Found entity 1: alt_vip_cvo_core File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/src_hdl/alt_vip_cvo_core.sv Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/src_hdl/alt_vip_cvo_mode_banks.sv
+    Info (12023): Found entity 1: alt_vip_cvo_mode_banks File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/src_hdl/alt_vip_cvo_mode_banks.sv Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/src_hdl/alt_vip_cvo_scheduler.sv
+    Info (12023): Found entity 1: alt_vip_cvo_scheduler File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/src_hdl/alt_vip_cvo_scheduler.sv Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/src_hdl/alt_vip_cvo_statemachine.sv
+    Info (12023): Found entity 1: alt_vip_cvo_statemachine File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/src_hdl/alt_vip_cvo_statemachine.sv Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/src_hdl/alt_vip_cvo_stream_marker.sv
+    Info (12023): Found entity 1: alt_vip_cvo_stream_marker File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/src_hdl/alt_vip_cvo_stream_marker.sv Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/src_hdl/alt_vip_cvo_sync_compare.v
+    Info (12023): Found entity 1: alt_vip_cvo_sync_compare File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/src_hdl/alt_vip_cvo_sync_compare.v Line: 18
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/src_hdl/alt_vip_cvo_sync_conditioner.sv
+    Info (12023): Found entity 1: alt_vip_cvo_sync_conditioner File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/src_hdl/alt_vip_cvo_sync_conditioner.sv Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/src_hdl/alt_vip_cvo_sync_generation.sv
+    Info (12023): Found entity 1: alt_vip_cvo_sync_generation File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/src_hdl/alt_vip_cvo_sync_generation.sv Line: 16
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/src_hdl/alt_vip_packet_transfer.sv
+    Info (12023): Found entity 1: alt_vip_packet_transfer File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/src_hdl/alt_vip_packet_transfer.sv Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/src_hdl/alt_vip_packet_transfer_pack_proc.sv
+    Info (12023): Found entity 1: alt_vip_packet_transfer_pack_proc File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/src_hdl/alt_vip_packet_transfer_pack_proc.sv Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/src_hdl/alt_vip_packet_transfer_read_proc.sv
+    Info (12023): Found entity 1: alt_vip_packet_transfer_read_proc File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/src_hdl/alt_vip_packet_transfer_read_proc.sv Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/src_hdl/alt_vip_packet_transfer_twofold_ram.sv
+    Info (12023): Found entity 1: alt_vip_packet_transfer_twofold_ram File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/src_hdl/alt_vip_packet_transfer_twofold_ram.sv Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/src_hdl/alt_vip_packet_transfer_twofold_ram_reversed.sv
+    Info (12023): Found entity 1: alt_vip_packet_transfer_twofold_ram_reversed File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/src_hdl/alt_vip_packet_transfer_twofold_ram_reversed.sv Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/src_hdl/alt_vip_packet_transfer_write_proc.sv
+    Info (12023): Found entity 1: alt_vip_packet_transfer_write_proc File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/src_hdl/alt_vip_packet_transfer_write_proc.sv Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/src_hdl/alt_vip_pip_sop_realign.sv
+    Info (12023): Found entity 1: alt_vip_pip_sop_realign File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/src_hdl/alt_vip_pip_sop_realign.sv Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/src_hdl/alt_vip_vfb_rd_ctrl.sv
+    Info (12023): Found entity 1: alt_vip_vfb_rd_ctrl File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/src_hdl/alt_vip_vfb_rd_ctrl.sv Line: 20
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/src_hdl/alt_vip_vfb_sync_ctrl.sv
+    Info (12023): Found entity 1: alt_vip_vfb_sync_ctrl File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/src_hdl/alt_vip_vfb_sync_ctrl.sv Line: 22
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/src_hdl/alt_vip_video_input_bridge_cmd.sv
+    Info (12023): Found entity 1: alt_vip_video_input_bridge_cmd File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/src_hdl/alt_vip_video_input_bridge_cmd.sv Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/src_hdl/alt_vip_video_input_bridge_resp.sv
+    Info (12023): Found entity 1: alt_vip_video_input_bridge_resp File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/src_hdl/alt_vip_video_input_bridge_resp.sv Line: 14
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/soc_system/submodules/src_hdl/alt_vip_video_output_bridge.sv
+    Info (12023): Found entity 1: alt_vip_video_output_bridge File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/src_hdl/alt_vip_video_output_bridge.sv Line: 14
+Warning (10236): Verilog HDL Implicit Net warning at hps_sdram_pll.sv(168): created implicit net for "pll_dr_clk" File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/hps_sdram_pll.sv Line: 168
+Warning (10222): Verilog HDL Parameter Declaration warning at alt_vip_cvo_mode_banks.sv(202): Parameter Declaration in module "alt_vip_cvo_mode_banks" behaves as a Local Parameter Declaration because the module has a Module Parameter Port List File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/src_hdl/alt_vip_cvo_mode_banks.sv Line: 202
+Warning (10222): Verilog HDL Parameter Declaration warning at alt_vip_cvo_mode_banks.sv(203): Parameter Declaration in module "alt_vip_cvo_mode_banks" behaves as a Local Parameter Declaration because the module has a Module Parameter Port List File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/src_hdl/alt_vip_cvo_mode_banks.sv Line: 203
+Warning (10222): Verilog HDL Parameter Declaration warning at alt_vip_cvo_mode_banks.sv(204): Parameter Declaration in module "alt_vip_cvo_mode_banks" behaves as a Local Parameter Declaration because the module has a Module Parameter Port List File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/src_hdl/alt_vip_cvo_mode_banks.sv Line: 204
+Warning (10222): Verilog HDL Parameter Declaration warning at alt_vip_cvo_mode_banks.sv(205): Parameter Declaration in module "alt_vip_cvo_mode_banks" behaves as a Local Parameter Declaration because the module has a Module Parameter Port List File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/src_hdl/alt_vip_cvo_mode_banks.sv Line: 205
+Warning (10222): Verilog HDL Parameter Declaration warning at alt_vip_cvo_mode_banks.sv(207): Parameter Declaration in module "alt_vip_cvo_mode_banks" behaves as a Local Parameter Declaration because the module has a Module Parameter Port List File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/src_hdl/alt_vip_cvo_mode_banks.sv Line: 207
+Warning (10222): Verilog HDL Parameter Declaration warning at alt_vip_cvo_mode_banks.sv(210): Parameter Declaration in module "alt_vip_cvo_mode_banks" behaves as a Local Parameter Declaration because the module has a Module Parameter Port List File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/src_hdl/alt_vip_cvo_mode_banks.sv Line: 210
+Warning (10222): Verilog HDL Parameter Declaration warning at alt_vip_common_frame_counter.v(49): Parameter Declaration in module "alt_vip_common_frame_counter" behaves as a Local Parameter Declaration because the module has a Module Parameter Port List File: I:/ECE554/DE1_SOC_Linux_FB/db/ip/soc_system/submodules/modules/alt_vip_common_frame_counter/src_hdl/alt_vip_common_frame_counter.v Line: 49
+Info (12127): Elaborating entity "DE1_SOC_Linux_FB" for the top level hierarchy
+Warning (10034): Output port "DRAM_ADDR" at DE1_SOC_Linux_FB.v(65) has no driver File: I:/ECE554/DE1_SOC_Linux_FB/DE1_SOC_Linux_FB.v Line: 65
+Warning (10034): Output port "DRAM_BA" at DE1_SOC_Linux_FB.v(66) has no driver File: I:/ECE554/DE1_SOC_Linux_FB/DE1_SOC_Linux_FB.v Line: 66
+Warning (10034): Output port "HEX0" at DE1_SOC_Linux_FB.v(90) has no driver File: I:/ECE554/DE1_SOC_Linux_FB/DE1_SOC_Linux_FB.v Line: 90
+Warning (10034): Output port "HEX1" at DE1_SOC_Linux_FB.v(93) has no driver File: I:/ECE554/DE1_SOC_Linux_FB/DE1_SOC_Linux_FB.v Line: 93
+Warning (10034): Output port "HEX2" at DE1_SOC_Linux_FB.v(96) has no driver File: I:/ECE554/DE1_SOC_Linux_FB/DE1_SOC_Linux_FB.v Line: 96
+Warning (10034): Output port "HEX3" at DE1_SOC_Linux_FB.v(99) has no driver File: I:/ECE554/DE1_SOC_Linux_FB/DE1_SOC_Linux_FB.v Line: 99
+Warning (10034): Output port "HEX4" at DE1_SOC_Linux_FB.v(102) has no driver File: I:/ECE554/DE1_SOC_Linux_FB/DE1_SOC_Linux_FB.v Line: 102
+Warning (10034): Output port "HEX5" at DE1_SOC_Linux_FB.v(105) has no driver File: I:/ECE554/DE1_SOC_Linux_FB/DE1_SOC_Linux_FB.v Line: 105
+Warning (10034): Output port "ADC_CONVST" at DE1_SOC_Linux_FB.v(39) has no driver File: I:/ECE554/DE1_SOC_Linux_FB/DE1_SOC_Linux_FB.v Line: 39
+Warning (10034): Output port "ADC_DIN" at DE1_SOC_Linux_FB.v(40) has no driver File: I:/ECE554/DE1_SOC_Linux_FB/DE1_SOC_Linux_FB.v Line: 40
+Warning (10034): Output port "ADC_SCLK" at DE1_SOC_Linux_FB.v(42) has no driver File: I:/ECE554/DE1_SOC_Linux_FB/DE1_SOC_Linux_FB.v Line: 42
+Warning (10034): Output port "AUD_DACDAT" at DE1_SOC_Linux_FB.v(48) has no driver File: I:/ECE554/DE1_SOC_Linux_FB/DE1_SOC_Linux_FB.v Line: 48
+Warning (10034): Output port "AUD_XCK" at DE1_SOC_Linux_FB.v(50) has no driver File: I:/ECE554/DE1_SOC_Linux_FB/DE1_SOC_Linux_FB.v Line: 50
+Warning (10034): Output port "DRAM_CAS_N" at DE1_SOC_Linux_FB.v(67) has no driver File: I:/ECE554/DE1_SOC_Linux_FB/DE1_SOC_Linux_FB.v Line: 67
+Warning (10034): Output port "DRAM_CKE" at DE1_SOC_Linux_FB.v(68) has no driver File: I:/ECE554/DE1_SOC_Linux_FB/DE1_SOC_Linux_FB.v Line: 68
+Warning (10034): Output port "DRAM_CLK" at DE1_SOC_Linux_FB.v(69) has no driver File: I:/ECE554/DE1_SOC_Linux_FB/DE1_SOC_Linux_FB.v Line: 69
+Warning (10034): Output port "DRAM_CS_N" at DE1_SOC_Linux_FB.v(70) has no driver File: I:/ECE554/DE1_SOC_Linux_FB/DE1_SOC_Linux_FB.v Line: 70
+Warning (10034): Output port "DRAM_LDQM" at DE1_SOC_Linux_FB.v(72) has no driver File: I:/ECE554/DE1_SOC_Linux_FB/DE1_SOC_Linux_FB.v Line: 72
+Warning (10034): Output port "DRAM_RAS_N" at DE1_SOC_Linux_FB.v(73) has no driver File: I:/ECE554/DE1_SOC_Linux_FB/DE1_SOC_Linux_FB.v Line: 73
+Warning (10034): Output port "DRAM_UDQM" at DE1_SOC_Linux_FB.v(74) has no driver File: I:/ECE554/DE1_SOC_Linux_FB/DE1_SOC_Linux_FB.v Line: 74
+Warning (10034): Output port "DRAM_WE_N" at DE1_SOC_Linux_FB.v(75) has no driver File: I:/ECE554/DE1_SOC_Linux_FB/DE1_SOC_Linux_FB.v Line: 75
+Warning (10034): Output port "FAN_CTRL" at DE1_SOC_Linux_FB.v(78) has no driver File: I:/ECE554/DE1_SOC_Linux_FB/DE1_SOC_Linux_FB.v Line: 78
+Warning (10034): Output port "FPGA_I2C_SCLK" at DE1_SOC_Linux_FB.v(81) has no driver File: I:/ECE554/DE1_SOC_Linux_FB/DE1_SOC_Linux_FB.v Line: 81
+Warning (10034): Output port "IRDA_TXD" at DE1_SOC_Linux_FB.v(165) has no driver File: I:/ECE554/DE1_SOC_Linux_FB/DE1_SOC_Linux_FB.v Line: 165
+Warning (10034): Output port "TD_RESET_N" at DE1_SOC_Linux_FB.v(186) has no driver File: I:/ECE554/DE1_SOC_Linux_FB/DE1_SOC_Linux_FB.v Line: 186
+Warning (10034): Output port "UART_TX" at DE1_SOC_Linux_FB.v(200) has no driver File: I:/ECE554/DE1_SOC_Linux_FB/DE1_SOC_Linux_FB.v Line: 200
+Warning (10034): Output port "UART_RTS" at DE1_SOC_Linux_FB.v(202) has no driver File: I:/ECE554/DE1_SOC_Linux_FB/DE1_SOC_Linux_FB.v Line: 202
+Warning (10034): Output port "QSPI_FLASH_SCLK" at DE1_SOC_Linux_FB.v(206) has no driver File: I:/ECE554/DE1_SOC_Linux_FB/DE1_SOC_Linux_FB.v Line: 206
+Warning (10034): Output port "QSPI_FLASH_CE_n" at DE1_SOC_Linux_FB.v(208) has no driver File: I:/ECE554/DE1_SOC_Linux_FB/DE1_SOC_Linux_FB.v Line: 208
+Warning (10034): Output port "RISCV_JTAG_TDO" at DE1_SOC_Linux_FB.v(213) has no driver File: I:/ECE554/DE1_SOC_Linux_FB/DE1_SOC_Linux_FB.v Line: 213
+Error (12153): Can't elaborate top-level user hierarchy
+Info (144001): Generated suppressed messages file I:/ECE554/DE1_SOC_Linux_FB/output_files/DE1_SOC_Linux_FB.map.smsg
+Error: Quartus Prime Analysis & Synthesis was unsuccessful. 43 errors, 61 warnings
+    Error: Peak virtual memory: 4878 megabytes
+    Error: Processing ended: Thu Mar 26 20:35:38 2026
+    Error: Elapsed time: 00:01:18
+    Error: Total CPU time (on all processors): 00:01:39
+
+
++------------------------------------------+
+; Analysis & Synthesis Suppressed Messages ;
++------------------------------------------+
+The suppressed messages can be found in I:/ECE554/DE1_SOC_Linux_FB/output_files/DE1_SOC_Linux_FB.map.smsg.
+
+

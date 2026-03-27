@@ -1,0 +1,12 @@
+Analysis & Synthesis Status : Failed - Thu Mar 26 20:35:38 2026
+Quartus Prime Version : 24.1std.0 Build 1077 03/04/2025 SC Lite Edition
+Revision Name : DE1_SOC_Linux_FB
+Top-level Entity Name : DE1_SOC_Linux_FB
+Family : Cyclone V
+Logic utilization (in ALMs) : N/A until Partition Merge
+Total registers : N/A until Partition Merge
+Total pins : N/A until Partition Merge
+Total virtual pins : N/A until Partition Merge
+Total block memory bits : N/A until Partition Merge
+Total PLLs : N/A until Partition Merge
+Total DLLs : N/A until Partition Merge
