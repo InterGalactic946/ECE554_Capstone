@@ -11,9 +11,9 @@
 // agreement for further details.
 
 
-// $Id: //acds/rel/24.1std/ip/merlin/altera_merlin_burst_adapter/new_source/altera_merlin_burst_adapter_new.sv#1 $
+// $Id: //acds/rel/25.1std/ip/merlin/altera_merlin_burst_adapter/new_source/altera_merlin_burst_adapter_new.sv#1 $
 // $Revision: #1 $
-// $Date: 2023/12/11 $
+// $Date: 2025/03/10 $
 // $Author: psgswbuild $
 
 `timescale 1 ns / 1 ns

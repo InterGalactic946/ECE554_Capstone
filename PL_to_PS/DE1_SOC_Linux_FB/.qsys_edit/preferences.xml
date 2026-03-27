@@ -6,11 +6,9 @@
    <connections preferredWidth="271" />
    <irq preferredWidth="63" />
    <name preferredWidth="278" />
-   <inputclock preferredWidth="169" />
   </columns>
  </systemtable>
- <library
-   expandedCategories="Library/Memory Interfaces and Controllers/Memory Interfaces with AltMemPHY,Library/Qsys Interconnect,Library/Basic Functions/On Chip Memory,Project,Library/Basic Functions/Simulation; Debug and Verification/Simulation,Library/Processors and Peripherals,Library,Library/Basic Functions/Simulation; Debug and Verification,Library/Processors and Peripherals/Hard Processor Components,Library/Qsys Interconnect/Memory-Mapped Alpha,Library/Memory Interfaces and Controllers/Memory Interfaces with UniPHY,Library/Memory Interfaces and Controllers,Library/Qsys Interconnect/Memory-Mapped,Library/Basic Functions" />
- <window width="3862" height="2110" x="-11" y="-11" />
- <hdlexample language="VERILOG" />
+ <library expandedCategories="Project,Library" />
+ <window width="2490" height="1573" x="-9" y="-9" />
+ <generation block_symbol_file="1" />
 </preferences>

@@ -788,7 +788,7 @@ on the Quartus Prime software download page.
 		(text "readdata" (rect 261 1443 570 2896)(font "Arial" (color 0 0 0)))
 		(text "writedata" (rect 261 1459 576 2928)(font "Arial" (color 0 0 0)))
 		(text "byteenable" (rect 261 1475 582 2960)(font "Arial" (color 0 0 0)))
-		(text " system " (rect 685 1496 1418 3002)(font "Arial" ))
+		(text " soc_system " (rect 664 1496 1400 3002)(font "Arial" ))
 		(line (pt 256 32)(pt 464 32)(line_width 1))
 		(line (pt 464 32)(pt 464 1496)(line_width 1))
 		(line (pt 256 1496)(pt 464 1496)(line_width 1))
