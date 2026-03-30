@@ -28,6 +28,8 @@ module Mic_Clk_Gen_tb ();
   logic volt_on;
   logic [2:0] mode_req;
   logic data_val;
+  tri data_l;
+  tri data_r;
   tri data;
   logic [1:0] curr_mode;
   logic mic_clk;
@@ -68,18 +70,37 @@ module Mic_Clk_Gen_tb ();
     mic_clk_edge_count += 1;
   end
 
+  // Resolve the individual microphone drivers onto the shared PDM wire.
+  assign data = data_l;
+  assign data = data_r;
+
   // Sample the left microphone on falling mic-clock edges.
   always @(negedge mic_clk) begin
-    if (data_val) begin
+    if (data_val && iMIC_MODEL_L.model_active) begin
       #1;
-      if ((data === 1'b0) || (data === 1'b1)) begin
+      if ((data_l !== 1'b0) && (data_l !== 1'b1)) begin
+        $error("ERROR: Left microphone did not drive DATA on its active edge!");
+        error_count += 1;
+      end
+
+      if (data_r !== 1'bz) begin
+        $error("ERROR: Right microphone was not high-Z on the left microphone edge!");
+        error_count += 1;
+      end
+
+      if ((data_l === 1'b0) || (data_l === 1'b1)) begin
+        if (data !== data_l) begin
+          $error("ERROR: Shared data bus did not resolve to the left microphone on its active edge!");
+          error_count += 1;
+        end
+
         left_sample_count += 1;
 
-        if (left_prev_valid && (data != left_prev_bit)) begin
+        if (left_prev_valid && (data_l != left_prev_bit)) begin
           left_toggle_count += 1;
         end
 
-        left_prev_bit   = data;
+        left_prev_bit   = data_l;
         left_prev_valid = 1'b1;
       end
     end
@@ -87,16 +108,31 @@ module Mic_Clk_Gen_tb ();
 
   // Sample the right microphone on rising mic-clock edges.
   always @(posedge mic_clk) begin
-    if (data_val) begin
+    if (data_val && iMIC_MODEL_R.model_active) begin
       #1;
-      if ((data === 1'b0) || (data === 1'b1)) begin
+      if ((data_r !== 1'b0) && (data_r !== 1'b1)) begin
+        $error("ERROR: Right microphone did not drive DATA on its active edge!");
+        error_count += 1;
+      end
+
+      if (data_l !== 1'bz) begin
+        $error("ERROR: Left microphone was not high-Z on the right microphone edge!");
+        error_count += 1;
+      end
+
+      if ((data_r === 1'b0) || (data_r === 1'b1)) begin
+        if (data !== data_r) begin
+          $error("ERROR: Shared data bus did not resolve to the right microphone on its active edge!");
+          error_count += 1;
+        end
+
         right_sample_count += 1;
 
-        if (right_prev_valid && (data != right_prev_bit)) begin
+        if (right_prev_valid && (data_r != right_prev_bit)) begin
           right_toggle_count += 1;
         end
 
-        right_prev_bit   = data;
+        right_prev_bit   = data_r;
         right_prev_valid = 1'b1;
       end
     end
@@ -122,7 +158,7 @@ module Mic_Clk_Gen_tb ();
       .clock_i(mic_clk),
       .select_i(1'b0),
 
-      .data_o(data)
+      .data_o(data_l)
   );
 
   // Instantiate right mic.
@@ -131,7 +167,7 @@ module Mic_Clk_Gen_tb ();
       .clock_i(mic_clk),
       .select_i(1'b1),
 
-      .data_o(data)
+      .data_o(data_r)
   );
 
   ///////////////////
@@ -259,8 +295,8 @@ module Mic_Clk_Gen_tb ();
           dual_samples_ready = 1'b1;
         end
         begin
-          TimeoutTask(dual_samples_ready, timeout_cycles,
-                      $sformatf("left/right mic samples during %s", label));
+          TimeoutTask(dual_samples_ready, timeout_cycles, $sformatf(
+                      "left/right mic samples during %s", label));
         end
       join_any
       disable fork;
