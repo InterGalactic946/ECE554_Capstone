@@ -44,8 +44,11 @@ module Mic_Clk_Gen_tb ();
   logic left_prev_valid, right_prev_valid;
 
   // ============================================================
-  // Timing helpers copied from the DUT for predictable checking.
-  // These are the full datasheet-based wait counts at SYS_CLK_HZ.
+  // Datasheet timing
+  // Power-up = 50 ms
+  // Wake-up  = 15 ms (from sleep to active)
+  // Mode chg = 10 ms
+  // Sleep in = 10 ms (from active to sleep)
   // ============================================================
   localparam int unsigned POWERUP_CYCLES = (SYS_CLK_HZ * 50) / 1000;
   localparam int unsigned WAKEUP_CYCLES = (SYS_CLK_HZ * 15) / 1000;
@@ -167,6 +170,20 @@ module Mic_Clk_Gen_tb ();
     end
   endtask : wait_n_mic_edges
 
+  task automatic TimeoutTask(input logic sig, input int clks2wait, input string signal);
+    fork
+      begin : timeout
+        repeat (clks2wait) @(posedge clk);
+        $error("ERROR: %s not getting asserted and/or held at its value.", signal);
+        error_count += 1;
+        $stop();
+      end : timeout
+      begin
+        @(posedge sig) disable timeout;
+      end
+    join
+  endtask : TimeoutTask
+
   task automatic ramp_vdd(input real start_v, input real stop_v, input real step_v,
                           input int unsigned settle_cycles_per_step);
     real vdd_step;
@@ -229,22 +246,24 @@ module Mic_Clk_Gen_tb ();
   task automatic wait_for_dual_channel_samples(input int unsigned samples_per_channel,
                                                input int unsigned timeout_cycles,
                                                input string label);
-    int unsigned waited_cycles;
+    logic dual_samples_ready;
     begin
-      waited_cycles = 0;
+      dual_samples_ready = 1'b0;
 
-      while (((left_sample_count < samples_per_channel) ||
-              (right_sample_count < samples_per_channel)) &&
-             (waited_cycles < timeout_cycles)) begin
-        @(negedge clk);
-        waited_cycles += 1;
-      end
-
-      if ((left_sample_count < samples_per_channel) ||
-          (right_sample_count < samples_per_channel)) begin
-        $error("ERROR: Timed out waiting for left/right mic samples during %s!", label);
-        error_count += 1;
-      end
+      fork
+        begin
+          while ((left_sample_count < samples_per_channel) ||
+                 (right_sample_count < samples_per_channel)) begin
+            @(negedge clk);
+          end
+          dual_samples_ready = 1'b1;
+        end
+        begin
+          TimeoutTask(dual_samples_ready, timeout_cycles,
+                      $sformatf("left/right mic samples during %s", label));
+        end
+      join_any
+      disable fork;
 
     end
   endtask : wait_for_dual_channel_samples

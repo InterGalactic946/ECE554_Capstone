@@ -1,0 +1,1 @@
+add wave /Mic_Clk_Gen_tb/clk; add wave /Mic_Clk_Gen_tb/rst; add wave /Mic_Clk_Gen_tb/volt_on; add wave /Mic_Clk_Gen_tb/mic_clk; add wave /Mic_Clk_Gen_tb/iCLK_GEN/data_val_o;
