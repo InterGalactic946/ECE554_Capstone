@@ -1,4 +1,4 @@
-`timescale 1 ps / 1 ps
+`timescale 1ns / 10ps
 // ------------------------------------------------------------
 // Module: Mic_Clk_Ctrl
 // Description: The Mic_Clk_Ctrl block selects between the four

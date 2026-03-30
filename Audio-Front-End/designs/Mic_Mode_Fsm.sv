@@ -1,4 +1,4 @@
-`timescale 1ns / 1ps
+`timescale 1ns / 10ps
 // ------------------------------------------------------------
 // Module: Mic_Mode_Fsm
 // Description: The Mic_Mode_Fsm controls the microphone's

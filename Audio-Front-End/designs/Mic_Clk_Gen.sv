@@ -1,4 +1,4 @@
-`timescale 1ns / 1ps
+`timescale 1ns / 10ps
 // ------------------------------------------------------------
 // Module: Mic_Clk_Gen
 // Description: The Mic_Clk_Gen generates the microphone clock
