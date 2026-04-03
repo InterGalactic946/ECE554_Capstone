@@ -13,12 +13,15 @@
 // Date: 03-24-2026
 // ------------------------------------------------------------
 module Mic_Clk_Gen_tb ();
+  import Mic_Time_pkg::*;
 
   localparam int unsigned SYS_CLK_HZ = 50_000_000;
+  localparam bit FAST_SIM = 1'b1;
+  localparam int unsigned FAST_SIM_DIV = 1000;
   localparam real VDD_ON_THRESHOLD_V = 1.62;
-  localparam int unsigned FSM_MARGIN_CYCLES = 1024;
-  localparam int unsigned CLOCK_ACTIVITY_OBSERVE_CYCLES = 800;
-  localparam int unsigned SAMPLE_TIMEOUT_CYCLES = 5_000_000;
+  localparam int unsigned FSM_MARGIN_CYCLES = 256;
+  localparam int unsigned CLOCK_ACTIVITY_OBSERVE_CYCLES = 256;
+  localparam int unsigned SAMPLE_TIMEOUT_CYCLES = 50_000;
 
   /////////////////////////////
   // Stimulus of type logic //
@@ -45,17 +48,18 @@ module Mic_Clk_Gen_tb ();
   logic left_prev_bit, right_prev_bit;
   logic left_prev_valid, right_prev_valid;
 
-  // ============================================================
-  // Datasheet timing
-  // Power-up = 50 ms
-  // Wake-up  = 15 ms (from sleep to active)
-  // Mode chg = 10 ms
-  // Sleep in = 10 ms (from active to sleep)
-  // ============================================================
-  localparam int unsigned POWERUP_CYCLES = (SYS_CLK_HZ * 50) / 1000;
-  localparam int unsigned WAKEUP_CYCLES = (SYS_CLK_HZ * 15) / 1000;
-  localparam int unsigned MODECHANGE_CYCLES = (SYS_CLK_HZ * 10) / 1000;
-  localparam int unsigned FALLASLEEP_CYCLES = (SYS_CLK_HZ * 10) / 1000;
+  localparam int unsigned POWERUP_CYCLES = mic_cycles_from_ms(
+      SYS_CLK_HZ, MIC_POWERUP_MS, FAST_SIM, FAST_SIM_DIV
+  );
+  localparam int unsigned WAKEUP_CYCLES = mic_cycles_from_ms(
+      SYS_CLK_HZ, MIC_WAKEUP_MS, FAST_SIM, FAST_SIM_DIV
+  );
+  localparam int unsigned MODECHANGE_CYCLES = mic_cycles_from_ms(
+      SYS_CLK_HZ, MIC_MODECHANGE_MS, FAST_SIM, FAST_SIM_DIV
+  );
+  localparam int unsigned FALLASLEEP_CYCLES = mic_cycles_from_ms(
+      SYS_CLK_HZ, MIC_FALLASLEEP_MS, FAST_SIM, FAST_SIM_DIV
+  );
 
   // Convert the analog-style supply to the digital power-good input used by the DUT.
   always_comb begin
@@ -90,7 +94,8 @@ module Mic_Clk_Gen_tb ();
 
       if ((data_l === 1'b0) || (data_l === 1'b1)) begin
         if (data !== data_l) begin
-          $error("ERROR: Shared data bus did not resolve to the left microphone on its active edge!");
+          $error(
+              "ERROR: Shared data bus did not resolve to the left microphone on its active edge!");
           error_count += 1;
         end
 
@@ -122,7 +127,8 @@ module Mic_Clk_Gen_tb ();
 
       if ((data_r === 1'b0) || (data_r === 1'b1)) begin
         if (data !== data_r) begin
-          $error("ERROR: Shared data bus did not resolve to the right microphone on its active edge!");
+          $error(
+              "ERROR: Shared data bus did not resolve to the right microphone on its active edge!");
           error_count += 1;
         end
 
@@ -140,7 +146,9 @@ module Mic_Clk_Gen_tb ();
 
   // Instantiate Clock Generator
   Mic_Clk_Gen #(
-      .SYS_CLK_HZ(SYS_CLK_HZ)
+      .SYS_CLK_HZ(SYS_CLK_HZ),
+      .FAST_SIM(FAST_SIM),
+      .FAST_SIM_DIV(FAST_SIM_DIV)
   ) iCLK_GEN (
       .clk_i(clk),
       .rst_i(rst),
@@ -153,7 +161,10 @@ module Mic_Clk_Gen_tb ();
   );
 
   // Instantiate left mic.
-  SPH0641LU4H_1_model iMIC_MODEL_L (
+  SPH0641LU4H_1_model #(
+      .FAST_SIM(FAST_SIM),
+      .FAST_SIM_DIV(FAST_SIM_DIV)
+  ) iMIC_MODEL_L (
       .vdd_i(volt_on),
       .clock_i(mic_clk),
       .select_i(1'b0),
@@ -162,7 +173,10 @@ module Mic_Clk_Gen_tb ();
   );
 
   // Instantiate right mic.
-  SPH0641LU4H_1_model iMIC_MODEL_R (
+  SPH0641LU4H_1_model #(
+      .FAST_SIM(FAST_SIM),
+      .FAST_SIM_DIV(FAST_SIM_DIV)
+  ) iMIC_MODEL_R (
       .vdd_i(volt_on),
       .clock_i(mic_clk),
       .select_i(1'b1),
@@ -325,6 +339,14 @@ module Mic_Clk_Gen_tb ();
     end
   endtask : check_bus_high_z
 
+  task automatic announce_test(input int unsigned test_num, input string description);
+    begin
+      $display("------------------------------------------------------------");
+      $display("TEST %0d STARTING @ %0t: %s", test_num, $time, description);
+      $display("------------------------------------------------------------");
+    end
+  endtask : announce_test
+
   initial begin
     error_count = 0;
     mic_clk_edge_count = 0;
@@ -332,13 +354,14 @@ module Mic_Clk_Gen_tb ();
 
     clk = 1'b0;
     rst = 1'b1;
-    mode_req = 3'h0;
+    mode_req = 3'h1;
     vdd_v = 0.0;
 
     wait_n_negedges(5);
     rst = 1'b0;
 
     // TEST 1: Below-threshold VDD should keep the mic path OFF.
+    announce_test(1, "Below-threshold VDD should keep the mic path OFF.");
     @(negedge clk) begin
       mode_req = 3'h6;
       set_vdd(1.55);
@@ -358,9 +381,10 @@ module Mic_Clk_Gen_tb ();
 
     expect_clock_quiet(CLOCK_ACTIVITY_OBSERVE_CYCLES, "below-threshold VDD");
 
-    // TEST 2: With power present, a disabled request should map to SLEEP.
+    // TEST 2: With power present, request 3'b001 should still map to SLEEP.
+    announce_test(2, "With power present, request 3'b001 should still map to SLEEP.");
     @(negedge clk) begin
-      mode_req = 3'h0;
+      mode_req = 3'h1;
     end
 
     ramp_vdd(1.55, 1.72, 0.03, 2);
@@ -372,7 +396,7 @@ module Mic_Clk_Gen_tb ();
     end
 
     if (curr_mode !== 2'h0) begin
-      $error("ERROR: curr_mode_o is not SLEEP after powering up with a disabled request!");
+      $error("ERROR: curr_mode_o is not SLEEP after powering up with mode request 3'b001!");
       error_count += 1;
     end
 
@@ -381,11 +405,10 @@ module Mic_Clk_Gen_tb ();
       error_count += 1;
     end
 
-    expect_clock_activity(CLOCK_ACTIVITY_OBSERVE_CYCLES, "sleep mode after a disabled request");
-    wait_n_mic_edges(4);
-    check_bus_high_z(6, "sleep mode");
+    expect_clock_quiet(CLOCK_ACTIVITY_OBSERVE_CYCLES, "sleep mode after a disabled request");
 
     // TEST 3: Wake into STANDARD mode and read data from both microphones.
+    announce_test(3, "Wake into STANDARD mode and read data from both microphones.");
     clear_capture_state();
     @(negedge clk) mode_req = 3'h6;
 
@@ -404,6 +427,7 @@ module Mic_Clk_Gen_tb ();
     wait_for_dual_channel_samples(24, SAMPLE_TIMEOUT_CYCLES, "STANDARD mode");
 
     // TEST 4: Brownout mid-transition should clear the mic path safely.
+    announce_test(4, "Brownout mid-transition should clear the mic path safely.");
     clear_capture_state();
     @(negedge clk) mode_req = 3'h7;
 
@@ -423,9 +447,10 @@ module Mic_Clk_Gen_tb ();
 
     expect_clock_quiet(CLOCK_ACTIVITY_OBSERVE_CYCLES, "brownout recovery");
 
-    // TEST 5: Threshold chatter should not prevent eventual recovery into LOW-POWER mode.
+    // TEST 5: Threshold chatter should not prevent eventual recovery into STANDARD mode.
+    announce_test(5, "Threshold chatter should not prevent eventual recovery into STANDARD mode.");
     clear_capture_state();
-    @(negedge clk) mode_req = 3'h5;
+    @(negedge clk) mode_req = 3'h6;
 
     set_vdd(1.60);
     wait_n_negedges(2);
@@ -437,8 +462,8 @@ module Mic_Clk_Gen_tb ();
 
     wait_n_negedges(POWERUP_CYCLES + FSM_MARGIN_CYCLES);
 
-    if (curr_mode !== 2'h1) begin
-      $error("ERROR: curr_mode_o is not LOW-POWER after threshold chatter recovery!");
+    if (curr_mode !== 2'h2) begin
+      $error("ERROR: curr_mode_o is not STANDARD after threshold chatter recovery!");
       error_count += 1;
     end
 
@@ -447,9 +472,10 @@ module Mic_Clk_Gen_tb ();
       error_count += 1;
     end
 
-    wait_for_dual_channel_samples(24, SAMPLE_TIMEOUT_CYCLES, "LOW-POWER recovery");
+    wait_for_dual_channel_samples(24, SAMPLE_TIMEOUT_CYCLES, "STANDARD recovery");
 
     // TEST 6: Direct OFF->ULTRASONIC request should still produce valid stereo data.
+    announce_test(6, "Direct OFF->ULTRASONIC request should still produce valid stereo data.");
     clear_capture_state();
     @(negedge clk) begin
       mode_req = 3'h7;
@@ -472,14 +498,15 @@ module Mic_Clk_Gen_tb ();
 
     wait_for_dual_channel_samples(24, SAMPLE_TIMEOUT_CYCLES, "OFF->ULTRASONIC");
 
-    // TEST 7: A powered disabled request should return to SLEEP and release the PDM bus.
+    // TEST 7: A powered request of 3'b001 should return to SLEEP and release the PDM bus.
+    announce_test(7, "A powered request of 3'b001 should return to SLEEP and release the PDM bus.");
     clear_capture_state();
-    @(negedge clk) mode_req = 3'h0;
+    @(negedge clk) mode_req = 3'h1;
 
     wait_n_negedges(FALLASLEEP_CYCLES + FSM_MARGIN_CYCLES);
 
     if (curr_mode !== 2'h0) begin
-      $error("ERROR: curr_mode_o is not SLEEP after a powered disabled request!");
+      $error("ERROR: curr_mode_o is not SLEEP after requesting mode 3'b001 while powered!");
       error_count += 1;
     end
 
@@ -488,9 +515,23 @@ module Mic_Clk_Gen_tb ();
       error_count += 1;
     end
 
-    expect_clock_activity(CLOCK_ACTIVITY_OBSERVE_CYCLES, "sleep after disabling while powered");
-    wait_n_mic_edges(4);
-    check_bus_high_z(6, "sleep after disabling while powered");
+    expect_clock_quiet(CLOCK_ACTIVITY_OBSERVE_CYCLES, "sleep after disabling while powered");
+
+    #1;
+    if (data_l !== 1'bz) begin
+      $error("ERROR: Left microphone did not release DATA after returning to SLEEP!");
+      error_count += 1;
+    end
+
+    if (data_r !== 1'bz) begin
+      $error("ERROR: Right microphone did not release DATA after returning to SLEEP!");
+      error_count += 1;
+    end
+
+    if (data !== 1'bz) begin
+      $error("ERROR: Shared PDM bus did not return to high-Z after returning to SLEEP!");
+      error_count += 1;
+    end
 
     if (error_count == 0) begin
       $display("YAHOO!! All tests passed.");
@@ -500,49 +541,4 @@ module Mic_Clk_Gen_tb ();
 
     $stop();
   end
-
-endmodule
-
-// ------------------------------------------------------------
-// Module: Mic_Clk_Pll
-// Description: Behavioral PLL stub for Mic_Clk_Gen_tb. It
-//              generates legal mic clock frequencies for each
-//              operating mode and asserts locked shortly after
-//              reset deasserts.
-// ------------------------------------------------------------
-module Mic_Clk_Pll (
-    input  logic refclk,
-    input  logic rst,
-    output logic outclk_1,
-    output logic outclk_3,
-    output logic outclk_4,
-    output logic outclk_5,
-    output logic locked
-);
-
-  localparam realtime SLEEP_HALF_PERIOD_NS = 5000.0;  // 100 kHz
-  localparam realtime LOW_PWR_HALF_PERIOD_NS = 1250.0;  // 400 kHz
-  localparam realtime STD_HALF_PERIOD_NS = 250.0;  // 2.0 MHz
-  localparam realtime ULT_HALF_PERIOD_NS = 125.0;  // 4.0 MHz
-
-  initial begin
-    outclk_1 = 1'b0;
-    outclk_3 = 1'b0;
-    outclk_4 = 1'b0;
-    outclk_5 = 1'b0;
-  end
-
-  always_ff @(posedge refclk) begin
-    if (rst) begin
-      locked <= 1'b0;
-    end else begin
-      locked <= 1'b1;
-    end
-  end
-
-  always #(SLEEP_HALF_PERIOD_NS) outclk_1 = ~outclk_1;
-  always #(LOW_PWR_HALF_PERIOD_NS) outclk_3 = ~outclk_3;
-  always #(STD_HALF_PERIOD_NS) outclk_4 = ~outclk_4;
-  always #(ULT_HALF_PERIOD_NS) outclk_5 = ~outclk_5;
-
 endmodule

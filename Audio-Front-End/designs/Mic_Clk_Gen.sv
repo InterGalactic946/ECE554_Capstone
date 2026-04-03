@@ -1,4 +1,4 @@
-`timescale 1ns / 10ps
+`timescale 1ns / 1ps
 // ------------------------------------------------------------
 // Module: Mic_Clk_Gen
 // Description: The Mic_Clk_Gen generates the microphone clock
@@ -11,7 +11,9 @@
 // Date: 03-23-2026
 // ------------------------------------------------------------
 module Mic_Clk_Gen #(
-    parameter int unsigned SYS_CLK_HZ = 50_000_000
+    parameter int unsigned SYS_CLK_HZ = 50_000_000,
+    parameter bit FAST_SIM = 1'b0,
+    parameter int unsigned FAST_SIM_DIV = 1
 ) (
     input logic clk_i,
     input logic rst_i,
@@ -26,8 +28,8 @@ module Mic_Clk_Gen #(
   /////////////////////////////////////////////////
   // Declare any internal signals as type logic //
   ///////////////////////////////////////////////
-  logic clk_sleep, clk_low_pwr, clk_std, clk_ult;
-  logic clk_en, pll_locked, clk_ctrl_en, clk_rdy;
+  logic clk_std, clk_ult;
+  logic clk_en, pll_locked, clk_ctrl_en;
   logic [1:0] clk_sel;
   ///////////////////////////////////////////////
 
@@ -36,14 +38,15 @@ module Mic_Clk_Gen #(
   ////////////////////////
   // Instantiate the FSM to control b/w transitions.
   Mic_Mode_Fsm #(
-      .SYS_CLK_HZ(SYS_CLK_HZ)
+      .SYS_CLK_HZ(SYS_CLK_HZ),
+      .FAST_SIM(FAST_SIM),
+      .FAST_SIM_DIV(FAST_SIM_DIV)
   ) iMIC_FSM (
       .clk_i(clk_i),
       .rst_i(rst_i),
       .volt_on_i(volt_on_i),
       .mode_req_i(mode_req_i),
       .pll_locked_i(pll_locked),
-      .clk_rdy_i(clk_rdy),
 
       .clk_en_o (clk_en),
       .clk_sel_o(clk_sel),
@@ -52,15 +55,13 @@ module Mic_Clk_Gen #(
       .data_val_o (data_val_o)
   );
 
-  // Instantiate the PLL that generates all 4 clocks.
+  // Instantiate the PLL that generates the clocks.
   Mic_Clk_Pll iPLL (
       .refclk(clk_i),
       .rst(rst_i),
 
-      .outclk_1(clk_sleep),
-      .outclk_3(clk_low_pwr),
-      .outclk_4(clk_std),
-      .outclk_5(clk_ult),
+      .outclk_0(clk_std),
+      .outclk_1(clk_ult),
       .locked  (pll_locked)
   );
 
@@ -69,18 +70,14 @@ module Mic_Clk_Gen #(
 
   // Instantiate clock mux.
   Mic_Clk_Ctrl iCLK_CTRL (
-      .clk_i(clk_i),
-      .rst_i(rst_i),
+      .inclk0x  (clk_i),
+      .inclk1x  (clk_i),
+      .inclk2x  (clk_std),
+      .inclk3x  (clk_ult),
+      .clkselect(clk_sel),
+      .ena      (clk_ctrl_en),
 
-      .clk0_i   (clk_sleep),
-      .clk1_i   (clk_low_pwr),
-      .clk2_i   (clk_std),
-      .clk3_i   (clk_ult),
-      .clk_sel_i(clk_sel),
-      .en_i     (clk_ctrl_en),
-
-      .clk_o    (mic_clk_o),
-      .clk_rdy_o(clk_rdy)
+      .outclk(mic_clk_o)
   );
 
 endmodule

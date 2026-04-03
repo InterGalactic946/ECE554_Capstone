@@ -7,6 +7,7 @@
 // Date: 03-23-2026
 // ------------------------------------------------------------
 module Mic_Mode_Fsm_tb ();
+  import Mic_Time_pkg::*;
 
   /////////////////////////////
   // Stimulus of type logic //
@@ -26,30 +27,18 @@ module Mic_Mode_Fsm_tb ();
   localparam int unsigned SYS_CLK_HZ = 50_000_000;
   localparam bit FAST_SIM = 1'b1;
   localparam int unsigned FAST_SIM_DIV = 50_000;
-
-  // Scales cycle count for different system clocks.
-  function automatic int unsigned scale_cycles(input int unsigned cycles);
-    int unsigned scaled_cycles;
-    begin
-      if (!FAST_SIM) begin
-        scale_cycles = cycles;
-      end else begin
-        scaled_cycles = (cycles + FAST_SIM_DIV - 1) / FAST_SIM_DIV;
-        scale_cycles  = (scaled_cycles == 0) ? 1 : scaled_cycles;
-      end
-    end
-  endfunction
-
-  // Datasheet parameters.
-  localparam int unsigned POWERUP_CYCLES_REAL = (SYS_CLK_HZ * 50) / 1000;
-  localparam int unsigned WAKEUP_CYCLES_REAL = (SYS_CLK_HZ * 15) / 1000;
-  localparam int unsigned MODECHANGE_CYCLES_REAL = (SYS_CLK_HZ * 10) / 1000;
-  localparam int unsigned FALLASLEEP_CYCLES_REAL = (SYS_CLK_HZ * 10) / 1000;
-
-  localparam int unsigned POWERUP_CYCLES = scale_cycles(POWERUP_CYCLES_REAL);
-  localparam int unsigned WAKEUP_CYCLES = scale_cycles(WAKEUP_CYCLES_REAL);
-  localparam int unsigned MODECHANGE_CYCLES = scale_cycles(MODECHANGE_CYCLES_REAL);
-  localparam int unsigned FALLASLEEP_CYCLES = scale_cycles(FALLASLEEP_CYCLES_REAL);
+  localparam int unsigned POWERUP_CYCLES = mic_cycles_from_ms(
+      SYS_CLK_HZ, MIC_POWERUP_MS, FAST_SIM, FAST_SIM_DIV
+  );
+  localparam int unsigned WAKEUP_CYCLES = mic_cycles_from_ms(
+      SYS_CLK_HZ, MIC_WAKEUP_MS, FAST_SIM, FAST_SIM_DIV
+  );
+  localparam int unsigned MODECHANGE_CYCLES = mic_cycles_from_ms(
+      SYS_CLK_HZ, MIC_MODECHANGE_MS, FAST_SIM, FAST_SIM_DIV
+  );
+  localparam int unsigned FALLASLEEP_CYCLES = mic_cycles_from_ms(
+      SYS_CLK_HZ, MIC_FALLASLEEP_MS, FAST_SIM, FAST_SIM_DIV
+  );
   localparam int unsigned FSM_MARGIN_CYCLES = 8;
 
   //////////////////////
@@ -65,7 +54,6 @@ module Mic_Mode_Fsm_tb ();
       .volt_on_i(volt_on),
       .mode_req_i(mode_req),
       .pll_locked_i(pll_locked),
-      .clk_rdy_i(pll_locked),
 
       .clk_en_o (clk_en),
       .clk_sel_o(clk_sel),
@@ -129,8 +117,8 @@ module Mic_Mode_Fsm_tb ();
     wait_n_negedges(POWERUP_CYCLES + FSM_MARGIN_CYCLES);
 
     @(negedge clk) begin
-      if (clk_en !== 1'b1) begin
-        $error("ERROR: clk_en_o is not high when a disabled request maps to SLEEP!");
+      if (clk_en !== 1'b0) begin
+        $error("ERROR: clk_en_o is not low when a disabled request maps to SLEEP!");
         error_count += 1;
       end
 
@@ -166,8 +154,8 @@ module Mic_Mode_Fsm_tb ();
         error_count += 1;
       end
 
-      if (clk_en !== 1'b1) begin
-        $error("ERROR: clk_en_o is not high when mic is enabled in SLEEP mode!");
+      if (clk_en !== 1'b0) begin
+        $error("ERROR: clk_en_o is not low when mic is enabled in SLEEP mode!");
         error_count += 1;
       end
 
@@ -177,14 +165,14 @@ module Mic_Mode_Fsm_tb ();
       end
     end
 
-    // TEST 4: Transition from SLEEP to LOW-POWER mode.
-    @(negedge clk) mode_req = 3'h5;
+    // TEST 4: Transition from SLEEP to STANDARD mode.
+    @(negedge clk) mode_req = 3'h6;
 
     wait_n_negedges((WAKEUP_CYCLES / 2) + 2);
 
     @(negedge clk) begin
-      if (clk_sel !== 2'h1) begin
-        $error("ERROR: clk_sel_o did not switch to LOW-POWER during wake-up!");
+      if (clk_sel !== 2'h2) begin
+        $error("ERROR: clk_sel_o did not switch to STANDARD during wake-up!");
         error_count += 1;
       end
 
@@ -194,59 +182,12 @@ module Mic_Mode_Fsm_tb ();
       end
 
       if (data_val !== 1'b0) begin
-        $error("ERROR: data_val_o stayed high during the SLEEP to LOW-POWER transition!");
+        $error("ERROR: data_val_o stayed high during the SLEEP to STANDARD transition!");
         error_count += 1;
       end
     end
 
     wait_n_negedges(WAKEUP_CYCLES + FSM_MARGIN_CYCLES);
-
-    @(negedge clk) begin
-      if (clk_sel !== 2'h1) begin
-        $error("ERROR: clk_sel_o is not 2'b01 after entering LOW-POWER mode!");
-        error_count += 1;
-      end
-
-      if (curr_mode !== 2'h1) begin
-        $error("ERROR: curr_mode_o is not 2'b01 after entering LOW-POWER mode!");
-        error_count += 1;
-      end
-
-      if (clk_en !== 1'b1) begin
-        $error("ERROR: clk_en_o is not high after entering LOW-POWER mode!");
-        error_count += 1;
-      end
-
-      if (data_val !== 1'b1) begin
-        $error("ERROR: data_val_o is not high after entering LOW-POWER mode!");
-        error_count += 1;
-      end
-    end
-
-    // TEST 5: Transition from LOW-POWER to STANDARD mode.
-    @(negedge clk) mode_req = 3'h6;
-
-    wait_n_negedges((MODECHANGE_CYCLES / 2) + 2);
-
-    @(negedge clk) begin
-      if (clk_sel !== 2'h2) begin
-        $error("ERROR: clk_sel_o did not switch to STANDARD during the mode change!");
-        error_count += 1;
-      end
-
-      if (curr_mode !== 2'h1) begin
-        $error(
-            "ERROR: curr_mode_o did not remain at the settled LOW-POWER mode during the mode change!");
-        error_count += 1;
-      end
-
-      if (data_val !== 1'b0) begin
-        $error("ERROR: data_val_o stayed high during the LOW-POWER to STANDARD transition!");
-        error_count += 1;
-      end
-    end
-
-    wait_n_negedges(MODECHANGE_CYCLES + FSM_MARGIN_CYCLES);
 
     @(negedge clk) begin
       if (clk_sel !== 2'h2) begin
@@ -270,7 +211,7 @@ module Mic_Mode_Fsm_tb ();
       end
     end
 
-    // TEST 6: Transition from STANDARD to ULTRASONIC mode.
+    // TEST 5: Transition from STANDARD to ULTRASONIC mode.
     @(negedge clk) mode_req = 3'h7;
 
     wait_n_negedges((MODECHANGE_CYCLES / 2) + 2);
@@ -317,7 +258,7 @@ module Mic_Mode_Fsm_tb ();
       end
     end
 
-    // TEST 7: Transition from ULTRASONIC to SLEEP mode.
+    // TEST 6: Transition from ULTRASONIC to SLEEP mode.
     @(negedge clk) mode_req = 3'h4;
 
     wait_n_negedges((FALLASLEEP_CYCLES / 2) + 2);
@@ -353,13 +294,36 @@ module Mic_Mode_Fsm_tb ();
         error_count += 1;
       end
 
-      if (clk_en !== 1'b1) begin
-        $error("ERROR: clk_en_o is not high after entering SLEEP mode!");
+      if (clk_en !== 1'b0) begin
+        $error("ERROR: clk_en_o is not low after entering SLEEP mode!");
         error_count += 1;
       end
 
       if (data_val !== 1'b0) begin
         $error("ERROR: data_val_o is not low after entering SLEEP mode!");
+        error_count += 1;
+      end
+    end
+
+    // TEST 7: A repeated SLEEP request should leave the mic in SLEEP.
+    @(negedge clk) mode_req = 3'h4;
+
+    wait_n_negedges(FSM_MARGIN_CYCLES);
+
+    @(negedge clk) begin
+      if (clk_sel !== 2'h0) begin
+        $error("ERROR: clk_sel_o did not remain at 2'b00 for a repeated SLEEP request!");
+        error_count += 1;
+      end
+
+      if (curr_mode !== 2'h0) begin
+        $error(
+            "ERROR: curr_mode_o did not remain at the settled SLEEP mode for a repeated SLEEP request!");
+        error_count += 1;
+      end
+
+      if (data_val !== 1'b0) begin
+        $error("ERROR: data_val_o is not low for a repeated SLEEP request!");
         error_count += 1;
       end
     end
@@ -428,8 +392,8 @@ module Mic_Mode_Fsm_tb ();
         error_count += 1;
       end
 
-      if (clk_en !== 1'b1) begin
-        $error("ERROR: clk_en_o is not high after a disabled request returns the mic to SLEEP!");
+      if (clk_en !== 1'b0) begin
+        $error("ERROR: clk_en_o is not low after a disabled request returns the mic to SLEEP!");
         error_count += 1;
       end
 
@@ -518,7 +482,7 @@ module Mic_Mode_Fsm_tb ();
     end
 
     // TEST 11: Brownout during a transition should return the mic to a safe OFF state.
-    @(negedge clk) mode_req = 3'h5;
+    @(negedge clk) mode_req = 3'h6;
 
     wait_n_negedges((MODECHANGE_CYCLES / 2) + 2);
 
@@ -551,29 +515,29 @@ module Mic_Mode_Fsm_tb ();
     // TEST 12: After a brownout, the FSM should recover cleanly once power returns.
     @(negedge clk) begin
       volt_on  = 1'b1;
-      mode_req = 3'h5;
+      mode_req = 3'h4;
     end
 
     wait_n_negedges(POWERUP_CYCLES + FSM_MARGIN_CYCLES);
 
     @(negedge clk) begin
-      if (clk_sel !== 2'h1) begin
-        $error("ERROR: clk_sel_o is not 2'b01 after recovering from a brownout!");
+      if (clk_sel !== 2'h0) begin
+        $error("ERROR: clk_sel_o is not 2'b00 after recovering from a brownout!");
         error_count += 1;
       end
 
-      if (curr_mode !== 2'h1) begin
-        $error("ERROR: curr_mode_o is not 2'b01 after recovering from a brownout!");
+      if (curr_mode !== 2'h0) begin
+        $error("ERROR: curr_mode_o is not 2'b00 after recovering from a brownout!");
         error_count += 1;
       end
 
-      if (clk_en !== 1'b1) begin
-        $error("ERROR: clk_en_o is not high after recovering from a brownout!");
+      if (clk_en !== 1'b0) begin
+        $error("ERROR: clk_en_o is not low after recovering from a brownout!");
         error_count += 1;
       end
 
-      if (data_val !== 1'b1) begin
-        $error("ERROR: data_val_o is not high after recovering from a brownout!");
+      if (data_val !== 1'b0) begin
+        $error("ERROR: data_val_o is not low after recovering from a brownout!");
         error_count += 1;
       end
     end
@@ -625,7 +589,7 @@ module Mic_Mode_Fsm_tb ();
 
     wait_n_negedges((MODECHANGE_CYCLES / 2) + 2);
 
-    @(negedge clk) mode_req = 3'h5;
+    @(negedge clk) mode_req = 3'h4;
 
     wait_n_negedges((MODECHANGE_CYCLES / 2) + 3);
 
@@ -648,26 +612,26 @@ module Mic_Mode_Fsm_tb ();
       end
     end
 
-    wait_n_negedges(MODECHANGE_CYCLES + FSM_MARGIN_CYCLES);
+    wait_n_negedges(FALLASLEEP_CYCLES + FSM_MARGIN_CYCLES);
 
     @(negedge clk) begin
-      if (clk_sel !== 2'h1) begin
-        $error("ERROR: clk_sel_o is not 2'b01 after the deferred request is serviced!");
+      if (clk_sel !== 2'h0) begin
+        $error("ERROR: clk_sel_o is not 2'b00 after the deferred request is serviced!");
         error_count += 1;
       end
 
-      if (curr_mode !== 2'h1) begin
-        $error("ERROR: curr_mode_o is not 2'b01 after the deferred request is serviced!");
+      if (curr_mode !== 2'h0) begin
+        $error("ERROR: curr_mode_o is not 2'b00 after the deferred request is serviced!");
         error_count += 1;
       end
 
-      if (clk_en !== 1'b1) begin
-        $error("ERROR: clk_en_o is not high after the deferred request is serviced!");
+      if (clk_en !== 1'b0) begin
+        $error("ERROR: clk_en_o is not low after the deferred request is serviced!");
         error_count += 1;
       end
 
-      if (data_val !== 1'b1) begin
-        $error("ERROR: data_val_o is not high after the deferred request is serviced!");
+      if (data_val !== 1'b0) begin
+        $error("ERROR: data_val_o is not low after the deferred request is serviced!");
         error_count += 1;
       end
     end

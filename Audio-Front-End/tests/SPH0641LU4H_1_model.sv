@@ -23,17 +23,7 @@ module SPH0641LU4H_1_model #(
     output tri data_o     // Microphone DATA pin. Driven only on the selected edge.
 );
 
-  // ============================================================
-  // Datasheet timing
-  // Power-up = 50 ms
-  // Wake-up  = 15 ms (from sleep to active)
-  // Mode chg = 10 ms
-  // Sleep in = 10 ms (from active to sleep)
-  // ============================================================
-  localparam realtime POWERUP_TIME_NS = 50_000_000.0;
-  localparam realtime WAKEUP_TIME_NS = 15_000_000.0;
-  localparam realtime MODECHANGE_TIME_NS = 10_000_000.0;
-  localparam realtime FALLASLEEP_TIME_NS = 10_000_000.0;
+  import Mic_Time_pkg::*;
 
   ///////////////////////////////////////
   // Declare state type as enumerated //
@@ -81,7 +71,11 @@ module SPH0641LU4H_1_model #(
   int unsigned wait_cntr, wait_cycles;  // Settle counter and value to load into it.
   realtime last_posedge_ns;  // Stores the timestamp of the previous clock posedge.
   realtime clock_period_ns;  // Stores the most recently measured clock period.
+  event clock_stopped_sleep_ev;  // Triggered when a powered microphone has no clock for long enough to be SLEEP.
   //////////////////////////////////////////////////////////
+
+  localparam realtime MIC_SLEEP_CLOCK_MAX_PERIOD_NS = 4_000.0;
+  localparam realtime MIC_STOPPED_CLOCK_DETECT_NS = MIC_SLEEP_CLOCK_MAX_PERIOD_NS + 1.0;
 
   // Drive DATA only when allowed to, else back off the bus.
   assign data_o = (data_drive_en) ? data_drive_val : 1'bz;
@@ -89,19 +83,6 @@ module SPH0641LU4H_1_model #(
   // ====================================================================
   // Functions to help manage state transitions and mode change requests
   // ====================================================================
-  // Scale cycles accordingly when FAST_SIM is active.
-  function automatic int unsigned scale_cycles(input int unsigned cycles);
-    int unsigned scaled_cycles;
-    begin
-      if (!FAST_SIM || (FAST_SIM_DIV === 0)) begin
-        scale_cycles = cycles;
-      end else begin
-        scaled_cycles = (cycles + FAST_SIM_DIV - 1) / FAST_SIM_DIV;
-        scale_cycles  = (scaled_cycles == 0) ? 1 : scaled_cycles;
-      end
-    end
-  endfunction : scale_cycles
-
   // Checks if the mic is in an active operating mode.
   function automatic bit is_active_mode(input mic_mode_t mic_mode);
     begin
@@ -143,6 +124,44 @@ module SPH0641LU4H_1_model #(
     end
   endfunction : triangle_sample
 
+  // Scale a wall-clock delay for FAST_SIM the same way we shorten datasheet waits elsewhere.
+  function automatic realtime scale_wait_ns(input realtime wait_ns);
+    realtime scaled_wait_ns;
+    begin
+      if ((wait_ns <= 0.0) || !FAST_SIM || (FAST_SIM_DIV == 0)) begin
+        scale_wait_ns = wait_ns;
+      end else begin
+        scaled_wait_ns = wait_ns / FAST_SIM_DIV;
+        scale_wait_ns  = (scaled_wait_ns < 1.0) ? 1.0 : scaled_wait_ns;
+      end
+    end
+  endfunction : scale_wait_ns
+
+  // When the applied clock stops, the model must still be able to settle into
+  // SLEEP after the appropriate datasheet delay. The stopped-clock detector
+  // itself already waits one SLEEP-clock period, so subtract that portion from
+  // the remaining settle time.
+  function automatic realtime stopped_clock_sleep_wait_ns(input mic_mode_t from_mode);
+    realtime total_wait_ns;
+    begin
+      unique case (from_mode)
+        MODE_OFF:     total_wait_ns = scale_wait_ns(MIC_POWERUP_TIME_NS);
+        MODE_SLEEP:   total_wait_ns = 0.0;
+        MODE_LOW_PWR: total_wait_ns = scale_wait_ns(MIC_FALLASLEEP_TIME_NS);
+        MODE_STD:     total_wait_ns = scale_wait_ns(MIC_FALLASLEEP_TIME_NS);
+        MODE_ULT:     total_wait_ns = scale_wait_ns(MIC_FALLASLEEP_TIME_NS);
+        MODE_INVALID: total_wait_ns = 0.0;
+        default:      total_wait_ns = 0.0;
+      endcase
+
+      if (total_wait_ns <= MIC_STOPPED_CLOCK_DETECT_NS) begin
+        stopped_clock_sleep_wait_ns = 0.0;
+      end else begin
+        stopped_clock_sleep_wait_ns = total_wait_ns - MIC_STOPPED_CLOCK_DETECT_NS;
+      end
+    end
+  endfunction : stopped_clock_sleep_wait_ns
+
   // Classifies the mic's operating mode based on the frequency of the clock input.
   function automatic mic_mode_t classify_mode(input logic vdd_on, input realtime period_ns);
     real freq_hz;
@@ -150,7 +169,7 @@ module SPH0641LU4H_1_model #(
       if (!vdd_on) begin
         classify_mode = MODE_OFF;  // No power means the mic is OFF.
       end else if (period_ns <= 0.0) begin
-        classify_mode = MODE_INVALID;  // No valid clock measurement yet.
+        classify_mode = MODE_SLEEP;  // A stopped clock is treated as SLEEP when power is present.
       end else begin
         freq_hz = 1.0e9 / period_ns;
 
@@ -192,10 +211,10 @@ module SPH0641LU4H_1_model #(
         MODE_OFF: begin
           unique case (to_mode)
             MODE_OFF:     wait_ns = 0.0;
-            MODE_SLEEP:   wait_ns = POWERUP_TIME_NS;
-            MODE_LOW_PWR: wait_ns = POWERUP_TIME_NS;
-            MODE_STD:     wait_ns = POWERUP_TIME_NS;
-            MODE_ULT:     wait_ns = POWERUP_TIME_NS;
+            MODE_SLEEP:   wait_ns = MIC_POWERUP_TIME_NS;
+            MODE_LOW_PWR: wait_ns = MIC_POWERUP_TIME_NS;
+            MODE_STD:     wait_ns = MIC_POWERUP_TIME_NS;
+            MODE_ULT:     wait_ns = MIC_POWERUP_TIME_NS;
             default:      wait_ns = 0.0;
           endcase
         end
@@ -204,9 +223,9 @@ module SPH0641LU4H_1_model #(
           unique case (to_mode)
             MODE_OFF:     wait_ns = 0.0;
             MODE_SLEEP:   wait_ns = 0.0;
-            MODE_LOW_PWR: wait_ns = WAKEUP_TIME_NS;
-            MODE_STD:     wait_ns = WAKEUP_TIME_NS;
-            MODE_ULT:     wait_ns = WAKEUP_TIME_NS;
+            MODE_LOW_PWR: wait_ns = MIC_WAKEUP_TIME_NS;
+            MODE_STD:     wait_ns = MIC_WAKEUP_TIME_NS;
+            MODE_ULT:     wait_ns = MIC_WAKEUP_TIME_NS;
             default:      wait_ns = 0.0;
           endcase
         end
@@ -214,10 +233,10 @@ module SPH0641LU4H_1_model #(
         MODE_LOW_PWR, MODE_STD, MODE_ULT: begin
           unique case (to_mode)
             MODE_OFF:     wait_ns = 0.0;  // Powered-down mode is entered by removing VDD.
-            MODE_SLEEP:   wait_ns = FALLASLEEP_TIME_NS;
-            MODE_LOW_PWR: wait_ns = (from_mode === MODE_LOW_PWR) ? 0.0 : MODECHANGE_TIME_NS;
-            MODE_STD:     wait_ns = (from_mode === MODE_STD) ? 0.0 : MODECHANGE_TIME_NS;
-            MODE_ULT:     wait_ns = (from_mode === MODE_ULT) ? 0.0 : MODECHANGE_TIME_NS;
+            MODE_SLEEP:   wait_ns = MIC_FALLASLEEP_TIME_NS;
+            MODE_LOW_PWR: wait_ns = (from_mode === MODE_LOW_PWR) ? 0.0 : MIC_MODECHANGE_TIME_NS;
+            MODE_STD:     wait_ns = (from_mode === MODE_STD) ? 0.0 : MIC_MODECHANGE_TIME_NS;
+            MODE_ULT:     wait_ns = (from_mode === MODE_ULT) ? 0.0 : MIC_MODECHANGE_TIME_NS;
             default:      wait_ns = 0.0;
           endcase
         end
@@ -226,9 +245,9 @@ module SPH0641LU4H_1_model #(
           unique case (to_mode)
             MODE_OFF:     wait_ns = 0.0;
             MODE_SLEEP:   wait_ns = 0.0;
-            MODE_LOW_PWR: wait_ns = POWERUP_TIME_NS;
-            MODE_STD:     wait_ns = POWERUP_TIME_NS;
-            MODE_ULT:     wait_ns = POWERUP_TIME_NS;
+            MODE_LOW_PWR: wait_ns = MIC_POWERUP_TIME_NS;
+            MODE_STD:     wait_ns = MIC_POWERUP_TIME_NS;
+            MODE_ULT:     wait_ns = MIC_POWERUP_TIME_NS;
             default:      wait_ns = 0.0;
           endcase
         end
@@ -240,7 +259,7 @@ module SPH0641LU4H_1_model #(
         transition_cycles = 0;
       end else begin
         raw_cycles = int'($ceil(wait_ns / period_ns));
-        transition_cycles = scale_cycles(raw_cycles);
+        transition_cycles = mic_scale_cycles(raw_cycles, FAST_SIM, FAST_SIM_DIV);
       end
     end
   endfunction : transition_cycles
@@ -257,7 +276,8 @@ module SPH0641LU4H_1_model #(
   assign request_valid = period_valid;
 
   // Decode the currently requested mode from the measured clock period.
-  assign requested_mode = (request_valid) ? classify_mode(vdd_i, clock_period_ns) : MODE_INVALID;
+  // A zero period is interpreted as SLEEP when power is present.
+  assign requested_mode = classify_mode(vdd_i, (request_valid) ? clock_period_ns : 0.0);
 
   // Detect illegal direct entry into ultrasonic from OFF or SLEEP.
   assign illegal_transition = is_illegal_transition(mode, requested_mode);
@@ -270,26 +290,30 @@ module SPH0641LU4H_1_model #(
   // Implements State Machine Logic //
   ///////////////////////////////////
   // Holds the current state or next state, accordingly.
-  always_ff @(posedge clock_i or negedge vdd_i) begin
+  always @(posedge clock_i or clock_stopped_sleep_ev or negedge vdd_i) begin
     if (!vdd_i) state <= IDLE;
+    else if (clock_stopped_sleep_ev.triggered) state <= RUN;
     else state <= nxt_state;
   end
 
   // Holds the current settled microphone mode.
-  always_ff @(posedge clock_i or negedge vdd_i) begin
+  always @(posedge clock_i or clock_stopped_sleep_ev or negedge vdd_i) begin
     if (!vdd_i) mode <= MODE_OFF;
+    else if (clock_stopped_sleep_ev.triggered) mode <= MODE_SLEEP;
     else mode <= nxt_mode;
   end
 
   // Holds the destination mode that the model is waiting to settle into.
-  always_ff @(posedge clock_i or negedge vdd_i) begin
+  always @(posedge clock_i or clock_stopped_sleep_ev or negedge vdd_i) begin
     if (!vdd_i) pending_mode <= MODE_OFF;
+    else if (clock_stopped_sleep_ev.triggered) pending_mode <= MODE_SLEEP;
     else pending_mode <= nxt_pending_mode;
   end
 
   // Holds the settle counter while the mic is transitioning between modes.
-  always_ff @(posedge clock_i or negedge vdd_i) begin
+  always @(posedge clock_i or clock_stopped_sleep_ev or negedge vdd_i) begin
     if (!vdd_i) wait_cntr <= 0;
+    else if (clock_stopped_sleep_ev.triggered) wait_cntr <= 0;
     else if (load) wait_cntr <= wait_cycles;
     else if (dec && !tmr_empty) wait_cntr <= wait_cntr - 1'b1;
   end
@@ -298,8 +322,10 @@ module SPH0641LU4H_1_model #(
   assign tmr_empty = (wait_cntr === 0);
 
   // Holds whether an illegal transition warning has already been reported.
-  always_ff @(posedge clock_i or negedge vdd_i) begin
+  always @(posedge clock_i or clock_stopped_sleep_ev or negedge vdd_i) begin
     if (!vdd_i) begin
+      warning_issued <= 1'b0;
+    end else if (clock_stopped_sleep_ev.triggered) begin
       warning_issued <= 1'b0;
     end else if (clr_warning) begin
       warning_issued <= 1'b0;
@@ -315,8 +341,13 @@ module SPH0641LU4H_1_model #(
 
   // Measures the applied microphone clock period. The first edge after power-up
   // only initializes the timestamp. The second and later edges update the measured period.
-  always_ff @(posedge clock_i or negedge vdd_i) begin
+  always @(posedge clock_i or clock_stopped_sleep_ev or negedge vdd_i) begin
     if (!vdd_i) begin
+      first_edge_seen <= 1'b0;
+      period_valid <= 1'b0;
+      last_posedge_ns <= 0.0;
+      clock_period_ns <= 0.0;
+    end else if (clock_stopped_sleep_ev.triggered) begin
       first_edge_seen <= 1'b0;
       period_valid <= 1'b0;
       last_posedge_ns <= 0.0;
@@ -332,6 +363,56 @@ module SPH0641LU4H_1_model #(
       last_posedge_ns <= $realtime;
     end
   end
+
+  // Detect when a powered microphone no longer sees any clock edges. This lets
+  // the behavioral model settle into SLEEP and release DATA even after the
+  // external clock is stopped completely.
+  always begin : stopped_clock_watchdog_proc
+    realtime settle_wait_ns;
+
+    if (!vdd_i) begin
+      @(posedge vdd_i);
+    end
+
+    fork : stopped_clock_window
+      begin : stopped_clock_edge_proc
+        // If we see any clock edge, the clock is not stopped, so we can just restart the watchdog.
+        @(posedge clock_i or negedge clock_i or negedge vdd_i);
+      end
+      begin : stopped_clock_timeout_proc
+        // Wait for the stopped-clock timeout duration. If that elapses without seeing a clock edge, we may need to settle into SLEEP.
+        #(MIC_STOPPED_CLOCK_DETECT_NS);
+
+        // If we are still powered and not already in SLEEP with DATA released, start the SLEEP settle process.
+        if (vdd_i && ((state !== RUN) || (mode !== MODE_SLEEP) || data_drive_en)) begin
+          // Determine how long we need to wait for the mic to settle into SLEEP based on the last settled mode, and subtract the time we've already waited in the watchdog.
+          settle_wait_ns = stopped_clock_sleep_wait_ns(mode);
+
+          // If the remaining settle time is already elapsed by the time we detect the stopped clock, settle into SLEEP immediately. Otherwise, wait for the remaining settle time while still monitoring for any clock edges that would restart the process.
+          if (settle_wait_ns <= 0.0) begin
+            ->>clock_stopped_sleep_ev;
+          end else begin
+            fork : stopped_clock_settle_window
+              begin : stopped_clock_settle_proc
+                // Wait for the remaining settle time required to enter SLEEP after a stopped clock, then trigger the SLEEP event if we are still powered. Any clock edge or power loss during this window restarts the watchdog instead of settling.
+                #(settle_wait_ns);
+
+                // If we are still powered, we have successfully settled into SLEEP after the stopped clock, so trigger the event to update the state machine and release DATA.
+                if (vdd_i) begin
+                  ->>clock_stopped_sleep_ev;
+                end
+              end
+              begin : stopped_clock_restart_proc
+                @(posedge clock_i or negedge clock_i or negedge vdd_i);
+              end
+            join_any
+            disable stopped_clock_settle_window;
+          end
+        end
+      end
+    join_any
+    disable stopped_clock_window;
+  end : stopped_clock_watchdog_proc
 
   //////////////////////////////////////////////////////////////////////////////////////////
   // Implements the combinational state transition and output logic of the state machine. //
@@ -484,7 +565,7 @@ module SPH0641LU4H_1_model #(
   // This is still a behavioral source, not an acoustic MEMS   //
   // model, but it is a true time-varying PDM stream.          //
   ///////////////////////////////////////////////////////////////
-  always @(posedge clock_i or negedge clock_i or negedge vdd_i) begin : data_drive_proc
+  always @(posedge clock_i or negedge clock_i or clock_stopped_sleep_ev or negedge vdd_i) begin : data_drive_proc
     logic [16:0] pdm_sum;
     logic [15:0] phase_next;
     logic [15:0] tone_sample_now;
@@ -494,6 +575,11 @@ module SPH0641LU4H_1_model #(
       data_drive_val <= 1'b0;  // Clear the last driven value.
       pdm_accum <= 16'h0000;  // Reset the pulse-density accumulator.
       tone_phase <= 16'h0000;  // Reset the internal tone phase.
+    end else if (clock_stopped_sleep_ev.triggered) begin
+      data_drive_en <= 1'b0;  // Release DATA once a stopped clock has settled into SLEEP.
+      data_drive_val <= 1'b0;
+      pdm_accum <= 16'h0000;
+      tone_phase <= 16'h0000;
     end else if (!model_active) begin
       data_drive_en <= 1'b0;  // Keep DATA high-Z in OFF, SLEEP, INVALID, WAIT, or FAULT.
       data_drive_val <= 1'b0;

@@ -1,4 +1,4 @@
-`timescale 1ns / 10ps
+`timescale 1ns / 1ps
 // ------------------------------------------------------------
 // Module: Mic_Mode_Fsm
 // Description: The Mic_Mode_Fsm controls the microphone's
@@ -20,18 +20,15 @@ module Mic_Mode_Fsm (
     input logic volt_on_i,
 
     // Requested mode:
-    // If volt_on_i is high and mode_req_i[2] is low, the mic remains in SLEEP.
+    // If volt_on_i is high and mode_req_i[2]/mode_req_i[1] is low, the mic remains in SLEEP.
     // 00 = sleep
-    // 01 = low-power
+    // 01 = sleep
     // 10 = standard
     // 11 = ultrasonic
     input logic [2:0] mode_req_i,
 
     // PLL lock is used to decide when the selected clock is trustworthy.
     input logic pll_locked_i,
-
-    // Indicates the selected output clock path has actually been enabled.
-    input logic clk_rdy_i,
 
     // Control outputs to clock-control block.
     output logic clk_en_o,
@@ -41,42 +38,25 @@ module Mic_Mode_Fsm (
     output logic [1:0] curr_mode_o,
     output logic data_val_o
 );
+  import Mic_Time_pkg::*;
 
   // Parameters for DUT.
   parameter int unsigned SYS_CLK_HZ = 50_000_000;
   parameter bit FAST_SIM = 1'b0;
   parameter int unsigned FAST_SIM_DIV = 50_000;
 
-  // ============================================================
-  // Datasheet timing
-  // Power-up = 50 ms
-  // Wake-up  = 15 ms (from sleep to active)
-  // Mode chg = 10 ms
-  // Sleep in = 10 ms (from active to sleep)
-  // ============================================================
-  localparam int unsigned POWERUP_CYCLES_REAL = (SYS_CLK_HZ * 50) / 1000;
-  localparam int unsigned WAKEUP_CYCLES_REAL = (SYS_CLK_HZ * 15) / 1000;
-  localparam int unsigned MODECHANGE_CYCLES_REAL = (SYS_CLK_HZ * 10) / 1000;
-  localparam int unsigned FALLASLEEP_CYCLES_REAL = (SYS_CLK_HZ * 10) / 1000;
-
-  // Ensure we scale cycle count appropriately based on FAST_SIM_DIV.
-  function automatic int unsigned scale_cycles(input int unsigned cycles);
-    int unsigned scaled_cycles;
-    begin
-      if (!FAST_SIM) begin
-        scale_cycles = cycles;
-      end else begin
-        // Round up during fast simulation so a shortened delay never becomes 0 cycles.
-        scaled_cycles = (cycles + FAST_SIM_DIV - 1) / FAST_SIM_DIV;
-        scale_cycles  = (scaled_cycles == 0) ? 1 : scaled_cycles;
-      end
-    end
-  endfunction : scale_cycles
-
-  localparam int unsigned POWERUP_CYCLES = scale_cycles(POWERUP_CYCLES_REAL);
-  localparam int unsigned WAKEUP_CYCLES = scale_cycles(WAKEUP_CYCLES_REAL);
-  localparam int unsigned MODECHANGE_CYCLES = scale_cycles(MODECHANGE_CYCLES_REAL);
-  localparam int unsigned FALLASLEEP_CYCLES = scale_cycles(FALLASLEEP_CYCLES_REAL);
+  localparam int unsigned POWERUP_CYCLES = mic_cycles_from_ms(
+      SYS_CLK_HZ, MIC_POWERUP_MS, FAST_SIM, FAST_SIM_DIV
+  );
+  localparam int unsigned WAKEUP_CYCLES = mic_cycles_from_ms(
+      SYS_CLK_HZ, MIC_WAKEUP_MS, FAST_SIM, FAST_SIM_DIV
+  );
+  localparam int unsigned MODECHANGE_CYCLES = mic_cycles_from_ms(
+      SYS_CLK_HZ, MIC_MODECHANGE_MS, FAST_SIM, FAST_SIM_DIV
+  );
+  localparam int unsigned FALLASLEEP_CYCLES = mic_cycles_from_ms(
+      SYS_CLK_HZ, MIC_FALLASLEEP_MS, FAST_SIM, FAST_SIM_DIV
+  );
 
   // Maximum counter width is decided by power up cycle count.
   localparam int unsigned WAIT_COUNTER_W = $clog2(POWERUP_CYCLES + 1);
@@ -97,11 +77,10 @@ module Mic_Mode_Fsm (
   // Declare modes as enumerated //
   ////////////////////////////////
   typedef enum logic [2:0] {
-    OFF = 3'b000,
+    OFF   = 3'b000,
     SLEEP = 3'b100,
-    LOW_PWR = 3'b101,
-    STD = 3'b110,
-    ULT = 3'b111
+    STD   = 3'b110,
+    ULT   = 3'b111
   } mode_t;
 
   /////////////////////////////////////////////////
@@ -156,7 +135,7 @@ module Mic_Mode_Fsm (
   always_comb begin
     if (!volt_on_i) begin
       req_mode = OFF;
-    end else if (!mode_req_i[2]) begin
+    end else if (~mode_req_i[2] | ~mode_req_i[1]) begin
       req_mode = SLEEP;
     end else begin
       req_mode = mode_t'(mode_req_i);
@@ -209,7 +188,7 @@ module Mic_Mode_Fsm (
   // ====================================================================
   function automatic logic is_active_mode(input mode_t mic_mode);
     begin
-      is_active_mode = (mic_mode == LOW_PWR) || (mic_mode == STD) || (mic_mode == ULT);
+      is_active_mode = (mic_mode == STD) || (mic_mode == ULT);
     end
   endfunction : is_active_mode
 
@@ -232,9 +211,6 @@ module Mic_Mode_Fsm (
               wait_cycles_cfg = '0;
             end
 
-            LOW_PWR: begin  // No action
-            end
-
             STD: begin  // No action
             end
 
@@ -248,30 +224,6 @@ module Mic_Mode_Fsm (
           endcase
         end
 
-        LOW_PWR: begin
-          pending_mode_cfg = final_mode;
-          wait_cycles_cfg  = MODECHANGE_CYCLES;
-
-          unique case (final_mode)
-            SLEEP: begin
-              wait_cycles_cfg = FALLASLEEP_CYCLES;
-            end
-
-            LOW_PWR: begin
-              wait_cycles_cfg = '0;
-            end
-
-            STD: begin  // No action
-            end
-
-            ULT: begin  // No action
-            end
-
-            default: begin  // OFF - no action
-            end
-          endcase
-        end
-
         STD: begin
           pending_mode_cfg = final_mode;
           wait_cycles_cfg  = MODECHANGE_CYCLES;
@@ -279,9 +231,6 @@ module Mic_Mode_Fsm (
           unique case (final_mode)
             SLEEP: begin
               wait_cycles_cfg = FALLASLEEP_CYCLES;
-            end
-
-            LOW_PWR: begin  // No action
             end
 
             STD: begin
@@ -305,9 +254,6 @@ module Mic_Mode_Fsm (
               wait_cycles_cfg = FALLASLEEP_CYCLES;
             end
 
-            LOW_PWR: begin  // No action
-            end
-
             STD: begin  // No action
             end
 
@@ -326,9 +272,6 @@ module Mic_Mode_Fsm (
 
           unique case (final_mode)
             SLEEP: begin  // No action
-            end
-
-            LOW_PWR: begin  // No action
             end
 
             STD: begin  // No action
@@ -408,7 +351,7 @@ module Mic_Mode_Fsm (
       end
 
       CLK_SEL: begin
-        nxt_state = CLK_EN;
+        nxt_state = (pending_mode == SLEEP) ? WAIT : CLK_EN;
       end
 
       CLK_EN: begin
@@ -418,19 +361,7 @@ module Mic_Mode_Fsm (
 
       WAIT: begin
         if (volt_on_i) begin  // Ensure brownout did not occur.
-          if (!pll_locked_i) begin
-            // If the PLL loses lock while waiting on an active transition, restart
-            // the transition from the current settled mode once the clocking
-            // infrastructure becomes trustworthy again.
-            comp_pending_mode_config(mode, final_mode, nxt_pending_mode, wait_cycles);
-            load_pending_mode = 1'b1;
-
-            // Load the next counter to wait for.
-            load = 1'b1;
-
-            // Disable the old clock, enable the new clock.
-            nxt_state = CLK_DIS;
-          end else if (clk_rdy_i) begin
+          if (pll_locked_i) begin
             // The PLL is locked and the selected clock path is now latched through
             // to the microphone, so it is safe to start the settle countdown.
             dec = 1'b1;
@@ -458,6 +389,18 @@ module Mic_Mode_Fsm (
               // Disable the old clock, enable the new clock.
               nxt_state = CLK_DIS;
             end
+          end else begin
+            // If the PLL loses lock while waiting on an active transition, restart
+            // the transition from the current settled mode once the clocking
+            // infrastructure becomes trustworthy again.
+            comp_pending_mode_config(mode, final_mode, nxt_pending_mode, wait_cycles);
+            load_pending_mode = 1'b1;
+
+            // Load the next counter to wait for.
+            load = 1'b1;
+
+            // Disable the old clock, enable the new clock.
+            nxt_state = CLK_DIS;
           end
         end else begin
           // Brownout: drive the outputs back to a safe OFF state.
