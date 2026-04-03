@@ -105,6 +105,11 @@ def main():
         elif args.synth:
             synthesize()
         else:
+            # Automatically enable IP simulation support when running all tests in a
+            # directory that contains Intel IP metadata files.
+            if args.all and not args.ip and config.directory_uses_ip():
+                args.ip = True
+
             # Assemble the selected input file.
             if args.asm:
                 assemble()

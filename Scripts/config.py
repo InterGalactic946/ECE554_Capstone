@@ -127,6 +127,31 @@ def choose_directory(args):
     return selected_top_dir
 
 
+def directory_uses_ip():
+    """
+    Detect whether the currently selected project directory contains Intel IP metadata files.
+
+    This helper scans the selected project directory recursively for `.qip` or `.qsys` files.
+    These files indicate that the project likely depends on generated IP simulation models and
+    vendor simulation libraries.
+
+    Returns:
+        bool: True if any `.qip` or `.qsys` file is found under TEST_DIR, otherwise False.
+    """
+    # Return False if the project directory has not been initialized yet.
+    if not TEST_DIR or not os.path.isdir(TEST_DIR):
+        return False
+
+    # Walk the selected project directory and look for Intel IP metadata files.
+    for root, _, files in os.walk(TEST_DIR):
+        for file_name in files:
+            if file_name.endswith((".qip", ".qsys")):
+                return True
+
+    # No IP metadata files were found under the selected project directory.
+    return False
+
+
 def setup_directories(name):
     """
     Ensure necessary directories exist for output, logs, and waveforms, and set up the environment.
