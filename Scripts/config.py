@@ -199,7 +199,7 @@ def setup_directories(name):
     CELL_LIBRARY_PATH = os.path.join(TESTS_DIR, "SAED32_lib")
     
     # Set the simulation library path for IPs and other simulation dependencies.
-    SIM_LIBRARY_PATH = os.path.join(ROOT_DIR, "SIM_LIBS")
+    SIM_LIBRARY_PATH = os.path.join(TESTS_DIR, "SIM_LIBS")
 
     # Verify that the provided test directory exists.
     if not os.path.exists(TEST_DIR):
