@@ -199,7 +199,7 @@ def get_gui_command(test_name, log_file, args):
         )
     elif args.ip:
         sim_command = (
-            f"vsim -wlf {wave_file} ./tests/WORK/{test_name}.{test_name} -logfile {log_file} "
+            f"vsim -wlf {wave_file} ./tests/WORK/{test_name}.{test_name} -logfile {log_file} -t ps "
             f"{form_sim_libs()} -voptargs='+acc' -do '{add_wave_command} run -all; "
             f"write format wave -window .main_pane.wave.interior.cs.body.pw.wf {wave_format_file}; "
             f"log -flush /*;'"
@@ -361,7 +361,7 @@ def run_simulation(test_name, log_file, args):
             sim_command = f"vsim -c ./tests/WORK/{test_name}.{test_name} -wlf {wave_file} -logfile {log_file} -t ns " \
                     f"-Lf {config.CELL_LIBRARY_PATH} -do 'run -all; log -flush /*; quit -f;'"         
         elif args.ip:
-            sim_command = f"vsim -c ./tests/WORK/{test_name}.{test_name} -wlf {wave_file} -logfile {log_file} "\
+            sim_command = f"vsim -c ./tests/WORK/{test_name}.{test_name} -wlf {wave_file} -logfile {log_file} -t ps "\
                     f"{form_sim_libs()} -do 'run -all; log  -flush /*; quit -f;'"       
     else:
         if args.mode == 1:
