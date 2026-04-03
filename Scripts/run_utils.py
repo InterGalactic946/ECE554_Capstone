@@ -355,7 +355,7 @@ def run_simulation(test_name, log_file, args):
                     
         # Modify the command for IP simulation.
         if args.ip:
-            sim_command = f"vsim -c ./tests/WORK/{test_name}.{test_name} -wlf {wave_file} -logfile {log_file} -t ns "\
+            sim_command = f"vsim -c ./tests/WORK/{test_name}.{test_name} -wlf {wave_file} -logfile {log_file} "\
                     f"{form_sim_libs()} -do 'run -all; log  -flush /*; quit -f;'"       
     else:
         if args.mode == 1:
