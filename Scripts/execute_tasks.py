@@ -59,6 +59,9 @@ def parse_arguments():
 
     # Flag to run the post synthesis test.
     parser.add_argument("-ps", "--post_synth", action="store_true", help="Run the post synthesis testbench in the directory.")
+    
+    # Flag to simulate the design using IPs and other dependencies in the SIM_LIBS directory.
+    parser.add_argument("-i", "--ip", action="store_true", help="Simulate the design using IPs and other dependencies in the SIM_LIBS directory.")
 
     # Option to check all verilog files within a directory.
     parser.add_argument("-c", "--check", action="store_true", help="Check all Verilog design files in the directory.")

@@ -22,6 +22,7 @@ TEST_DIR = None
 BUILD_DIR = None
 DEPENDENCY_GRAPH = None
 CELL_LIBRARY_PATH = None
+SIM_LIBRARY_PATH = None
 TESTS_DIR = None
 DESIGNS_DIR = None
 PACKAGES_DIR = None
@@ -149,7 +150,7 @@ def setup_directories(name):
         return
     
     # Modifying the global directory variables declared above.
-    global TEST_DIR, OUTPUTS_DIR, TESTS_DIR, CELL_LIBRARY_PATH, DESIGNS_DIR, PACKAGES_DIR, TEST_PROGRAMS_DIR, WAVE_CMD_DIR, OUTPUT_DIR, WAVES_DIR, LOGS_DIR, TRANSCRIPT_DIR, COMPILATION_DIR, SYNTHESIS_DIR, WORK_DIR, BUILD_DIR, DEPENDENCY_GRAPH
+    global TEST_DIR, OUTPUTS_DIR, TESTS_DIR, CELL_LIBRARY_PATH, SIM_LIBRARY_PATH, DESIGNS_DIR, PACKAGES_DIR, TEST_PROGRAMS_DIR, WAVE_CMD_DIR, OUTPUT_DIR, WAVES_DIR, LOGS_DIR, TRANSCRIPT_DIR, COMPILATION_DIR, SYNTHESIS_DIR, WORK_DIR, BUILD_DIR, DEPENDENCY_GRAPH
     
     # Set the path for the main test directory using the provided 'name'.
     TEST_DIR = os.path.join(ROOT_DIR, name)
@@ -171,6 +172,9 @@ def setup_directories(name):
 
     # Set the cell library path for post synthesis simulation.
     CELL_LIBRARY_PATH = os.path.join(TESTS_DIR, "SAED32_lib")
+    
+    # Set the simulation library path for IPs and other simulation dependencies.
+    SIM_LIBRARY_PATH = os.path.join(ROOT_DIR, "SIM_LIBS")
 
     # Verify that the provided test directory exists.
     if not os.path.exists(TEST_DIR):

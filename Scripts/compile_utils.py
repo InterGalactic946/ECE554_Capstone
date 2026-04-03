@@ -266,8 +266,8 @@ def compile_files(test_name, args):
         # Base vlog arguments.
         vlog_args = "+acc -stats=none"
 
-        # If post synthesis is requested compile with the timescale directive.
-        if args.post_synth or test_name.endswith("ps_tb"):
+        # If post synthesis simulation or IP simulation, add timescale definition to vlog arguments.
+        if args.post_synth or test_name.endswith("ps_tb") or args.ip:
             vlog_args = f"-timescale=1ns/1ps {vlog_args}"
 
         # Append file inputs to the vlog command.

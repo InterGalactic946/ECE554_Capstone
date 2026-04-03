@@ -4,23 +4,23 @@
 
 `timescale 1 ps / 1 ps
 module Mic_Clk_Ctrl (
-		input  wire       inclk3x,   //  altclkctrl_input.inclk3x
-		input  wire       inclk2x,   //                  .inclk2x
-		input  wire       inclk1x,   //                  .inclk1x
-		input  wire       inclk0x,   //                  .inclk0x
-		input  wire [1:0] clkselect, //                  .clkselect
-		input  wire       ena,       //                  .ena
-		output wire       outclk     // altclkctrl_output.outclk
-	);
+    input  wire       inclk3x,    //  altclkctrl_input.inclk3x
+    input  wire       inclk2x,    //                  .inclk2x
+    input  wire       inclk1x,    //                  .inclk1x
+    input  wire       inclk0x,    //                  .inclk0x
+    input  wire [1:0] clkselect,  //                  .clkselect
+    input  wire       ena,        //                  .ena
+    output wire       outclk      // altclkctrl_output.outclk
+);
 
-	Mic_Clk_Ctrl_altclkctrl_0 altclkctrl_0 (
-		.inclk3x   (inclk3x),   //  altclkctrl_input.inclk3x
-		.inclk2x   (inclk2x),   //                  .inclk2x
-		.inclk1x   (inclk1x),   //                  .inclk1x
-		.inclk0x   (inclk0x),   //                  .inclk0x
-		.clkselect (clkselect), //                  .clkselect
-		.ena       (ena),       //                  .ena
-		.outclk    (outclk)     // altclkctrl_output.outclk
-	);
+  Mic_Clk_Ctrl_altclkctrl_0 altclkctrl_0 (
+      .inclk3x  (inclk3x),    //  altclkctrl_input.inclk3x
+      .inclk2x  (inclk2x),    //                  .inclk2x
+      .inclk1x  (inclk1x),    //                  .inclk1x
+      .inclk0x  (inclk0x),    //                  .inclk0x
+      .clkselect(clkselect),  //                  .clkselect
+      .ena      (ena),        //                  .ena
+      .outclk   (outclk)      // altclkctrl_output.outclk
+  );
 
 endmodule

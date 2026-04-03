@@ -320,6 +320,26 @@ def run_simulation(test_name, log_file, args):
         - Constructs the appropriate simulation command and executes it.
         - Logs simulation output and returns the status based on log file checks.
     """
+    def form_sim_libs():
+        """
+        Form the simulation libraries argument for the vsim command by checking the SIM_LIBRARY_PATH directory.
+        
+        Returns:
+            str: A string containing the -L arguments for each valid library found in the SIM_LIBRARY_PATH directory.
+        """
+        sim_libs_arg = ""
+        if os.path.exists(config.SIM_LIBRARY_PATH):
+            for item in os.listdir(config.SIM_LIBRARY_PATH):
+                # Get the library path.
+                item_path = os.path.join(config.SIM_LIBRARY_PATH, item)
+                
+                # If it's a directory, assume it's a compiled library and add it to the sim libs argument.
+                if os.path.isdir(item_path):
+                    sim_libs_arg += f"-L {item_path} "
+        
+        # Return the formatted argument string for the simulation command.
+        return sim_libs_arg.strip()
+    
     # Define paths for the wave file.
     wave_file = os.path.join(config.WAVES_DIR, f"{test_name}.wlf")
         
@@ -331,7 +351,12 @@ def run_simulation(test_name, log_file, args):
         # Modify the command for post synthesis.
         if args.post_synth or test_name.endswith("ps_tb"):
             sim_command = f"vsim -c ./tests/WORK/{test_name}.{test_name} -wlf {wave_file} -logfile {log_file} -t ns " \
-                    f"-Lf {config.CELL_LIBRARY_PATH} -do 'run -all; log -flush /*; quit -f;'"        
+                    f"-Lf {config.CELL_LIBRARY_PATH} -do 'run -all; log -flush /*; quit -f;'"
+                    
+        # Modify the command for IP simulation.
+        if args.ip:
+            sim_command = f"vsim -c ./tests/WORK/{test_name}.{test_name} -wlf {wave_file} -logfile {log_file} -t ns "\
+                    f"{form_sim_libs()} -do 'run -all; log  -flush /*; quit -f;'"       
     else:
         if args.mode == 1:
             if not args.all:
