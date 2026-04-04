@@ -135,7 +135,7 @@ module proc (
   // Miss detected when not a hit.
   assign ICACHE_miss = ~ICACHE_hit;
   assign DCACHE_miss = EX_MEM_MemEnable & ~DCACHE_hit;
-  
+
   // Instantiate the cache arbitrator to handle memory accesses.
   Arbitrator iCACHE_ARBITRATOR (
     .clk(clk),

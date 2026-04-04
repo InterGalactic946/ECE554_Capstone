@@ -101,8 +101,45 @@ package Core_Cfg_pkg;
   localparam int unsigned CACHE_SIZE_BYTES = CACHE_SET_COUNT * CACHE_WAYS * CACHE_LINE_SIZE_B;
 
   // Word/byte enable widths
-  localparam int unsigned WORD_ENABLE_W = $clog2(CACHE_LINE_WORDS);  // 3 bits for word enable
+  localparam int unsigned WORD_IDX_W = $clog2(CACHE_LINE_WORDS);  // 3 bits for word index
   localparam int unsigned BYTE_ENABLE_W = 4;  // 4 bytes per word
+
+  // Cache address slice parameters
+  localparam int unsigned CACHE_BYTE_IDX_W = $clog2(CACHE_LINE_BYTE_W);
+  localparam int unsigned CACHE_BYTE_IDX_LSB = 0;
+  localparam int unsigned CACHE_BYTE_IDX_MSB = CACHE_BYTE_IDX_LSB + CACHE_BYTE_IDX_W - 1;
+
+  // Word index bits within the cache line (for 32B line = 8 words, so 3 bits).
+  localparam int unsigned CACHE_WORD_IDX_LSB = CACHE_BYTE_IDX_MSB + 1;
+  localparam int unsigned CACHE_WORD_IDX_MSB = CACHE_WORD_IDX_LSB + WORD_IDX_W - 1;
+
+  // Cache line offset bits (byte index + word index).
+  localparam int unsigned CACHE_LINE_OFFSET_W = CACHE_BYTE_IDX_W + WORD_IDX_W;
+  localparam int unsigned CACHE_LINE_OFFSET_LSB = CACHE_BYTE_IDX_LSB;
+  localparam int unsigned CACHE_LINE_OFFSET_MSB = CACHE_WORD_IDX_MSB;
+
+  // Set index bits.
+  localparam int unsigned CACHE_SET_WIDTH = CACHE_SET_IDX_W;
+  localparam int unsigned CACHE_SET_IDX_LSB = CACHE_LINE_OFFSET_MSB + 1;
+  localparam int unsigned CACHE_SET_IDX_MSB = CACHE_SET_IDX_LSB + CACHE_SET_IDX_W - 1;
+
+  // Tag bits are the remaining upper bits after removing set index and line offset bits from the address.
+  localparam int unsigned CACHE_TAG_LSB = CACHE_SET_IDX_MSB + 1;
+  localparam int unsigned CACHE_TAG_MSB = PLEN - 1;
+  localparam int unsigned CACHE_TAG_W = CACHE_TAG_MSB - CACHE_TAG_LSB + 1;
+
+  // Metadata entry bit positions within the packed tag array entry.
+  localparam int unsigned CACHE_META_LRU_BIT = 0;
+  localparam int unsigned CACHE_META_VALID_BIT = 1;
+  localparam int unsigned CACHE_META_TAG_LSB = 2;
+  localparam int unsigned CACHE_META_TAG_MSB = CACHE_META_TAG_LSB + CACHE_TAG_W - 1;
+
+  // Tag array parameters
+  // TAG_WIDTH is the packed metadata-entry width, not just the raw line-tag width.
+  // For a 32-bit address, 64 sets, and 32-byte cache lines:
+  //   raw line tag = 32 - 6 set bits - 5 line-offset bits = 21 bits
+  //   packed entry = 21 tag bits + 1 valid bit + 1 LRU bit = 23 bits
+  localparam int unsigned TAG_WIDTH = CACHE_TAG_W + 2;
 
   // ================= Memory Geometry =================
   // Total address width from CPU
