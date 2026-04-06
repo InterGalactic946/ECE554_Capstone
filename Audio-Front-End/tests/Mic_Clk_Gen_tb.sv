@@ -29,7 +29,7 @@ module Mic_Clk_Gen_tb ();
   logic clk;
   logic rst;
   logic volt_on;
-  logic [2:0] mode_req;
+  logic [1:0] mode_req;
   logic data_val;
   tri data_l;
   tri data_r;
@@ -187,6 +187,10 @@ module Mic_Clk_Gen_tb ();
   ///////////////////
   // TB utilities //
   /////////////////
+  function automatic bit verify_clk_sel(input logic [1:0] val);
+    verify_clk_sel = (val === 2'h0) || (val === 2'h1);
+  endfunction
+
   task automatic wait_n_negedges(input int unsigned num_edges);
     repeat (num_edges) @(negedge clk);
   endtask : wait_n_negedges
@@ -354,7 +358,7 @@ module Mic_Clk_Gen_tb ();
 
     clk = 1'b0;
     rst = 1'b1;
-    mode_req = 3'h1;
+    mode_req = 2'h1;
     vdd_v = 0.0;
 
     wait_n_negedges(5);
@@ -363,7 +367,7 @@ module Mic_Clk_Gen_tb ();
     // TEST 1: Below-threshold VDD should keep the mic path OFF.
     announce_test(1, "Below-threshold VDD should keep the mic path OFF.");
     @(negedge clk) begin
-      mode_req = 3'h6;
+      mode_req = 2'h2;
       set_vdd(1.55);
     end
 
@@ -381,10 +385,10 @@ module Mic_Clk_Gen_tb ();
 
     expect_clock_quiet(CLOCK_ACTIVITY_OBSERVE_CYCLES, "below-threshold VDD");
 
-    // TEST 2: With power present, request 3'b001 should still map to SLEEP.
-    announce_test(2, "With power present, request 3'b001 should still map to SLEEP.");
+    // TEST 2: With power present, request 2'b01 should still map to SLEEP.
+    announce_test(2, "With power present, request 2'b00 should still map to SLEEP.");
     @(negedge clk) begin
-      mode_req = 3'h1;
+      mode_req = 2'h0;
     end
 
     ramp_vdd(1.55, 1.72, 0.03, 2);
@@ -395,8 +399,8 @@ module Mic_Clk_Gen_tb ();
       error_count += 1;
     end
 
-    if (curr_mode !== 2'h0) begin
-      $error("ERROR: curr_mode_o is not SLEEP after powering up with mode request 3'b001!");
+    if (curr_mode !== 2'h1) begin
+      $error("ERROR: curr_mode_o is not SLEEP after powering up with mode request 2'b01!");
       error_count += 1;
     end
 
@@ -410,7 +414,7 @@ module Mic_Clk_Gen_tb ();
     // TEST 3: Wake into STANDARD mode and read data from both microphones.
     announce_test(3, "Wake into STANDARD mode and read data from both microphones.");
     clear_capture_state();
-    @(negedge clk) mode_req = 3'h6;
+    @(negedge clk) mode_req = 2'h2;
 
     wait_n_negedges(WAKEUP_CYCLES + FSM_MARGIN_CYCLES);
 
@@ -429,7 +433,7 @@ module Mic_Clk_Gen_tb ();
     // TEST 4: Brownout mid-transition should clear the mic path safely.
     announce_test(4, "Brownout mid-transition should clear the mic path safely.");
     clear_capture_state();
-    @(negedge clk) mode_req = 3'h7;
+    @(negedge clk) mode_req = 2'h3;
 
     wait_n_negedges((MODECHANGE_CYCLES / 2) + 2);
     ramp_vdd(vdd_v, 1.55, 0.04, 1);
@@ -450,7 +454,7 @@ module Mic_Clk_Gen_tb ();
     // TEST 5: Threshold chatter should not prevent eventual recovery into STANDARD mode.
     announce_test(5, "Threshold chatter should not prevent eventual recovery into STANDARD mode.");
     clear_capture_state();
-    @(negedge clk) mode_req = 3'h6;
+    @(negedge clk) mode_req = 2'h2;
 
     set_vdd(1.60);
     wait_n_negedges(2);
@@ -478,7 +482,7 @@ module Mic_Clk_Gen_tb ();
     announce_test(6, "Direct OFF->ULTRASONIC request should still produce valid stereo data.");
     clear_capture_state();
     @(negedge clk) begin
-      mode_req = 3'h7;
+      mode_req = 2'h3;
       set_vdd(0.0);
     end
 
@@ -498,15 +502,15 @@ module Mic_Clk_Gen_tb ();
 
     wait_for_dual_channel_samples(24, SAMPLE_TIMEOUT_CYCLES, "OFF->ULTRASONIC");
 
-    // TEST 7: A powered request of 3'b001 should return to SLEEP and release the PDM bus.
-    announce_test(7, "A powered request of 3'b001 should return to SLEEP and release the PDM bus.");
+    // TEST 7: A powered request of 2'b01 should return to SLEEP and release the PDM bus.
+    announce_test(7, "A powered request of 2'b01 should return to SLEEP and release the PDM bus.");
     clear_capture_state();
-    @(negedge clk) mode_req = 3'h1;
+    @(negedge clk) mode_req = 2'h1;
 
     wait_n_negedges(FALLASLEEP_CYCLES + FSM_MARGIN_CYCLES);
 
-    if (curr_mode !== 2'h0) begin
-      $error("ERROR: curr_mode_o is not SLEEP after requesting mode 3'b001 while powered!");
+    if (curr_mode !== 2'h1) begin
+      $error("ERROR: curr_mode_o is not SLEEP after requesting mode 2'b01 while powered!");
       error_count += 1;
     end
 

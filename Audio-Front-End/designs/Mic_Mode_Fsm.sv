@@ -20,12 +20,12 @@ module Mic_Mode_Fsm (
     input logic volt_on_i,
 
     // Requested mode:
-    // If volt_on_i is high and mode_req_i[2]/mode_req_i[1] is low, the mic remains in SLEEP.
+    // If volt_on_i is high and mode_req_i[1] is low, the mic remains in SLEEP.
     // 00 = sleep
     // 01 = sleep
     // 10 = standard
     // 11 = ultrasonic
-    input logic [2:0] mode_req_i,
+    input logic [1:0] mode_req_i,
 
     // PLL lock is used to decide when the selected clock is trustworthy.
     input logic pll_locked_i,
@@ -76,11 +76,11 @@ module Mic_Mode_Fsm (
   //////////////////////////////////
   // Declare modes as enumerated //
   ////////////////////////////////
-  typedef enum logic [2:0] {
-    OFF   = 3'b000,
-    SLEEP = 3'b100,
-    STD   = 3'b110,
-    ULT   = 3'b111
+  typedef enum logic [1:0] {
+    OFF   = 2'b00,
+    SLEEP = 2'b01,
+    STD   = 2'b10,
+    ULT   = 2'b11
   } mode_t;
 
   /////////////////////////////////////////////////
@@ -133,9 +133,9 @@ module Mic_Mode_Fsm (
   // request still maps to SLEEP because the datasheet defines sleep as VDD high
   // with a low-frequency microphone clock.
   always_comb begin
-    if (!volt_on_i) begin
+    if (~volt_on_i) begin
       req_mode = OFF;
-    end else if (~mode_req_i[2] | ~mode_req_i[1]) begin
+    end else if (~mode_req_i[1]) begin
       req_mode = SLEEP;
     end else begin
       req_mode = mode_t'(mode_req_i);

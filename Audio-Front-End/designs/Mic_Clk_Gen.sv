@@ -18,7 +18,7 @@ module Mic_Clk_Gen #(
     input logic clk_i,
     input logic rst_i,
     input logic volt_on_i,
-    input logic [2:0] mode_req_i,
+    input logic [1:0] mode_req_i,
 
     output logic data_val_o,
     output logic [1:0] curr_mode_o,

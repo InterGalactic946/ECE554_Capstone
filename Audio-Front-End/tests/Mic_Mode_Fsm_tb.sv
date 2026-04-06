@@ -15,7 +15,7 @@ module Mic_Mode_Fsm_tb ();
   logic clk;
   logic rst;
   logic volt_on;
-  logic [2:0] mode_req;
+  logic [1:0] mode_req;
   logic pll_locked;
   logic clk_en;
   logic [1:0] clk_sel;
@@ -62,6 +62,10 @@ module Mic_Mode_Fsm_tb ();
       .data_val_o (data_val)
   );
 
+  function automatic bit verify_clk_sel(input logic [1:0] val);
+    verify_clk_sel = (val === 2'h0) || (val === 2'h1);
+  endfunction
+
   task automatic wait_n_negedges(input int unsigned num_edges);
     repeat (num_edges) @(negedge clk);
   endtask
@@ -72,7 +76,7 @@ module Mic_Mode_Fsm_tb ();
     error_count = 0;
     pll_locked = 1'b0;
     volt_on = 1'b0;
-    mode_req = 3'h0;
+    mode_req = 2'h0;
 
     // Wait for the first clock cycle to assert reset.
     @(posedge clk);
@@ -111,7 +115,7 @@ module Mic_Mode_Fsm_tb ();
     @(negedge clk) begin
       pll_locked = 1'b1;
       volt_on = 1'b1;
-      mode_req = 3'h3;
+      mode_req = 2'h0;
     end
 
     wait_n_negedges(POWERUP_CYCLES + FSM_MARGIN_CYCLES);
@@ -122,13 +126,13 @@ module Mic_Mode_Fsm_tb ();
         error_count += 1;
       end
 
-      if (clk_sel !== 2'h0) begin
-        $error("ERROR: clk_sel_o is not 2'b00 when a disabled request maps to SLEEP!");
+      if (!verify_clk_sel(clk_sel)) begin
+        $error("ERROR: clk_sel_o is not 2'b00 or 2'b01 when a disabled request maps to SLEEP!");
         error_count += 1;
       end
 
-      if (curr_mode !== 2'h0) begin
-        $error("ERROR: curr_mode_o is not 2'b00 when a disabled request maps to SLEEP!");
+      if (curr_mode !== 2'h1) begin
+        $error("ERROR: curr_mode_o is not 2'b01 when a disabled request maps to SLEEP!");
         error_count += 1;
       end
 
@@ -139,18 +143,18 @@ module Mic_Mode_Fsm_tb ();
     end
 
     // TEST 3: Assert mode_req as sleep, and verify that the correct clock is generated.
-    @(negedge clk) mode_req = 3'h4;
+    @(negedge clk) mode_req = 2'h0;
 
     wait_n_negedges(POWERUP_CYCLES + FSM_MARGIN_CYCLES);
 
     @(negedge clk) begin
-      if (clk_sel !== 2'h0) begin
-        $error("ERROR: clk_sel_o is not 2'b00 when mic is enabled in SLEEP mode!");
+      if (!verify_clk_sel(clk_sel)) begin
+        $error("ERROR: clk_sel_o is not 2'b00 or 2'b01 when mic is enabled in SLEEP mode!");
         error_count += 1;
       end
 
-      if (curr_mode !== 2'h0) begin
-        $error("ERROR: curr_mode_o is not 2'b00 when mic is enabled in SLEEP mode!");
+      if (curr_mode !== 2'h1) begin
+        $error("ERROR: curr_mode_o is not 2'b01 when mic is enabled in SLEEP mode!");
         error_count += 1;
       end
 
@@ -166,7 +170,7 @@ module Mic_Mode_Fsm_tb ();
     end
 
     // TEST 4: Transition from SLEEP to STANDARD mode.
-    @(negedge clk) mode_req = 3'h6;
+    @(negedge clk) mode_req = 2'h2;
 
     wait_n_negedges((WAKEUP_CYCLES / 2) + 2);
 
@@ -176,7 +180,7 @@ module Mic_Mode_Fsm_tb ();
         error_count += 1;
       end
 
-      if (curr_mode !== 2'h0) begin
+      if (curr_mode !== 2'h1) begin
         $error("ERROR: curr_mode_o did not remain at the settled SLEEP mode during wake-up!");
         error_count += 1;
       end
@@ -212,7 +216,7 @@ module Mic_Mode_Fsm_tb ();
     end
 
     // TEST 5: Transition from STANDARD to ULTRASONIC mode.
-    @(negedge clk) mode_req = 3'h7;
+    @(negedge clk) mode_req = 2'h3;
 
     wait_n_negedges((MODECHANGE_CYCLES / 2) + 2);
 
@@ -259,13 +263,13 @@ module Mic_Mode_Fsm_tb ();
     end
 
     // TEST 6: Transition from ULTRASONIC to SLEEP mode.
-    @(negedge clk) mode_req = 3'h4;
+    @(negedge clk) mode_req = 2'h1;
 
     wait_n_negedges((FALLASLEEP_CYCLES / 2) + 2);
 
     @(negedge clk) begin
-      if (clk_sel !== 2'h0) begin
-        $error("ERROR: clk_sel_o did not switch to SLEEP during the fall-asleep transition!");
+      if (!verify_clk_sel(clk_sel)) begin
+        $error("ERROR: clk_sel_o did not switch to 2'b00 or 2'b01 during the fall-asleep transition!");
         error_count += 1;
       end
 
@@ -284,13 +288,13 @@ module Mic_Mode_Fsm_tb ();
     wait_n_negedges(FALLASLEEP_CYCLES + FSM_MARGIN_CYCLES);
 
     @(negedge clk) begin
-      if (clk_sel !== 2'h0) begin
-        $error("ERROR: clk_sel_o is not 2'b00 after entering SLEEP mode!");
+      if (!verify_clk_sel(clk_sel)) begin
+        $error("ERROR: clk_sel_o is not 2'b00 or 2'b01 after entering SLEEP mode!");
         error_count += 1;
       end
 
-      if (curr_mode !== 2'h0) begin
-        $error("ERROR: curr_mode_o is not 2'b00 after entering SLEEP mode!");
+      if (curr_mode !== 2'h1) begin
+        $error("ERROR: curr_mode_o is not 2'b01 after entering SLEEP mode!");
         error_count += 1;
       end
 
@@ -306,17 +310,17 @@ module Mic_Mode_Fsm_tb ();
     end
 
     // TEST 7: A repeated SLEEP request should leave the mic in SLEEP.
-    @(negedge clk) mode_req = 3'h4;
+    @(negedge clk) mode_req = 2'h0;
 
     wait_n_negedges(FSM_MARGIN_CYCLES);
 
     @(negedge clk) begin
-      if (clk_sel !== 2'h0) begin
-        $error("ERROR: clk_sel_o did not remain at 2'b00 for a repeated SLEEP request!");
+      if (!verify_clk_sel(clk_sel)) begin
+        $error("ERROR: clk_sel_o did not remain at 2'b00 or 2'b01 for a repeated SLEEP request!");
         error_count += 1;
       end
 
-      if (curr_mode !== 2'h0) begin
+      if (curr_mode !== 2'h1) begin
         $error(
             "ERROR: curr_mode_o did not remain at the settled SLEEP mode for a repeated SLEEP request!");
         error_count += 1;
@@ -329,7 +333,7 @@ module Mic_Mode_Fsm_tb ();
     end
 
     // TEST 8: Verify SLEEP to ULTRASONIC goes through STANDARD first.
-    @(negedge clk) mode_req = 3'h7;
+    @(negedge clk) mode_req = 2'h3;
 
     wait_n_negedges((WAKEUP_CYCLES / 2) + 2);
 
@@ -340,7 +344,7 @@ module Mic_Mode_Fsm_tb ();
         error_count += 1;
       end
 
-      if (curr_mode !== 2'h0) begin
+      if (curr_mode !== 2'h1) begin
         $error(
             "ERROR: curr_mode_o did not remain at the settled SLEEP mode during the first leg of the SLEEP to ULTRASONIC transition!");
         error_count += 1;
@@ -377,18 +381,18 @@ module Mic_Mode_Fsm_tb ();
     end
 
     // TEST 9: A disabled request with power present should return the mic to SLEEP.
-    @(negedge clk) mode_req = 3'h0;
+    @(negedge clk) mode_req = 2'h0;
 
     wait_n_negedges(FALLASLEEP_CYCLES + FSM_MARGIN_CYCLES);
 
     @(negedge clk) begin
-      if (clk_sel !== 2'h0) begin
-        $error("ERROR: clk_sel_o is not 2'b00 after applying a disabled request!");
+      if (!verify_clk_sel(clk_sel)) begin
+        $error("ERROR: clk_sel_o is not 2'b00 or 2'b01 after applying a disabled request!");
         error_count += 1;
       end
 
-      if (curr_mode !== 2'h0) begin
-        $error("ERROR: curr_mode_o is not 2'b00 after applying a disabled request!");
+      if (curr_mode !== 2'h1) begin
+        $error("ERROR: curr_mode_o is not 2'b01 after applying a disabled request!");
         error_count += 1;
       end
 
@@ -433,7 +437,7 @@ module Mic_Mode_Fsm_tb ();
 
     @(negedge clk) begin
       volt_on  = 1'b1;
-      mode_req = 3'h7;
+      mode_req = 2'h3;
     end
 
     wait_n_negedges((POWERUP_CYCLES / 2) + 2);
@@ -482,7 +486,7 @@ module Mic_Mode_Fsm_tb ();
     end
 
     // TEST 11: Brownout during a transition should return the mic to a safe OFF state.
-    @(negedge clk) mode_req = 3'h6;
+    @(negedge clk) mode_req = 2'h2;
 
     wait_n_negedges((MODECHANGE_CYCLES / 2) + 2);
 
@@ -515,19 +519,19 @@ module Mic_Mode_Fsm_tb ();
     // TEST 12: After a brownout, the FSM should recover cleanly once power returns.
     @(negedge clk) begin
       volt_on  = 1'b1;
-      mode_req = 3'h4;
+      mode_req = 2'h1;
     end
 
     wait_n_negedges(POWERUP_CYCLES + FSM_MARGIN_CYCLES);
 
     @(negedge clk) begin
-      if (clk_sel !== 2'h0) begin
-        $error("ERROR: clk_sel_o is not 2'b00 after recovering from a brownout!");
+      if (!verify_clk_sel(clk_sel)) begin
+        $error("ERROR: clk_sel_o is not 2'b00 or 2'b01 after recovering from a brownout!");
         error_count += 1;
       end
 
-      if (curr_mode !== 2'h0) begin
-        $error("ERROR: curr_mode_o is not 2'b00 after recovering from a brownout!");
+      if (curr_mode !== 2'h1) begin
+        $error("ERROR: curr_mode_o is not 2'b01 after recovering from a brownout!");
         error_count += 1;
       end
 
@@ -543,7 +547,7 @@ module Mic_Mode_Fsm_tb ();
     end
 
     // TEST 13: Loss of PLL lock mid-transition should restart the wait and recover cleanly.
-    @(negedge clk) mode_req = 3'h6;
+    @(negedge clk) mode_req = 2'h2;
 
     wait_n_negedges((MODECHANGE_CYCLES / 2) + 2);
 
@@ -585,11 +589,11 @@ module Mic_Mode_Fsm_tb ();
     end
 
     // TEST 14: A new request during a busy transition should wait until the current transition completes.
-    @(negedge clk) mode_req = 3'h7;
+    @(negedge clk) mode_req = 2'h3;
 
     wait_n_negedges((MODECHANGE_CYCLES / 2) + 2);
 
-    @(negedge clk) mode_req = 3'h4;
+    @(negedge clk) mode_req = 2'h0;
 
     wait_n_negedges((MODECHANGE_CYCLES / 2) + 3);
 
@@ -615,13 +619,13 @@ module Mic_Mode_Fsm_tb ();
     wait_n_negedges(FALLASLEEP_CYCLES + FSM_MARGIN_CYCLES);
 
     @(negedge clk) begin
-      if (clk_sel !== 2'h0) begin
-        $error("ERROR: clk_sel_o is not 2'b00 after the deferred request is serviced!");
+      if (!verify_clk_sel(clk_sel)) begin
+        $error("ERROR: clk_sel_o is not 2'b00 or 2'b01 after the deferred request is serviced!");
         error_count += 1;
       end
 
-      if (curr_mode !== 2'h0) begin
-        $error("ERROR: curr_mode_o is not 2'b00 after the deferred request is serviced!");
+      if (curr_mode !== 2'h1) begin
+        $error("ERROR: curr_mode_o is not 2'b01 after the deferred request is serviced!");
         error_count += 1;
       end
 
