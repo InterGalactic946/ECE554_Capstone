@@ -7,6 +7,7 @@
 // Date: 03-26-2026
 // ------------------------------------------------------------
 module SPH0641LU4H_1_model_tb ();
+  import Tb_Util_pkg::*;
 
   /////////////////////////////
   // Stimulus of type logic //
@@ -31,10 +32,6 @@ module SPH0641LU4H_1_model_tb ();
       .data_o(data)
   );
 
-  task automatic wait_n_posedges(input int unsigned num_edges);
-    repeat (num_edges) @(posedge clk);
-  endtask
-
   initial begin
     error_count = 0;
     vdd = 1'b0;
@@ -43,7 +40,7 @@ module SPH0641LU4H_1_model_tb ();
     half_period_ns = 4_000;
 
     // TEST 1: Power-down keeps DATA high-Z.
-    wait_n_posedges(4);
+    wait_n_posedges(clk, 4);
 
     if (data !== 1'bz) begin
       $error("ERROR: data_o is not high-Z when the microphone is powered down!");
@@ -52,7 +49,7 @@ module SPH0641LU4H_1_model_tb ();
 
     // TEST 2: Power-up with a sleep clock keeps DATA high-Z.
     vdd = 1'b1;
-    wait_n_posedges(16);
+    wait_n_posedges(clk, 16);
 
     if (data !== 1'bz) begin
       $error("ERROR: data_o is not high-Z in SLEEP mode!");
@@ -61,10 +58,10 @@ module SPH0641LU4H_1_model_tb ();
 
     // TEST 3: Direct power-up into ULTRASONIC is treated as illegal and stays high-Z.
     vdd = 1'b0;
-    wait_n_posedges(4);
+    wait_n_posedges(clk, 4);
     half_period_ns = 156;
     vdd = 1'b1;
-    wait_n_posedges(24);
+    wait_n_posedges(clk, 24);
 
     @(posedge clk);
     #1;
@@ -75,7 +72,7 @@ module SPH0641LU4H_1_model_tb ();
 
     // TEST 4: Recover with a legal STANDARD clock and ensure DATA becomes active.
     half_period_ns = 400;
-    wait_n_posedges(96);
+    wait_n_posedges(clk, 96);
 
     @(posedge clk);
     #1;
@@ -95,7 +92,7 @@ module SPH0641LU4H_1_model_tb ();
 
     // TEST 5: Move to LOW-POWER mode and ensure DATA drives on the selected edge.
     half_period_ns = 1_000;
-    wait_n_posedges(24);
+    wait_n_posedges(clk, 24);
 
     @(posedge clk);
     #1;
@@ -113,7 +110,7 @@ module SPH0641LU4H_1_model_tb ();
 
     // TEST 6: Flip SELECT and ensure DATA moves to the falling edge.
     select = 1'b0;
-    wait_n_posedges(4);
+    wait_n_posedges(clk, 4);
 
     @(posedge clk);
     #1;
@@ -131,7 +128,7 @@ module SPH0641LU4H_1_model_tb ();
 
     // TEST 7: Move to ULTRASONIC mode from an active legal mode and ensure DATA remains active.
     half_period_ns = 156;
-    wait_n_posedges(40);
+    wait_n_posedges(clk, 40);
 
     @(negedge clk);
     #1;

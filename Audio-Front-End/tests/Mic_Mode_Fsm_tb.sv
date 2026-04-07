@@ -8,6 +8,7 @@
 // ------------------------------------------------------------
 module Mic_Mode_Fsm_tb ();
   import Mic_Time_pkg::*;
+  import Tb_Util_pkg::*;
 
   /////////////////////////////
   // Stimulus of type logic //
@@ -62,13 +63,6 @@ module Mic_Mode_Fsm_tb ();
       .data_val_o (data_val)
   );
 
-  function automatic bit verify_clk_sel(input logic [1:0] val);
-    verify_clk_sel = (val === 2'h0) || (val === 2'h1);
-  endfunction
-
-  task automatic wait_n_negedges(input int unsigned num_edges);
-    repeat (num_edges) @(negedge clk);
-  endtask
 
   initial begin
     clk = 1'b0;
@@ -118,7 +112,7 @@ module Mic_Mode_Fsm_tb ();
       mode_req = 2'h0;
     end
 
-    wait_n_negedges(POWERUP_CYCLES + FSM_MARGIN_CYCLES);
+    wait_n_negedges(clk, POWERUP_CYCLES + FSM_MARGIN_CYCLES);
 
     @(negedge clk) begin
       if (clk_en !== 1'b0) begin
@@ -145,7 +139,7 @@ module Mic_Mode_Fsm_tb ();
     // TEST 3: Assert mode_req as sleep, and verify that the correct clock is generated.
     @(negedge clk) mode_req = 2'h0;
 
-    wait_n_negedges(POWERUP_CYCLES + FSM_MARGIN_CYCLES);
+    wait_n_negedges(clk, POWERUP_CYCLES + FSM_MARGIN_CYCLES);
 
     @(negedge clk) begin
       if (!verify_clk_sel(clk_sel)) begin
@@ -172,7 +166,7 @@ module Mic_Mode_Fsm_tb ();
     // TEST 4: Transition from SLEEP to STANDARD mode.
     @(negedge clk) mode_req = 2'h2;
 
-    wait_n_negedges((WAKEUP_CYCLES / 2) + 2);
+    wait_n_negedges(clk, (WAKEUP_CYCLES / 2) + 2);
 
     @(negedge clk) begin
       if (clk_sel !== 2'h2) begin
@@ -191,7 +185,7 @@ module Mic_Mode_Fsm_tb ();
       end
     end
 
-    wait_n_negedges(WAKEUP_CYCLES + FSM_MARGIN_CYCLES);
+    wait_n_negedges(clk, WAKEUP_CYCLES + FSM_MARGIN_CYCLES);
 
     @(negedge clk) begin
       if (clk_sel !== 2'h2) begin
@@ -218,7 +212,7 @@ module Mic_Mode_Fsm_tb ();
     // TEST 5: Transition from STANDARD to ULTRASONIC mode.
     @(negedge clk) mode_req = 2'h3;
 
-    wait_n_negedges((MODECHANGE_CYCLES / 2) + 2);
+    wait_n_negedges(clk, (MODECHANGE_CYCLES / 2) + 2);
 
     @(negedge clk) begin
       if (clk_sel !== 2'h3) begin
@@ -238,7 +232,7 @@ module Mic_Mode_Fsm_tb ();
       end
     end
 
-    wait_n_negedges(MODECHANGE_CYCLES + FSM_MARGIN_CYCLES);
+    wait_n_negedges(clk, MODECHANGE_CYCLES + FSM_MARGIN_CYCLES);
 
     @(negedge clk) begin
       if (clk_sel !== 2'h3) begin
@@ -265,11 +259,12 @@ module Mic_Mode_Fsm_tb ();
     // TEST 6: Transition from ULTRASONIC to SLEEP mode.
     @(negedge clk) mode_req = 2'h1;
 
-    wait_n_negedges((FALLASLEEP_CYCLES / 2) + 2);
+    wait_n_negedges(clk, (FALLASLEEP_CYCLES / 2) + 2);
 
     @(negedge clk) begin
       if (!verify_clk_sel(clk_sel)) begin
-        $error("ERROR: clk_sel_o did not switch to 2'b00 or 2'b01 during the fall-asleep transition!");
+        $error(
+            "ERROR: clk_sel_o did not switch to 2'b00 or 2'b01 during the fall-asleep transition!");
         error_count += 1;
       end
 
@@ -285,7 +280,7 @@ module Mic_Mode_Fsm_tb ();
       end
     end
 
-    wait_n_negedges(FALLASLEEP_CYCLES + FSM_MARGIN_CYCLES);
+    wait_n_negedges(clk, FALLASLEEP_CYCLES + FSM_MARGIN_CYCLES);
 
     @(negedge clk) begin
       if (!verify_clk_sel(clk_sel)) begin
@@ -312,7 +307,7 @@ module Mic_Mode_Fsm_tb ();
     // TEST 7: A repeated SLEEP request should leave the mic in SLEEP.
     @(negedge clk) mode_req = 2'h0;
 
-    wait_n_negedges(FSM_MARGIN_CYCLES);
+    wait_n_negedges(clk, FSM_MARGIN_CYCLES);
 
     @(negedge clk) begin
       if (!verify_clk_sel(clk_sel)) begin
@@ -335,7 +330,7 @@ module Mic_Mode_Fsm_tb ();
     // TEST 8: Verify SLEEP to ULTRASONIC goes through STANDARD first.
     @(negedge clk) mode_req = 2'h3;
 
-    wait_n_negedges((WAKEUP_CYCLES / 2) + 2);
+    wait_n_negedges(clk, (WAKEUP_CYCLES / 2) + 2);
 
     @(negedge clk) begin
       if (clk_sel !== 2'h2) begin
@@ -356,7 +351,7 @@ module Mic_Mode_Fsm_tb ();
       end
     end
 
-    wait_n_negedges(WAKEUP_CYCLES + MODECHANGE_CYCLES + FSM_MARGIN_CYCLES);
+    wait_n_negedges(clk, WAKEUP_CYCLES + MODECHANGE_CYCLES + FSM_MARGIN_CYCLES);
 
     @(negedge clk) begin
       if (clk_sel !== 2'h3) begin
@@ -383,7 +378,7 @@ module Mic_Mode_Fsm_tb ();
     // TEST 9: A disabled request with power present should return the mic to SLEEP.
     @(negedge clk) mode_req = 2'h0;
 
-    wait_n_negedges(FALLASLEEP_CYCLES + FSM_MARGIN_CYCLES);
+    wait_n_negedges(clk, FALLASLEEP_CYCLES + FSM_MARGIN_CYCLES);
 
     @(negedge clk) begin
       if (!verify_clk_sel(clk_sel)) begin
@@ -411,7 +406,7 @@ module Mic_Mode_Fsm_tb ();
     // through STANDARD first after power returns.
     @(negedge clk) volt_on = 1'b0;
 
-    wait_n_negedges(FSM_MARGIN_CYCLES);
+    wait_n_negedges(clk, FSM_MARGIN_CYCLES);
 
     @(negedge clk) begin
       if (clk_sel !== 2'h0) begin
@@ -440,7 +435,7 @@ module Mic_Mode_Fsm_tb ();
       mode_req = 2'h3;
     end
 
-    wait_n_negedges((POWERUP_CYCLES / 2) + 2);
+    wait_n_negedges(clk, (POWERUP_CYCLES / 2) + 2);
 
     @(negedge clk) begin
       if (clk_sel !== 2'h2) begin
@@ -461,7 +456,7 @@ module Mic_Mode_Fsm_tb ();
       end
     end
 
-    wait_n_negedges(POWERUP_CYCLES + MODECHANGE_CYCLES + FSM_MARGIN_CYCLES);
+    wait_n_negedges(clk, POWERUP_CYCLES + MODECHANGE_CYCLES + FSM_MARGIN_CYCLES);
 
     @(negedge clk) begin
       if (clk_sel !== 2'h3) begin
@@ -488,11 +483,11 @@ module Mic_Mode_Fsm_tb ();
     // TEST 11: Brownout during a transition should return the mic to a safe OFF state.
     @(negedge clk) mode_req = 2'h2;
 
-    wait_n_negedges((MODECHANGE_CYCLES / 2) + 2);
+    wait_n_negedges(clk, (MODECHANGE_CYCLES / 2) + 2);
 
     @(negedge clk) volt_on = 1'b0;
 
-    wait_n_negedges(FSM_MARGIN_CYCLES);
+    wait_n_negedges(clk, FSM_MARGIN_CYCLES);
 
     @(negedge clk) begin
       if (clk_sel !== 2'h0) begin
@@ -522,7 +517,7 @@ module Mic_Mode_Fsm_tb ();
       mode_req = 2'h1;
     end
 
-    wait_n_negedges(POWERUP_CYCLES + FSM_MARGIN_CYCLES);
+    wait_n_negedges(clk, POWERUP_CYCLES + FSM_MARGIN_CYCLES);
 
     @(negedge clk) begin
       if (!verify_clk_sel(clk_sel)) begin
@@ -549,11 +544,11 @@ module Mic_Mode_Fsm_tb ();
     // TEST 13: Loss of PLL lock mid-transition should restart the wait and recover cleanly.
     @(negedge clk) mode_req = 2'h2;
 
-    wait_n_negedges((MODECHANGE_CYCLES / 2) + 2);
+    wait_n_negedges(clk, (MODECHANGE_CYCLES / 2) + 2);
 
     @(negedge clk) pll_locked = 1'b0;
 
-    wait_n_negedges(3);
+    wait_n_negedges(clk, 3);
 
     @(negedge clk) begin
       if (data_val !== 1'b0) begin
@@ -564,7 +559,7 @@ module Mic_Mode_Fsm_tb ();
 
     @(negedge clk) pll_locked = 1'b1;
 
-    wait_n_negedges(MODECHANGE_CYCLES + FSM_MARGIN_CYCLES);
+    wait_n_negedges(clk, MODECHANGE_CYCLES + FSM_MARGIN_CYCLES);
 
     @(negedge clk) begin
       if (clk_sel !== 2'h2) begin
@@ -591,11 +586,11 @@ module Mic_Mode_Fsm_tb ();
     // TEST 14: A new request during a busy transition should wait until the current transition completes.
     @(negedge clk) mode_req = 2'h3;
 
-    wait_n_negedges((MODECHANGE_CYCLES / 2) + 2);
+    wait_n_negedges(clk, (MODECHANGE_CYCLES / 2) + 2);
 
     @(negedge clk) mode_req = 2'h0;
 
-    wait_n_negedges((MODECHANGE_CYCLES / 2) + 3);
+    wait_n_negedges(clk, (MODECHANGE_CYCLES / 2) + 3);
 
     @(negedge clk) begin
       if (clk_sel !== 2'h3) begin
@@ -616,7 +611,7 @@ module Mic_Mode_Fsm_tb ();
       end
     end
 
-    wait_n_negedges(FALLASLEEP_CYCLES + FSM_MARGIN_CYCLES);
+    wait_n_negedges(clk, FALLASLEEP_CYCLES + FSM_MARGIN_CYCLES);
 
     @(negedge clk) begin
       if (!verify_clk_sel(clk_sel)) begin

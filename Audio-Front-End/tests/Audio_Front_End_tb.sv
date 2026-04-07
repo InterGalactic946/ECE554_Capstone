@@ -14,6 +14,7 @@
 // ------------------------------------------------------------
 module Audio_Front_End_tb ();
   import Mic_Time_pkg::*;
+  import Tb_Util_pkg::*;
 
   localparam int unsigned SYS_CLK_HZ = 50_000_000;
   localparam bit FAST_SIM = 1'b1;
@@ -36,10 +37,17 @@ module Audio_Front_End_tb ();
   tri data_l;
   tri data_r;
   tri data;
+  logic data_bus_mon;
   logic [1:0] curr_mode;
   logic mic_clk;
   logic dut_volt_on;
   logic mic_vdd_on;
+  logic dut_volt_on_hi;
+  logic dut_volt_on_lo;
+  logic curr_mode_sleep;
+  logic curr_mode_std;
+  logic curr_mode_ult;
+  logic dual_samples_ready;
   real vdd_v;
   int error_count;
 
@@ -76,6 +84,17 @@ module Audio_Front_End_tb ();
   // Resolve the individual microphone drivers onto the shared PDM wire.
   assign data = data_l;
   assign data = data_r;
+
+  // Mirror shared-bus activity and common wait conditions onto logic signals.
+  always_comb begin
+    data_bus_mon = data;
+    dut_volt_on_hi = (dut_volt_on === 1'b1);
+    dut_volt_on_lo = (dut_volt_on === 1'b0);
+    curr_mode_sleep = (curr_mode === 2'h1);
+    curr_mode_std = (curr_mode === 2'h2);
+    curr_mode_ult = (curr_mode === 2'h3);
+    dual_samples_ready = (left_sample_count >= 24) && (right_sample_count >= 24);
+  end
 
   // Sample the left microphone on falling mic-clock edges.
   always @(negedge mic_clk) begin
@@ -222,276 +241,40 @@ module Audio_Front_End_tb ();
     end
   endfunction
 
-  // Simulate one ADC transaction by latching the current bench voltage at the
-  // start of conversion and shifting the 12-bit result out MSB-first.
-  task automatic simulate_adc_reading(input logic [11:0] voltage);
-    int bit_idx;
-    begin
-      // Waits till CS is low.
-      wait (adc_cs === 1'b0);
-
-      // Shift out the bits on the falling edge of SCLK, starting with the MSB.
-      adc_data_out = voltage[11];
-
-      // At each falling edge of SCLK, shift out the next bit of the latched voltage.
-      for (bit_idx = 10; bit_idx >= 0; bit_idx -= 1) begin
-        @(negedge adc_sclk);
-        adc_data_out = voltage[bit_idx];
-      end
-
-      // After the last bit, wait for CS to go high again before driving the bus low.
-      wait (adc_cs === 1'b1);
-
-      // Drive the bus low after the transaction is complete to avoid leaving it floating.
-      adc_data_out = 1'b0;
-    end
-  endtask : simulate_adc_reading
 
   // Continuously monitor for ADC conversions and respond with the appropriate code
   // based on the current bench voltage.
   always @(negedge adc_cs) begin
     $display("ADC conversion started at time %0t for voltage %.3f V (code 0x%03X)", $time, vdd_v,
              voltage_to_adc_code(vdd_v));
-    simulate_adc_reading(voltage_to_adc_code(vdd_v));
+    simulate_adc_reading(adc_cs, adc_sclk, adc_data_out, voltage_to_adc_code(vdd_v));
   end
 
-  ///////////////////
-  // TB utilities //
-  /////////////////
-  function automatic bit verify_clk_sel(input logic [1:0] val);
-    verify_clk_sel = (val === 2'h0) || (val === 2'h1);
-  endfunction
-
-  task automatic wait_n_negedges(input int unsigned num_edges);
-    repeat (num_edges) @(negedge clk);
-  endtask : wait_n_negedges
-
-  task automatic wait_for_dut_volt_on(input logic expected_level, input int unsigned timeout_cycles,
-                                      input string label);
-    logic condition_met;
-    begin
-      if (dut_volt_on === expected_level) begin
-        return;
-      end
-
-      condition_met = 1'b0;
-
-      fork
-        begin
-          wait (dut_volt_on === expected_level);
-          condition_met = 1'b1;
-        end
-        begin
-          TimeoutTask(condition_met, timeout_cycles,
-                      $sformatf("%s (dut_volt_on=%0d)", label, expected_level));
-        end
-      join_any
-      disable fork;
-    end
-  endtask : wait_for_dut_volt_on
-
-  task automatic wait_for_curr_mode(input logic [1:0] expected_mode,
-                                    input int unsigned timeout_cycles, input string label);
-    logic condition_met;
-    begin
-      if (curr_mode === expected_mode) begin
-        return;
-      end
-
-      condition_met = 1'b0;
-
-      fork
-        begin
-          wait (curr_mode === expected_mode);
-          condition_met = 1'b1;
-        end
-        begin
-          TimeoutTask(condition_met, timeout_cycles,
-                      $sformatf("%s (curr_mode=%0d)", label, expected_mode));
-        end
-      join_any
-      disable fork;
-    end
-  endtask : wait_for_curr_mode
-
-  task automatic clear_capture_state();
-    begin
-      left_sample_count = 0;
-      right_sample_count = 0;
-      left_toggle_count = 0;
-      right_toggle_count = 0;
-      left_prev_bit = 1'b0;
-      right_prev_bit = 1'b0;
-      left_prev_valid = 1'b0;
-      right_prev_valid = 1'b0;
-    end
-  endtask : clear_capture_state
-
-  task automatic set_vdd(input real new_vdd_v);
-    begin
-      vdd_v = new_vdd_v;
-      #1;
-    end
-  endtask : set_vdd
-
-  task automatic wait_n_mic_edges(input int unsigned num_edges);
-    int unsigned edge_idx;
-    begin
-      for (edge_idx = 0; edge_idx < num_edges; edge_idx += 1) begin
-        @(posedge mic_clk or negedge mic_clk);
-      end
-    end
-  endtask : wait_n_mic_edges
-
-  task automatic TimeoutTask(input logic sig, input int clks2wait, input string signal);
-    fork
-      begin : timeout
-        repeat (clks2wait) @(posedge clk);
-        $error("ERROR: %s not getting asserted and/or held at its value.", signal);
-        error_count += 1;
-        $stop();
-      end : timeout
-      begin
-        @(posedge sig) disable timeout;
-      end
-    join
-  endtask : TimeoutTask
-
-  task automatic ramp_vdd(input real start_v, input real stop_v, input real step_v,
-                          input int unsigned settle_cycles_per_step);
-    real vdd_step;
-    begin
-      vdd_step = start_v;
-      set_vdd(vdd_step);
-
-      if (stop_v >= start_v) begin
-        while (vdd_step < stop_v) begin
-          wait_n_negedges(settle_cycles_per_step);
-          vdd_step = vdd_step + step_v;
-
-          if (vdd_step > stop_v) begin
-            vdd_step = stop_v;
-          end
-
-          set_vdd(vdd_step);
-        end
-      end else begin
-        while (vdd_step > stop_v) begin
-          wait_n_negedges(settle_cycles_per_step);
-          vdd_step = vdd_step - step_v;
-
-          if (vdd_step < stop_v) begin
-            vdd_step = stop_v;
-          end
-
-          set_vdd(vdd_step);
-        end
-      end
-    end
-  endtask : ramp_vdd
-
-  task automatic expect_clock_quiet(input int unsigned observe_cycles, input string label);
-    int start_edge_count;
-    begin
-      start_edge_count = mic_clk_edge_count;
-      wait_n_negedges(observe_cycles);
-
-      if (mic_clk_edge_count != start_edge_count) begin
-        $error("ERROR: mic_clk_o toggled unexpectedly during %s!", label);
-        error_count += 1;
-      end
-    end
-  endtask : expect_clock_quiet
-
-  task automatic expect_clock_activity(input int unsigned observe_cycles, input string label);
-    int start_edge_count;
-    begin
-      start_edge_count = mic_clk_edge_count;
-      wait_n_negedges(observe_cycles);
-
-      if (mic_clk_edge_count == start_edge_count) begin
-        $error("ERROR: mic_clk_o did not toggle during %s!", label);
-        error_count += 1;
-      end
-    end
-  endtask : expect_clock_activity
-
-  task automatic wait_for_dual_channel_samples(input int unsigned samples_per_channel,
-                                               input int unsigned timeout_cycles,
-                                               input string label);
-    logic dual_samples_ready;
-    begin
-      dual_samples_ready = 1'b0;
-
-      fork
-        begin
-          while ((left_sample_count < samples_per_channel) ||
-                 (right_sample_count < samples_per_channel)) begin
-            @(negedge clk);
-          end
-          dual_samples_ready = 1'b1;
-        end
-        begin
-          TimeoutTask(dual_samples_ready, timeout_cycles, $sformatf(
-                      "left/right mic samples during %s", label));
-        end
-      join_any
-      disable fork;
-
-    end
-  endtask : wait_for_dual_channel_samples
-
-  task automatic check_bus_high_z(input int unsigned edge_pairs, input string label);
-    int unsigned pair_idx;
-    begin
-      for (pair_idx = 0; pair_idx < edge_pairs; pair_idx += 1) begin
-        @(posedge mic_clk);
-        #1;
-        if (data !== 1'bz) begin
-          $error("ERROR: Shared data bus was not high-Z on a right-channel edge during %s!", label);
-          error_count += 1;
-        end
-
-        @(negedge mic_clk);
-        #1;
-        if (data !== 1'bz) begin
-          $error("ERROR: Shared data bus was not high-Z on a left-channel edge during %s!", label);
-          error_count += 1;
-        end
-      end
-    end
-  endtask : check_bus_high_z
-
-  task automatic announce_test(input int unsigned test_num, input string description);
-    begin
-      $display("------------------------------------------------------------");
-      $display("TEST %0d STARTING @ %0t: %s", test_num, $time, description);
-      $display("------------------------------------------------------------");
-    end
-  endtask : announce_test
-
+  // Start the test sequence.
   initial begin
     error_count = 0;
     mic_clk_edge_count = 0;
     adc_data_out = 1'b0;
-    clear_capture_state();
+    clear_capture_state(left_sample_count, right_sample_count, left_toggle_count,
+                        right_toggle_count, left_prev_bit, right_prev_bit, left_prev_valid,
+                        right_prev_valid);
 
     clk = 1'b0;
     rst = 1'b1;
     mode_req = 2'h1;
     vdd_v = 0.0;
 
-    wait_n_negedges(5);
+    wait_n_negedges(clk, 5);
     rst = 1'b0;
 
     // TEST 1: Below-threshold VDD should keep the mic path OFF.
     announce_test(1, "Below-threshold VDD should keep the mic path OFF.");
     @(negedge clk) begin
       mode_req = 2'h2;
-      set_vdd(1.55);
+      set_vdd(vdd_v, 1.55);
     end
 
-    wait_n_negedges(POWERUP_CYCLES + FSM_MARGIN_CYCLES);
+    wait_n_negedges(clk, POWERUP_CYCLES + FSM_MARGIN_CYCLES);
 
     if (dut_volt_on !== 1'b0) begin
       $error("ERROR: DUT volt_on asserted below the 1.62 V threshold!");
@@ -503,120 +286,140 @@ module Audio_Front_End_tb ();
       error_count += 1;
     end
 
-    expect_clock_quiet(CLOCK_ACTIVITY_OBSERVE_CYCLES, "below-threshold VDD");
+    expect_clock_quiet(clk, mic_clk_edge_count, error_count, CLOCK_ACTIVITY_OBSERVE_CYCLES,
+                       "below-threshold VDD");
 
-    // TEST 2: With power present, request 2'b01 should still map to SLEEP.
+    // TEST 2: With power present, request 2'b00 should still map to SLEEP.
     announce_test(2, "With power present, request 2'b00 should still map to SLEEP.");
     @(negedge clk) begin
       mode_req = 2'h0;
     end
 
-    ramp_vdd(1.55, 1.72, 0.03, 2);
-    wait_for_dut_volt_on(1'b1, POWERUP_CYCLES + FSM_MARGIN_CYCLES,
-                         "dut_volt_on after VDD crossed the threshold");
-    wait_for_curr_mode(2'h1, POWERUP_CYCLES + FSM_MARGIN_CYCLES, "powering up into SLEEP");
+    ramp_vdd(clk, vdd_v, 1.55, 1.72, 0.03, 2);
+    WaitTask(clk, error_count, dut_volt_on_hi, POWERUP_CYCLES + FSM_MARGIN_CYCLES,
+             "dut_volt_on after VDD crossed the threshold");
+    WaitTask(clk, error_count, curr_mode_sleep, POWERUP_CYCLES + FSM_MARGIN_CYCLES,
+             "powering up into SLEEP");
 
     if (data_val !== 1'b0) begin
       $error("ERROR: data_val_o is not low in SLEEP mode!");
       error_count += 1;
     end
 
-    expect_clock_quiet(CLOCK_ACTIVITY_OBSERVE_CYCLES, "sleep mode after a disabled request");
+    expect_clock_quiet(clk, mic_clk_edge_count, error_count, CLOCK_ACTIVITY_OBSERVE_CYCLES,
+                       "sleep mode after a disabled request");
 
     // TEST 3: Wake into STANDARD mode and read data from both microphones.
     announce_test(3, "Wake into STANDARD mode and read data from both microphones.");
-    clear_capture_state();
+    clear_capture_state(left_sample_count, right_sample_count, left_toggle_count,
+                        right_toggle_count, left_prev_bit, right_prev_bit, left_prev_valid,
+                        right_prev_valid);
     @(negedge clk) mode_req = 2'h2;
 
-    wait_for_curr_mode(2'h2, WAKEUP_CYCLES + FSM_MARGIN_CYCLES, "requesting STANDARD mode");
+    WaitTask(clk, error_count, curr_mode_std, WAKEUP_CYCLES + FSM_MARGIN_CYCLES,
+             "requesting STANDARD mode");
 
     if (data_val !== 1'b1) begin
       $error("ERROR: data_val_o is not high after entering STANDARD mode!");
       error_count += 1;
     end
 
-    wait_for_dual_channel_samples(24, SAMPLE_TIMEOUT_CYCLES, "STANDARD mode");
+    WaitTask(clk, error_count, dual_samples_ready, SAMPLE_TIMEOUT_CYCLES,
+             "left/right mic samples during STANDARD mode");
 
     // TEST 4: Brownout mid-transition should clear the mic path safely.
     announce_test(4, "Brownout mid-transition should clear the mic path safely.");
-    clear_capture_state();
+    clear_capture_state(left_sample_count, right_sample_count, left_toggle_count,
+                        right_toggle_count, left_prev_bit, right_prev_bit, left_prev_valid,
+                        right_prev_valid);
     @(negedge clk) mode_req = 2'h3;
 
-    wait_n_negedges((MODECHANGE_CYCLES / 2) + 2);
-    ramp_vdd(vdd_v, 1.55, 0.04, 1);
-    wait_for_dut_volt_on(1'b0, POWERUP_CYCLES + FSM_MARGIN_CYCLES, "dut_volt_on after a brownout");
-    wait_n_negedges(FSM_MARGIN_CYCLES);
+    wait_n_negedges(clk, (MODECHANGE_CYCLES / 2) + 2);
+    ramp_vdd(clk, vdd_v, vdd_v, 1.55, 0.04, 1);
+    WaitTask(clk, error_count, dut_volt_on_lo, POWERUP_CYCLES + FSM_MARGIN_CYCLES,
+             "dut_volt_on after a brownout");
+    wait_n_negedges(clk, FSM_MARGIN_CYCLES);
 
     if (data_val !== 1'b0) begin
       $error("ERROR: data_val_o did not clear after a brownout!");
       error_count += 1;
     end
 
-    expect_clock_quiet(CLOCK_ACTIVITY_OBSERVE_CYCLES, "brownout recovery");
+    expect_clock_quiet(clk, mic_clk_edge_count, error_count, CLOCK_ACTIVITY_OBSERVE_CYCLES,
+                       "brownout recovery");
 
     // TEST 5: Threshold chatter should not prevent eventual recovery into STANDARD mode.
     announce_test(5, "Threshold chatter should not prevent eventual recovery into STANDARD mode.");
-    clear_capture_state();
+    clear_capture_state(left_sample_count, right_sample_count, left_toggle_count,
+                        right_toggle_count, left_prev_bit, right_prev_bit, left_prev_valid,
+                        right_prev_valid);
     @(negedge clk) mode_req = 2'h2;
 
-    set_vdd(1.60);
-    wait_n_negedges(2);
-    set_vdd(1.63);
-    wait_n_negedges(2);
-    set_vdd(1.61);
-    wait_n_negedges(2);
-    set_vdd(1.68);
+    set_vdd(vdd_v, 1.60);
+    wait_n_negedges(clk, 2);
+    set_vdd(vdd_v, 1.63);
+    wait_n_negedges(clk, 2);
+    set_vdd(vdd_v, 1.61);
+    wait_n_negedges(clk, 2);
+    set_vdd(vdd_v, 1.68);
 
-    wait_for_dut_volt_on(1'b1, POWERUP_CYCLES + FSM_MARGIN_CYCLES,
-                         "dut_volt_on after threshold chatter recovery");
-    wait_for_curr_mode(2'h2, POWERUP_CYCLES + WAKEUP_CYCLES + FSM_MARGIN_CYCLES,
-                       "threshold chatter recovery into STANDARD");
+    WaitTask(clk, error_count, dut_volt_on_hi, POWERUP_CYCLES + FSM_MARGIN_CYCLES,
+             "dut_volt_on after threshold chatter recovery");
+    WaitTask(clk, error_count, curr_mode_std, POWERUP_CYCLES + WAKEUP_CYCLES + FSM_MARGIN_CYCLES,
+             "threshold chatter recovery into STANDARD");
 
     if (data_val !== 1'b1) begin
       $error("ERROR: data_val_o is not high after threshold chatter recovery!");
       error_count += 1;
     end
 
-    wait_for_dual_channel_samples(24, SAMPLE_TIMEOUT_CYCLES, "STANDARD recovery");
+    WaitTask(clk, error_count, dual_samples_ready, SAMPLE_TIMEOUT_CYCLES,
+             "left/right mic samples during STANDARD recovery");
 
     // TEST 6: Direct OFF->ULTRASONIC request should still produce valid stereo data.
     announce_test(6, "Direct OFF->ULTRASONIC request should still produce valid stereo data.");
-    clear_capture_state();
+    clear_capture_state(left_sample_count, right_sample_count, left_toggle_count,
+                        right_toggle_count, left_prev_bit, right_prev_bit, left_prev_valid,
+                        right_prev_valid);
     @(negedge clk) begin
       mode_req = 2'h3;
-      set_vdd(0.0);
+      set_vdd(vdd_v, 0.0);
     end
 
-    wait_for_dut_volt_on(1'b0, POWERUP_CYCLES + FSM_MARGIN_CYCLES,
-                         "dut_volt_on before OFF->ULTRASONIC sequencing");
-    wait_n_negedges(FSM_MARGIN_CYCLES);
-    ramp_vdd(0.0, 1.80, 0.06, 2);
-    wait_for_dut_volt_on(1'b1, POWERUP_CYCLES + FSM_MARGIN_CYCLES,
-                         "dut_volt_on during OFF->ULTRASONIC sequencing");
-    wait_for_curr_mode(2'h3, POWERUP_CYCLES + MODECHANGE_CYCLES + FSM_MARGIN_CYCLES,
-                       "OFF->ULTRASONIC sequencing");
+    WaitTask(clk, error_count, dut_volt_on_lo, POWERUP_CYCLES + FSM_MARGIN_CYCLES,
+             "dut_volt_on before OFF->ULTRASONIC sequencing");
+    wait_n_negedges(clk, FSM_MARGIN_CYCLES);
+    ramp_vdd(clk, vdd_v, 0.0, 1.80, 0.06, 2);
+    WaitTask(clk, error_count, dut_volt_on_hi, POWERUP_CYCLES + FSM_MARGIN_CYCLES,
+             "dut_volt_on during OFF->ULTRASONIC sequencing");
+    WaitTask(clk, error_count, curr_mode_ult,
+             POWERUP_CYCLES + MODECHANGE_CYCLES + FSM_MARGIN_CYCLES, "OFF->ULTRASONIC sequencing");
 
     if (data_val !== 1'b1) begin
       $error("ERROR: data_val_o is not high after OFF->ULTRASONIC sequencing!");
       error_count += 1;
     end
 
-    wait_for_dual_channel_samples(24, SAMPLE_TIMEOUT_CYCLES, "OFF->ULTRASONIC");
+    WaitTask(clk, error_count, dual_samples_ready, SAMPLE_TIMEOUT_CYCLES,
+             "left/right mic samples during OFF->ULTRASONIC");
 
     // TEST 7: A powered request of 2'b01 should return to SLEEP and release the PDM bus.
     announce_test(7, "A powered request of 2'b01 should return to SLEEP and release the PDM bus.");
-    clear_capture_state();
+    clear_capture_state(left_sample_count, right_sample_count, left_toggle_count,
+                        right_toggle_count, left_prev_bit, right_prev_bit, left_prev_valid,
+                        right_prev_valid);
     @(negedge clk) mode_req = 2'h1;
 
-    wait_for_curr_mode(2'h1, FALLASLEEP_CYCLES + FSM_MARGIN_CYCLES,
-                       "returning to SLEEP while powered");
+    WaitTask(clk, error_count, curr_mode_sleep, FALLASLEEP_CYCLES + FSM_MARGIN_CYCLES,
+             "returning to SLEEP while powered");
 
     if (data_val !== 1'b0) begin
       $error("ERROR: data_val_o is not low after returning to SLEEP!");
       error_count += 1;
     end
 
-    expect_clock_quiet(CLOCK_ACTIVITY_OBSERVE_CYCLES, "sleep after disabling while powered");
+    expect_clock_quiet(clk, mic_clk_edge_count, error_count, CLOCK_ACTIVITY_OBSERVE_CYCLES,
+                       "sleep after disabling while powered");
 
     #1;
     if (data_l !== 1'bz) begin
