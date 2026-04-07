@@ -63,44 +63,44 @@ derive_clock_uncertainty
 # datapaths. The FSM enforces safe sequencing: CLK_DIS -> CLK_SEL -> CLK_EN -> WAIT.
 
 set_false_path \
--from [get_registers {Mic_Clk_Gen:iCLK_GEN|Mic_Mode_Fsm:iMIC_FSM|clk_en_o}] \
--to   [get_registers {Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL|*select_reg*}]
+-from [get_registers {Audio_Front_End:iAUD_FRONT|Mic_Clk_Gen:iCLK_GEN|Mic_Mode_Fsm:iMIC_FSM|clk_en_o}] \
+-to   [get_registers {Audio_Front_End:iAUD_FRONT|Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL|*select_reg*}]
 
 set_false_path \
--from [get_registers {Mic_Clk_Gen:iCLK_GEN|Mic_Mode_Fsm:iMIC_FSM|pending_mode[0]}] \
--to   [get_registers {Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL|*select_reg*}]
+-from [get_registers {Audio_Front_End:iAUD_FRONT|Mic_Clk_Gen:iCLK_GEN|Mic_Mode_Fsm:iMIC_FSM|pending_mode[0]}] \
+-to   [get_registers {Audio_Front_End:iAUD_FRONT|Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL|*select_reg*}]
 
 set_false_path \
--from [get_registers {Mic_Clk_Gen:iCLK_GEN|Mic_Mode_Fsm:iMIC_FSM|pending_mode[1]}] \
--to   [get_registers {Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL|*select_reg*}]
+-from [get_registers {Audio_Front_End:iAUD_FRONT|Mic_Clk_Gen:iCLK_GEN|Mic_Mode_Fsm:iMIC_FSM|pending_mode[1]}] \
+-to   [get_registers {Audio_Front_End:iAUD_FRONT|Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL|*select_reg*}]
 
 set_false_path \
--from [get_registers {Mic_Clk_Gen:iCLK_GEN|Mic_Mode_Fsm:iMIC_FSM|clk_en_o}] \
--to   [get_registers {Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL|Mic_Clk_Ctrl_altclkctrl_0:altclkctrl_0|Mic_Clk_Ctrl_altclkctrl_0_sub:Mic_Clk_Ctrl_altclkctrl_0_sub_component|sd1~FF_0}]
+-from [get_registers {Audio_Front_End:iAUD_FRONT|Mic_Clk_Gen:iCLK_GEN|Mic_Mode_Fsm:iMIC_FSM|clk_en_o}] \
+-to   [get_registers {Audio_Front_End:iAUD_FRONT|Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL|Mic_Clk_Ctrl_altclkctrl_0:altclkctrl_0|Mic_Clk_Ctrl_altclkctrl_0_sub:Mic_Clk_Ctrl_altclkctrl_0_sub_component|sd1~FF_0}]
 
 set_false_path \
--from [get_registers {Mic_Clk_Gen:iCLK_GEN|Mic_Mode_Fsm:iMIC_FSM|pending_mode[0]}] \
--to   [get_registers {Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL|Mic_Clk_Ctrl_altclkctrl_0:altclkctrl_0|Mic_Clk_Ctrl_altclkctrl_0_sub:Mic_Clk_Ctrl_altclkctrl_0_sub_component|sd1~FF_0}]
+-from [get_registers {Audio_Front_End:iAUD_FRONT|Mic_Clk_Gen:iCLK_GEN|Mic_Mode_Fsm:iMIC_FSM|pending_mode[0]}] \
+-to   [get_registers {Audio_Front_End:iAUD_FRONT|Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL|Mic_Clk_Ctrl_altclkctrl_0:altclkctrl_0|Mic_Clk_Ctrl_altclkctrl_0_sub:Mic_Clk_Ctrl_altclkctrl_0_sub_component|sd1~FF_0}]
 
 set_false_path \
--from [get_registers {Mic_Clk_Gen:iCLK_GEN|Mic_Mode_Fsm:iMIC_FSM|pending_mode[1]}] \
--to   [get_registers {Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL|Mic_Clk_Ctrl_altclkctrl_0:altclkctrl_0|Mic_Clk_Ctrl_altclkctrl_0_sub:Mic_Clk_Ctrl_altclkctrl_0_sub_component|sd1~FF_0}]
+-from [get_registers {Audio_Front_End:iAUD_FRONT|Mic_Clk_Gen:iCLK_GEN|Mic_Mode_Fsm:iMIC_FSM|pending_mode[1]}] \
+-to   [get_registers {Audio_Front_End:iAUD_FRONT|Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL|Mic_Clk_Ctrl_altclkctrl_0:altclkctrl_0|Mic_Clk_Ctrl_altclkctrl_0_sub:Mic_Clk_Ctrl_altclkctrl_0_sub_component|sd1~FF_0}]
 
 set_false_path \
--from [get_registers {Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL|*select_reg*}] \
--to   [get_registers {Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL|*select_reg*}]
+-from [get_registers {Audio_Front_End:iAUD_FRONT|Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL|*select_reg*}] \
+-to   [get_registers {Audio_Front_End:iAUD_FRONT|Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL|*select_reg*}]
 
 set_false_path \
--from [get_registers {Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL|Mic_Clk_Ctrl_altclkctrl_0:altclkctrl_0|Mic_Clk_Ctrl_altclkctrl_0_sub:Mic_Clk_Ctrl_altclkctrl_0_sub_component|sd1~FF_0}] \
--to   [get_registers {Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL|*select_reg*}]
+-from [get_registers {Audio_Front_End:iAUD_FRONT|Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL|Mic_Clk_Ctrl_altclkctrl_0:altclkctrl_0|Mic_Clk_Ctrl_altclkctrl_0_sub:Mic_Clk_Ctrl_altclkctrl_0_sub_component|sd1~FF_0}] \
+-to   [get_registers {Audio_Front_End:iAUD_FRONT|Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL|*select_reg*}]
 
 set_false_path \
--from [get_registers {Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL|*select_reg*}] \
--to   [get_registers {Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL|Mic_Clk_Ctrl_altclkctrl_0:altclkctrl_0|Mic_Clk_Ctrl_altclkctrl_0_sub:Mic_Clk_Ctrl_altclkctrl_0_sub_component|sd1~FF_0}]
+-from [get_registers {Audio_Front_End:iAUD_FRONT|Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL|*select_reg*}] \
+-to   [get_registers {Audio_Front_End:iAUD_FRONT|Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL|Mic_Clk_Ctrl_altclkctrl_0:altclkctrl_0|Mic_Clk_Ctrl_altclkctrl_0_sub:Mic_Clk_Ctrl_altclkctrl_0_sub_component|sd1~FF_0}]
 
 set_false_path \
--from [get_registers {Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL|Mic_Clk_Ctrl_altclkctrl_0:altclkctrl_0|Mic_Clk_Ctrl_altclkctrl_0_sub:Mic_Clk_Ctrl_altclkctrl_0_sub_component|sd1~FF_0}] \
--to   [get_registers {Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL|Mic_Clk_Ctrl_altclkctrl_0:altclkctrl_0|Mic_Clk_Ctrl_altclkctrl_0_sub:Mic_Clk_Ctrl_altclkctrl_0_sub_component|sd1~FF_0}]
+-from [get_registers {Audio_Front_End:iAUD_FRONT|Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL|Mic_Clk_Ctrl_altclkctrl_0:altclkctrl_0|Mic_Clk_Ctrl_altclkctrl_0_sub:Mic_Clk_Ctrl_altclkctrl_0_sub_component|sd1~FF_0}] \
+-to   [get_registers {Audio_Front_End:iAUD_FRONT|Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL|Mic_Clk_Ctrl_altclkctrl_0:altclkctrl_0|Mic_Clk_Ctrl_altclkctrl_0_sub:Mic_Clk_Ctrl_altclkctrl_0_sub_component|sd1~FF_0}]
 
 
 #**************************************************************
