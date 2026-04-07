@@ -20,10 +20,10 @@ module Clock_Gen (
     //////////// SEG7 //////////
     output reg [6:0] HEX0,
     output reg [6:0] HEX1,
-    output [6:0] HEX2,
-    output [6:0] HEX3,
-    output [6:0] HEX4,
-    output [6:0] HEX5,
+    output reg [6:0] HEX2,
+    output reg [6:0] HEX3,
+    output reg [6:0] HEX4,
+    output reg [6:0] HEX5,
 
     //////////// KEY //////////
     input [3:0] KEY,
