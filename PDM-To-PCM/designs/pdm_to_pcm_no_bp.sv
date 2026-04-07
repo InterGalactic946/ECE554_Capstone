@@ -5,7 +5,9 @@ module pdm_to_pcm_no_bp (
     input rst_n,
     input mic_raw,
     output [15:0] pcm_pos,
-    output [15:0] pcm_neg
+    output pcm_valid_pos,
+    output [15:0] pcm_neg,
+    output pcm_valid_neg
 );
 
     logic pdm_pos, pdm_neg;
@@ -15,8 +17,13 @@ module pdm_to_pcm_no_bp (
     logic [17:0] comp_out_pos, comp_out_neg;
 
     logic mic_clk_delayed;
+    logic output_valid_pos_delayed; 
+    logic output_valid_neg_delayed;
 
     logic [7:0] clk_cnt;
+
+    assign pcm_valid_pos = output_valid_pos & ~output_valid_pos_delayed;
+    assign pcm_valid_neg = output_valid_neg & ~output_valid_neg_delayed;
 
     assign data_in_pos = pdm_pos ? 2'b01 : 2'b11;
     assign data_in_neg = pdm_neg ? 2'b01 : 2'b11;
@@ -33,19 +40,11 @@ module pdm_to_pcm_no_bp (
             pdm_neg <= 1'b0;
         end
         else begin
-            if (mic_mode == 2'b01) begin
-                if (clk_cnt == 42) begin
+            if (mic_mode == 2'b10) begin
+                if (clk_cnt == 6) begin
                     pdm_pos <= mic_raw; 
                 end
-                else if (clk_cnt == 113) begin
-                    pdm_neg <= mic_raw; 
-                end
-            end
-            else if (mic_mode == 2'b10) begin
-                if (clk_cnt == 14) begin
-                    pdm_pos <= mic_raw; 
-                end
-                else if (clk_cnt == 39) begin
+                else if (clk_cnt == 16) begin
                     pdm_neg <= mic_raw; 
                 end
             end
@@ -80,6 +79,24 @@ module pdm_to_pcm_no_bp (
         end
         else begin
             mic_clk_delayed <= mic_clk;
+        end
+    end 
+
+    always @(posedge clk, negedge rst_n) begin
+        if (!rst_n) begin
+            output_valid_pos_delayed <= 1'b0;
+        end
+        else begin
+            output_valid_pos_delayed <= output_valid_pos;
+        end
+    end 
+
+    always @(posedge clk, negedge rst_n) begin
+        if (!rst_n) begin
+            output_valid_neg_delayed <= 1'b0;
+        end
+        else begin
+            output_valid_neg_delayed <= output_valid_neg;
         end
     end 
 
