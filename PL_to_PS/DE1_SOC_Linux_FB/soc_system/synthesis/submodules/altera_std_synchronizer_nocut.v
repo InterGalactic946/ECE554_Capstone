@@ -1,16 +1,3 @@
-// (C) 2001-2025 Altera Corporation. All rights reserved.
-// Your use of Altera Corporation's design tools, logic functions and other 
-// software and tools, and its AMPP partner logic functions, and any output 
-// files from any of the foregoing (including device programming or simulation 
-// files), and any associated documentation or information are expressly subject 
-// to the terms and conditions of the Altera Program License Subscription 
-// Agreement, Altera IP License Agreement, or other applicable 
-// license agreement, including, without limitation, that your use is for the 
-// sole purpose of programming logic devices manufactured by Altera and sold by 
-// Altera or its authorized distributors.  Please refer to the applicable 
-// agreement for further details.
-
-
 // $Id: //acds/main/ip/sopc/components/primitives/altera_std_synchronizer/altera_std_synchronizer.v#8 $
 // $Revision: #8 $
 // $Date: 2009/02/18 $
@@ -49,13 +36,12 @@ module altera_std_synchronizer_nocut (
                                 );
 
    parameter depth = 3; // This value must be >= 2 !
-   parameter rst_value = 0;     
      
    input   clk;
    input   reset_n;    
    input   din;
    output  dout;
-   
+
    // QuartusII synthesis directives:
    //     1. Preserve all registers ie. do not touch them.
    //     2. Do not merge other flip-flops with synchronizer flip-flops.
@@ -102,14 +88,14 @@ module altera_std_synchronizer_nocut (
 
    always @(posedge clk or negedge reset_n) begin
        if (reset_n == 0) 
-         din_last <= (rst_value == 0)? 1'b0 : 1'b1;
+         din_last <= 1'b0;
        else
          din_last <= din;
    end
 
    always @(posedge clk or negedge reset_n) begin
        if (reset_n == 0) 
-         din_s1 <= (rst_value == 0)? 1'b0 : 1'b1;
+         din_s1 <= 1'b0;
        else
          din_s1 <= next_din_s1;
    end
@@ -117,23 +103,12 @@ module altera_std_synchronizer_nocut (
 `else 
 
    //synthesis translate_on   
-   generate if (rst_value == 0)
-       always @(posedge clk or negedge reset_n) begin
-           if (reset_n == 0) 
-             din_s1 <= 1'b0;
-           else
-             din_s1 <= din;
-       end
-   endgenerate
-   
-   generate if (rst_value == 1)
-       always @(posedge clk or negedge reset_n) begin
-           if (reset_n == 0) 
-             din_s1 <= 1'b1;
-           else
-             din_s1 <= din;
-       end
-   endgenerate
+   always @(posedge clk or negedge reset_n) begin
+       if (reset_n == 0) 
+         din_s1 <= 1'b0;
+       else
+         din_s1 <= din;
+   end
    //synthesis translate_off      
 
 `endif
@@ -151,7 +126,7 @@ module altera_std_synchronizer_nocut (
 
    // the remaining synchronizer registers form a simple shift register
    // of length depth-1
-   generate if (rst_value == 0)
+   generate
       if (depth < 3) begin
          always @(posedge clk or negedge reset_n) begin
             if (reset_n == 0) 
@@ -163,24 +138,6 @@ module altera_std_synchronizer_nocut (
          always @(posedge clk or negedge reset_n) begin
             if (reset_n == 0) 
               dreg <= {depth-1{1'b0}};
-            else
-              dreg <= {dreg[depth-3:0], din_s1};
-         end
-      end
-   endgenerate
-   
-   generate if (rst_value == 1)
-      if (depth < 3) begin
-         always @(posedge clk or negedge reset_n) begin
-            if (reset_n == 0) 
-              dreg <= {depth-1{1'b1}};            
-            else
-              dreg <= din_s1;
-         end         
-      end else begin
-         always @(posedge clk or negedge reset_n) begin
-            if (reset_n == 0) 
-              dreg <= {depth-1{1'b1}};
             else
               dreg <= {dreg[depth-3:0], din_s1};
          end

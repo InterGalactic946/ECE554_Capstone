@@ -1,10 +1,10 @@
-# (C) 2001-2025 Altera Corporation. All rights reserved.
+# (C) 2001-2016 Altera Corporation. All rights reserved.
 # Your use of Altera Corporation's design tools, logic functions and other 
 # software and tools, and its AMPP partner logic functions, and any output 
-# files from any of the foregoing (including device programming or simulation 
+# files any of the foregoing (including device programming or simulation 
 # files), and any associated documentation or information are expressly subject 
 # to the terms and conditions of the Altera Program License Subscription 
-# Agreement, Altera IP License Agreement, or other applicable 
+# Agreement, Altera MegaCore Function License Agreement, or other applicable 
 # license agreement, including, without limitation, that your use is for the 
 # sole purpose of programming logic devices manufactured by Altera and sold by 
 # Altera or its authorized distributors.  Please refer to the applicable 
@@ -46,7 +46,7 @@ set t(min_CK) 1.25
 ##########################
 
 # A/C Setup/Hold
-set t(IS) 0.34
+set t(IS) 0.33
 set t(IH) 0.24
 
 # Data Setup/Hold
@@ -86,8 +86,8 @@ set t(DCD) 0.0
 # Controller parameters
 #######################
 
-set t(RL) 7
-set t(WL) 7
+set t(RL) 11
+set t(WL) 8
 set t(DWIDTH_RATIO) [expr { 1 * 2 }]
 set t(rd_to_wr_turnaround_oct) 2
 
@@ -139,12 +139,12 @@ set ISI(READ_DQS) 0.0
 # Board skews
 set board(abs_max_CK_delay) 0.03
 set board(abs_max_DQS_delay) 0.02
-set board(minCK_DQS_skew) 0.06
-set board(maxCK_DQS_skew) 0.12
+set board(minCK_DQS_skew) 0.09
+set board(maxCK_DQS_skew) 0.16
 set board(tpd_inter_DIMM) 0.0
 set board(intra_DQS_group_skew) 0.01
-set board(inter_DQS_group_skew) 0.06
-set board(DQ_DQS_skew) 0.05
-set board(intra_addr_ctrl_skew) 0.02
-set board(addresscmd_CK_skew) 0.01
+set board(inter_DQS_group_skew) 0.08
+set board(DQ_DQS_skew) 0.0
+set board(intra_addr_ctrl_skew) 0.03
+set board(addresscmd_CK_skew) 0.0
 
