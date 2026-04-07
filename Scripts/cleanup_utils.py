@@ -72,6 +72,9 @@ def _clean_paths_in_dir(base_dir):
     """
     paths_to_remove = [
         os.path.join(base_dir, 'synthesis'),                           # Synthesis output directory
+        os.path.join(base_dir, 'transcript'),                          # Transcript log file
+        os.path.join(base_dir, 'dump.fsdb'),                           # FSDB waveform dump file
+        os.path.join(base_dir, 'vsim_stacktrace.vstf'),                # Stack trace file from simulation
         os.path.join(base_dir, 'dump.vcd'),                            # VCD waveform dump file
         os.path.join(base_dir, 'tests', 'output'),                     # Directory containing output logs and traces
         os.path.join(base_dir, 'tests', 'output', 'verilogsim.log'),   # Simulation log file

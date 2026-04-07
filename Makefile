@@ -36,7 +36,7 @@ default:
 	@echo "  make kill 	                  - Closes all started vsim instances from the script."
 	@echo "  make synthesis                  - Synthesizes design to Synopsys 32-nm Cell Library."
 	@echo "  make start <start_type>         - Generate starter files (start_type: d=design, t=testbench, default=both)."
-	@echo "  make run <mode> [as] [ps] (a)   - Run tests in a specified directory with a selected mode (c,s,g,v) and optionally assembles files."
+	@echo "  make run <mode> [i] [as] [ps] (a) - Run tests in a specified directory with a selected mode (c,s,g,v) and optionally assembles files."
 	@echo "  make log <log_type>             - Display logs for a specified directory and log type."
 	@echo "  make clean <clean_type>         - Clean up generated files in a specified directory."
 	@echo "  make ci                         - Run CI sweep (all directories) and summarize pass/fail."
@@ -140,11 +140,12 @@ start:
 # Target: run
 # This target runs tests with the specified arguments:
 # - <mode>: Test mode (default or one of `v`, `g`, `s`, `c`).
+# - <i>: Optional flag for simulating the design using IPs and other dependencies in the SIM_LIBS directory.
 # - <as>: Optional flag for assembling an input file.
 # - <ps>: Optional flag for running post-synthesis tests.
 # - <a>: Optional flag for additional arguments (e.g., 'a' to run all tests in a specific mode).
 # Usage:
-#   make run <mode> [as] [ps] (a)
+#   make run <mode> [i] [as] [ps] (a)
 ##################################################
 run:
 	@if [ "$(words $(runargs))" -eq 0 ]; then \
@@ -163,7 +164,7 @@ run:
 			v) mode_code=3 ;; \
 			*) \
 				echo "Error: Invalid arguments for 'run' target. Usage:"; \
-				echo "  make run v|g|s|c [as] [ps] (a)"; \
+				echo "  make run v|g|s|c [i] [as] [ps] (a)"; \
 				exit 1; \
 				;; \
 		esac; \
