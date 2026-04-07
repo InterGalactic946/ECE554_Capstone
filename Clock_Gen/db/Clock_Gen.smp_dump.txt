@@ -1,0 +1,28 @@
+
+State Machine - |Clock_Gen|Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|dps_extra_kick:dps_extra_inst|dps_current_state
+Name dps_current_state.PHASE_DONE_LOW_0 dps_current_state.PHASE_DONE_LOW_4 dps_current_state.PHASE_DONE_LOW_3 dps_current_state.PHASE_DONE_LOW_2 dps_current_state.PHASE_DONE_LOW_1 dps_current_state.PHASE_DONE_HIGH 
+dps_current_state.PHASE_DONE_HIGH 0 0 0 0 0 0 
+dps_current_state.PHASE_DONE_LOW_1 0 0 0 0 1 1 
+dps_current_state.PHASE_DONE_LOW_2 0 0 0 1 0 1 
+dps_current_state.PHASE_DONE_LOW_3 0 0 1 0 0 1 
+dps_current_state.PHASE_DONE_LOW_4 0 1 0 0 0 1 
+dps_current_state.PHASE_DONE_LOW_0 1 0 0 0 0 1 
+
+State Machine - |Clock_Gen|Mic_Clk_Gen:iCLK_GEN|Mic_Mode_Fsm:iMIC_FSM|state
+Name state.RUN state.WAIT state.CLK_EN state.CLK_SEL state.CLK_DIS state.IDLE 
+state.IDLE 0 0 0 0 0 0 
+state.CLK_DIS 0 0 0 0 1 1 
+state.CLK_SEL 0 0 0 1 0 1 
+state.CLK_EN 0 0 1 0 0 1 
+state.WAIT 0 1 0 0 0 1 
+state.RUN 1 0 0 0 0 1 
+
+State Machine - |Clock_Gen|ADC_Controller:iADC_CTRL|ADC_Controller_adc_mega_0:adc_mega_0|altera_up_avalon_adv_adc:ADC_CTRL|currState
+Name currState.pauseStateNoAddrIncr currState.initCtrlRegState currState.pauseState currState.doneState currState.transState currState.waitState currState.resetState 
+currState.resetState 0 0 0 0 0 0 0 
+currState.waitState 0 0 0 0 0 1 1 
+currState.transState 0 0 0 0 1 0 1 
+currState.doneState 0 0 0 1 0 0 1 
+currState.pauseState 0 0 1 0 0 0 1 
+currState.initCtrlRegState 0 1 0 0 0 0 1 
+currState.pauseStateNoAddrIncr 1 0 0 0 0 0 1 

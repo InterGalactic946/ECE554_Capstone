@@ -1,0 +1,2 @@
+set_global_assignment -name QIP_FILE [file join $::quartus(qip_path) ADC_Controller/ADC_Controller.qip]
+set_global_assignment -name QIP_FILE [file join $::quartus(qip_path) Mic_Clk_Ctrl/Mic_Clk_Ctrl.qip]

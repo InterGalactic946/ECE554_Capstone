@@ -1,0 +1,1265 @@
+Analysis & Synthesis report for Clock_Gen
+Mon Apr  6 20:56:21 2026
+Quartus Prime Version 25.1std.0 Build 1129 10/21/2025 SC Lite Edition
+
+
+---------------------
+; Table of Contents ;
+---------------------
+  1. Legal Notice
+  2. Analysis & Synthesis Summary
+  3. Analysis & Synthesis Settings
+  4. Parallel Compilation
+  5. Analysis & Synthesis Source Files Read
+  6. Analysis & Synthesis Resource Usage Summary
+  7. Analysis & Synthesis Resource Utilization by Entity
+  8. Analysis & Synthesis IP Cores Summary
+  9. State Machine - |Clock_Gen|Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|dps_extra_kick:dps_extra_inst|dps_current_state
+ 10. State Machine - |Clock_Gen|Mic_Clk_Gen:iCLK_GEN|Mic_Mode_Fsm:iMIC_FSM|state
+ 11. State Machine - |Clock_Gen|ADC_Controller:iADC_CTRL|ADC_Controller_adc_mega_0:adc_mega_0|altera_up_avalon_adv_adc:ADC_CTRL|currState
+ 12. Registers Removed During Synthesis
+ 13. Removed Registers Triggering Further Register Optimizations
+ 14. General Register Statistics
+ 15. Inverted Register Statistics
+ 16. Multiplexer Restructuring Statistics (Restructuring Performed)
+ 17. Source assignments for Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i
+ 18. Source assignments for Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|altera_pll_dps_lcell_comb:lcell_cntsel_int_0
+ 19. Source assignments for Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|altera_pll_dps_lcell_comb:lcell_cntsel_int_1
+ 20. Source assignments for Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|altera_pll_dps_lcell_comb:lcell_cntsel_int_2
+ 21. Source assignments for Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|altera_pll_dps_lcell_comb:lcell_cntsel_int_3
+ 22. Source assignments for Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|altera_pll_dps_lcell_comb:lcell_cntsel_int_4
+ 23. Source assignments for Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL|Mic_Clk_Ctrl_altclkctrl_0:altclkctrl_0|Mic_Clk_Ctrl_altclkctrl_0_sub:Mic_Clk_Ctrl_altclkctrl_0_sub_component
+ 24. Parameter Settings for User Entity Instance: ADC_Controller:iADC_CTRL|ADC_Controller_adc_mega_0:adc_mega_0
+ 25. Parameter Settings for User Entity Instance: ADC_Controller:iADC_CTRL|ADC_Controller_adc_mega_0:adc_mega_0|altera_up_avalon_adv_adc:ADC_CTRL
+ 26. Parameter Settings for User Entity Instance: Mic_Clk_Gen:iCLK_GEN
+ 27. Parameter Settings for User Entity Instance: Mic_Clk_Gen:iCLK_GEN|Mic_Mode_Fsm:iMIC_FSM
+ 28. Parameter Settings for User Entity Instance: Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i
+ 29. Port Connectivity Checks: "ADC_Controller:iADC_CTRL"
+ 30. Post-Synthesis Netlist Statistics for Top Partition
+ 31. Elapsed Time Per Partition
+ 32. Analysis & Synthesis Messages
+
+
+
+----------------
+; Legal Notice ;
+----------------
+Copyright (C) 2025  Altera Corporation. All rights reserved.
+Your use of Altera Corporation's design tools, logic functions 
+and other software and tools, and any partner logic 
+functions, and any output files from any of the foregoing 
+(including device programming or simulation files), and any 
+associated documentation or information are expressly subject 
+to the terms and conditions of the Altera Program License 
+Subscription Agreement, the Altera Quartus Prime License Agreement,
+the Altera IP License Agreement, or other applicable license
+agreement, including, without limitation, that your use is for
+the sole purpose of programming logic devices manufactured by
+Altera and sold by Altera or its authorized distributors.  Please
+refer to the Altera Software License Subscription Agreements 
+on the Quartus Prime software download page.
+
+
+
++-----------------------------------------------------------------------------------+
+; Analysis & Synthesis Summary                                                      ;
++---------------------------------+-------------------------------------------------+
+; Analysis & Synthesis Status     ; Successful - Mon Apr  6 20:56:21 2026           ;
+; Quartus Prime Version           ; 25.1std.0 Build 1129 10/21/2025 SC Lite Edition ;
+; Revision Name                   ; Clock_Gen                                       ;
+; Top-level Entity Name           ; Clock_Gen                                       ;
+; Family                          ; Cyclone V                                       ;
+; Logic utilization (in ALMs)     ; N/A                                             ;
+; Total registers                 ; 113                                             ;
+; Total pins                      ; 100                                             ;
+; Total virtual pins              ; 0                                               ;
+; Total block memory bits         ; 0                                               ;
+; Total DSP Blocks                ; 0                                               ;
+; Total HSSI RX PCSs              ; 0                                               ;
+; Total HSSI PMA RX Deserializers ; 0                                               ;
+; Total HSSI TX PCSs              ; 0                                               ;
+; Total HSSI PMA TX Serializers   ; 0                                               ;
+; Total PLLs                      ; 1                                               ;
+; Total DLLs                      ; 0                                               ;
++---------------------------------+-------------------------------------------------+
+
+
++---------------------------------------------------------------------------------------------------------------------------+
+; Analysis & Synthesis Settings                                                                                             ;
++---------------------------------------------------------------------------------+--------------------+--------------------+
+; Option                                                                          ; Setting            ; Default Value      ;
++---------------------------------------------------------------------------------+--------------------+--------------------+
+; Device                                                                          ; 5CSEMA5F31C6       ;                    ;
+; Top-level entity name                                                           ; Clock_Gen          ; Clock_Gen          ;
+; Family name                                                                     ; Cyclone V          ; Cyclone V          ;
+; Use smart compilation                                                           ; Off                ; Off                ;
+; Enable parallel Assembler and Timing Analyzer during compilation                ; On                 ; On                 ;
+; Enable compact report table                                                     ; Off                ; Off                ;
+; Restructure Multiplexers                                                        ; Auto               ; Auto               ;
+; MLAB Add Timing Constraints For Mixed-Port Feed-Through Mode Setting Don't Care ; Off                ; Off                ;
+; Create Debugging Nodes for IP Cores                                             ; Off                ; Off                ;
+; Preserve fewer node names                                                       ; On                 ; On                 ;
+; Intel FPGA IP Evaluation Mode                                                   ; Enable             ; Enable             ;
+; Verilog Version                                                                 ; Verilog_2001       ; Verilog_2001       ;
+; VHDL Version                                                                    ; VHDL_1993          ; VHDL_1993          ;
+; State Machine Processing                                                        ; Auto               ; Auto               ;
+; Safe State Machine                                                              ; Off                ; Off                ;
+; Extract Verilog State Machines                                                  ; On                 ; On                 ;
+; Extract VHDL State Machines                                                     ; On                 ; On                 ;
+; Ignore Verilog initial constructs                                               ; Off                ; Off                ;
+; Iteration limit for constant Verilog loops                                      ; 5000               ; 5000               ;
+; Iteration limit for non-constant Verilog loops                                  ; 250                ; 250                ;
+; Add Pass-Through Logic to Inferred RAMs                                         ; On                 ; On                 ;
+; Infer RAMs from Raw Logic                                                       ; On                 ; On                 ;
+; Parallel Synthesis                                                              ; On                 ; On                 ;
+; DSP Block Balancing                                                             ; Auto               ; Auto               ;
+; NOT Gate Push-Back                                                              ; On                 ; On                 ;
+; Power-Up Don't Care                                                             ; On                 ; On                 ;
+; Remove Redundant Logic Cells                                                    ; Off                ; Off                ;
+; Remove Duplicate Registers                                                      ; On                 ; On                 ;
+; Ignore CARRY Buffers                                                            ; Off                ; Off                ;
+; Ignore CASCADE Buffers                                                          ; Off                ; Off                ;
+; Ignore GLOBAL Buffers                                                           ; Off                ; Off                ;
+; Ignore ROW GLOBAL Buffers                                                       ; Off                ; Off                ;
+; Ignore LCELL Buffers                                                            ; Off                ; Off                ;
+; Ignore SOFT Buffers                                                             ; On                 ; On                 ;
+; Limit AHDL Integers to 32 Bits                                                  ; Off                ; Off                ;
+; Optimization Technique                                                          ; Balanced           ; Balanced           ;
+; Carry Chain Length                                                              ; 70                 ; 70                 ;
+; Auto Carry Chains                                                               ; On                 ; On                 ;
+; Auto Open-Drain Pins                                                            ; On                 ; On                 ;
+; Perform WYSIWYG Primitive Resynthesis                                           ; Off                ; Off                ;
+; Auto ROM Replacement                                                            ; On                 ; On                 ;
+; Auto RAM Replacement                                                            ; On                 ; On                 ;
+; Auto DSP Block Replacement                                                      ; On                 ; On                 ;
+; Auto Shift Register Replacement                                                 ; Auto               ; Auto               ;
+; Allow Shift Register Merging across Hierarchies                                 ; Auto               ; Auto               ;
+; Auto Clock Enable Replacement                                                   ; On                 ; On                 ;
+; Strict RAM Replacement                                                          ; Off                ; Off                ;
+; Allow Synchronous Control Signals                                               ; On                 ; On                 ;
+; Force Use of Synchronous Clear Signals                                          ; Off                ; Off                ;
+; Auto Resource Sharing                                                           ; Off                ; Off                ;
+; Allow Any RAM Size For Recognition                                              ; Off                ; Off                ;
+; Allow Any ROM Size For Recognition                                              ; Off                ; Off                ;
+; Allow Any Shift Register Size For Recognition                                   ; Off                ; Off                ;
+; Use LogicLock Constraints during Resource Balancing                             ; On                 ; On                 ;
+; Ignore translate_off and synthesis_off directives                               ; Off                ; Off                ;
+; Timing-Driven Synthesis                                                         ; On                 ; On                 ;
+; Report Parameter Settings                                                       ; On                 ; On                 ;
+; Report Source Assignments                                                       ; On                 ; On                 ;
+; Report Connectivity Checks                                                      ; On                 ; On                 ;
+; Ignore Maximum Fan-Out Assignments                                              ; Off                ; Off                ;
+; Synchronization Register Chain Length                                           ; 3                  ; 3                  ;
+; Power Optimization During Synthesis                                             ; Normal compilation ; Normal compilation ;
+; HDL message level                                                               ; Level2             ; Level2             ;
+; Suppress Register Optimization Related Messages                                 ; Off                ; Off                ;
+; Number of Removed Registers Reported in Synthesis Report                        ; 5000               ; 5000               ;
+; Number of Swept Nodes Reported in Synthesis Report                              ; 5000               ; 5000               ;
+; Number of Inverted Registers Reported in Synthesis Report                       ; 100                ; 100                ;
+; Clock MUX Protection                                                            ; On                 ; On                 ;
+; Auto Gated Clock Conversion                                                     ; Off                ; Off                ;
+; Block Design Naming                                                             ; Auto               ; Auto               ;
+; SDC constraint protection                                                       ; Off                ; Off                ;
+; Synthesis Effort                                                                ; Auto               ; Auto               ;
+; Shift Register Replacement - Allow Asynchronous Clear Signal                    ; On                 ; On                 ;
+; Pre-Mapping Resynthesis Optimization                                            ; Off                ; Off                ;
+; Analysis & Synthesis Message Level                                              ; Medium             ; Medium             ;
+; Disable Register Merging Across Hierarchies                                     ; Auto               ; Auto               ;
+; Resource Aware Inference For Block RAM                                          ; On                 ; On                 ;
+; Automatic Parallel Synthesis                                                    ; On                 ; On                 ;
+; Partial Reconfiguration Bitstream ID                                            ; Off                ; Off                ;
++---------------------------------------------------------------------------------+--------------------+--------------------+
+
+
++------------------------------------------+
+; Parallel Compilation                     ;
++----------------------------+-------------+
+; Processors                 ; Number      ;
++----------------------------+-------------+
+; Number detected on machine ; 16          ;
+; Maximum allowed            ; 12          ;
+;                            ;             ;
+; Average used               ; 1.00        ;
+; Maximum used               ; 12          ;
+;                            ;             ;
+; Usage by Processor         ; % Time Used ;
+;     Processor 1            ; 100.0%      ;
+;     Processors 2-12        ;   0.0%      ;
++----------------------------+-------------+
+
+
++-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Analysis & Synthesis Source Files Read                                                                                                                                                                                                                                                                                                                          ;
++-----------------------------------------------------------------------------------------------------------------------------------------------+-----------------+------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------+----------------+
+; File Name with User-Entered Path                                                                                                              ; Used in Netlist ; File Type                    ; File Name with Absolute Path                                                                                                                  ; Library        ;
++-----------------------------------------------------------------------------------------------------------------------------------------------+-----------------+------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------+----------------+
+; Seven_Seg.sv                                                                                                                                  ; yes             ; User SystemVerilog HDL File  ; C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Seven_Seg.sv                                                ;                ;
+; Mic_Clk_Pll_0002.v                                                                                                                            ; yes             ; User Verilog HDL File        ; C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Mic_Clk_Pll_0002.v                                          ;                ;
+; ADC_Controller.v                                                                                                                              ; yes             ; User Verilog HDL File        ; C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/ADC_Controller.v                                            ;                ;
+; Mic_Time_pkg.sv                                                                                                                               ; yes             ; User SystemVerilog HDL File  ; C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Mic_Time_pkg.sv                                             ;                ;
+; Mic_Mode_Fsm.sv                                                                                                                               ; yes             ; User SystemVerilog HDL File  ; C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Mic_Mode_Fsm.sv                                             ;                ;
+; Mic_Clk_Pll.v                                                                                                                                 ; yes             ; User Wizard-Generated File   ; C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Mic_Clk_Pll.v                                               ; Mic_Clk_Pll    ;
+; Mic_Clk_Gen.sv                                                                                                                                ; yes             ; User SystemVerilog HDL File  ; C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Mic_Clk_Gen.sv                                              ;                ;
+; Clock_Gen.v                                                                                                                                   ; yes             ; User Verilog HDL File        ; C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Clock_Gen.v                                                 ;                ;
+; c:/users/owner/ece554/de1_soc/tools/systembuilder/codegenerated/de1_soc/clock_gen/db/ip/adc_controller/submodules/adc_controller_adc_mega_0.v ; yes             ; Auto-Found Verilog HDL File  ; c:/users/owner/ece554/de1_soc/tools/systembuilder/codegenerated/de1_soc/clock_gen/db/ip/adc_controller/submodules/adc_controller_adc_mega_0.v ; ADC_Controller ;
+; c:/users/owner/ece554/de1_soc/tools/systembuilder/codegenerated/de1_soc/clock_gen/db/ip/adc_controller/submodules/altera_up_avalon_adv_adc.v  ; yes             ; Auto-Found Verilog HDL File  ; c:/users/owner/ece554/de1_soc/tools/systembuilder/codegenerated/de1_soc/clock_gen/db/ip/adc_controller/submodules/altera_up_avalon_adv_adc.v  ; ADC_Controller ;
+; c:/users/owner/ece554/de1_soc/tools/systembuilder/codegenerated/de1_soc/clock_gen/db/ip/mic_clk_ctrl/mic_clk_ctrl.v                           ; yes             ; Auto-Found Verilog HDL File  ; c:/users/owner/ece554/de1_soc/tools/systembuilder/codegenerated/de1_soc/clock_gen/db/ip/mic_clk_ctrl/mic_clk_ctrl.v                           ; Mic_Clk_Ctrl   ;
+; c:/users/owner/ece554/de1_soc/tools/systembuilder/codegenerated/de1_soc/clock_gen/db/ip/mic_clk_ctrl/submodules/mic_clk_ctrl_altclkctrl_0.v   ; yes             ; Auto-Found Verilog HDL File  ; c:/users/owner/ece554/de1_soc/tools/systembuilder/codegenerated/de1_soc/clock_gen/db/ip/mic_clk_ctrl/submodules/mic_clk_ctrl_altclkctrl_0.v   ; Mic_Clk_Ctrl   ;
+; altera_pll.v                                                                                                                                  ; yes             ; Megafunction                 ; c:/altera_lite/25.1std/quartus/libraries/megafunctions/altera_pll.v                                                                           ;                ;
+; altera_pll_dps_lcell_comb.v                                                                                                                   ; yes             ; Megafunction                 ; c:/altera_lite/25.1std/quartus/libraries/megafunctions/altera_pll_dps_lcell_comb.v                                                            ;                ;
+; altera_cyclonev_pll.v                                                                                                                         ; yes             ; Megafunction                 ; c:/altera_lite/25.1std/quartus/libraries/megafunctions/altera_cyclonev_pll.v                                                                  ;                ;
++-----------------------------------------------------------------------------------------------------------------------------------------------+-----------------+------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------+----------------+
+
+
++--------------------------------------------------------------+
+; Analysis & Synthesis Resource Usage Summary                  ;
++---------------------------------------------+----------------+
+; Resource                                    ; Usage          ;
++---------------------------------------------+----------------+
+; Estimate of Logic utilization (ALMs needed) ; 121            ;
+;                                             ;                ;
+; Combinational ALUT usage for logic          ; 201            ;
+;     -- 7 input functions                    ; 0              ;
+;     -- 6 input functions                    ; 36             ;
+;     -- 5 input functions                    ; 32             ;
+;     -- 4 input functions                    ; 49             ;
+;     -- <=3 input functions                  ; 84             ;
+;                                             ;                ;
+; Dedicated logic registers                   ; 113            ;
+;                                             ;                ;
+; I/O pins                                    ; 100            ;
+;                                             ;                ;
+; Total DSP Blocks                            ; 0              ;
+;                                             ;                ;
+; Total PLLs                                  ; 1              ;
+;     -- Fractional PLLs                      ; 1              ;
+;                                             ;                ;
+; Maximum fan-out node                        ; CLOCK_50~input ;
+; Maximum fan-out                             ; 113            ;
+; Total fan-out                               ; 1351           ;
+; Average fan-out                             ; 2.43           ;
++---------------------------------------------+----------------+
+
+
++-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Analysis & Synthesis Resource Utilization by Entity                                                                                                                                                                                                                                                                                                                                                                         ;
++-------------------------------------------------------------------------------------+---------------------+---------------------------+-------------------+------------+------+--------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------+----------------+
+; Compilation Hierarchy Node                                                          ; Combinational ALUTs ; Dedicated Logic Registers ; Block Memory Bits ; DSP Blocks ; Pins ; Virtual Pins ; Full Hierarchy Name                                                                                                                                                         ; Entity Name                   ; Library Name   ;
++-------------------------------------------------------------------------------------+---------------------+---------------------------+-------------------+------------+------+--------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------+----------------+
+; |Clock_Gen                                                                          ; 201 (7)             ; 113 (1)                   ; 0                 ; 0          ; 100  ; 0            ; |Clock_Gen                                                                                                                                                                  ; Clock_Gen                     ; work           ;
+;    |ADC_Controller:iADC_CTRL|                                                       ; 56 (0)              ; 73 (0)                    ; 0                 ; 0          ; 0    ; 0            ; |Clock_Gen|ADC_Controller:iADC_CTRL                                                                                                                                         ; ADC_Controller                ; work           ;
+;       |ADC_Controller_adc_mega_0:adc_mega_0|                                        ; 56 (2)              ; 73 (13)                   ; 0                 ; 0          ; 0    ; 0            ; |Clock_Gen|ADC_Controller:iADC_CTRL|ADC_Controller_adc_mega_0:adc_mega_0                                                                                                    ; ADC_Controller_adc_mega_0     ; ADC_Controller ;
+;          |altera_up_avalon_adv_adc:ADC_CTRL|                                        ; 54 (54)             ; 60 (60)                   ; 0                 ; 0          ; 0    ; 0            ; |Clock_Gen|ADC_Controller:iADC_CTRL|ADC_Controller_adc_mega_0:adc_mega_0|altera_up_avalon_adv_adc:ADC_CTRL                                                                  ; altera_up_avalon_adv_adc      ; ADC_Controller ;
+;    |Mic_Clk_Gen:iCLK_GEN|                                                           ; 117 (0)             ; 39 (0)                    ; 0                 ; 0          ; 0    ; 0            ; |Clock_Gen|Mic_Clk_Gen:iCLK_GEN                                                                                                                                             ; Mic_Clk_Gen                   ; work           ;
+;       |Mic_Clk_Ctrl:iCLK_CTRL|                                                      ; 1 (0)               ; 2 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |Clock_Gen|Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL                                                                                                                      ; Mic_Clk_Ctrl                  ; Mic_Clk_Ctrl   ;
+;          |Mic_Clk_Ctrl_altclkctrl_0:altclkctrl_0|                                   ; 1 (0)               ; 2 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |Clock_Gen|Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL|Mic_Clk_Ctrl_altclkctrl_0:altclkctrl_0                                                                               ; Mic_Clk_Ctrl_altclkctrl_0     ; Mic_Clk_Ctrl   ;
+;             |Mic_Clk_Ctrl_altclkctrl_0_sub:Mic_Clk_Ctrl_altclkctrl_0_sub_component| ; 1 (1)               ; 2 (2)                     ; 0                 ; 0          ; 0    ; 0            ; |Clock_Gen|Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL|Mic_Clk_Ctrl_altclkctrl_0:altclkctrl_0|Mic_Clk_Ctrl_altclkctrl_0_sub:Mic_Clk_Ctrl_altclkctrl_0_sub_component         ; Mic_Clk_Ctrl_altclkctrl_0_sub ; Mic_Clk_Ctrl   ;
+;       |Mic_Clk_Pll:iPLL|                                                            ; 0 (0)               ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |Clock_Gen|Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL                                                                                                                            ; Mic_Clk_Pll                   ; Mic_Clk_Pll    ;
+;          |Mic_Clk_Pll_0002:mic_clk_pll_inst|                                        ; 0 (0)               ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |Clock_Gen|Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst                                                                                          ; Mic_Clk_Pll_0002              ; work           ;
+;             |altera_pll:altera_pll_i|                                               ; 0 (0)               ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |Clock_Gen|Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i                                                                  ; altera_pll                    ; work           ;
+;                |altera_cyclonev_pll:cyclonev_pll|                                   ; 0 (0)               ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |Clock_Gen|Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|altera_cyclonev_pll:cyclonev_pll                                 ; altera_cyclonev_pll           ; work           ;
+;                   |altera_cyclonev_pll_base:fpll_0|                                 ; 0 (0)               ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |Clock_Gen|Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|altera_cyclonev_pll:cyclonev_pll|altera_cyclonev_pll_base:fpll_0 ; altera_cyclonev_pll_base      ; work           ;
+;       |Mic_Mode_Fsm:iMIC_FSM|                                                       ; 116 (116)           ; 37 (37)                   ; 0                 ; 0          ; 0    ; 0            ; |Clock_Gen|Mic_Clk_Gen:iCLK_GEN|Mic_Mode_Fsm:iMIC_FSM                                                                                                                       ; Mic_Mode_Fsm                  ; work           ;
+;    |Seven_Seg:s2|                                                                   ; 7 (7)               ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |Clock_Gen|Seven_Seg:s2                                                                                                                                                     ; Seven_Seg                     ; work           ;
+;    |Seven_Seg:s3|                                                                   ; 7 (7)               ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |Clock_Gen|Seven_Seg:s3                                                                                                                                                     ; Seven_Seg                     ; work           ;
+;    |Seven_Seg:s4|                                                                   ; 7 (7)               ; 0 (0)                     ; 0                 ; 0          ; 0    ; 0            ; |Clock_Gen|Seven_Seg:s4                                                                                                                                                     ; Seven_Seg                     ; work           ;
++-------------------------------------------------------------------------------------+---------------------+---------------------------+-------------------+------------+------+--------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------+----------------+
+Note: For table entries with two numbers listed, the numbers in parentheses indicate the number of resources of the given type used by the specific entity alone. The numbers listed outside of parentheses indicate the total resources of the given type used by the specific entity and all of its sub-entities in the hierarchy.
+
+
++------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Analysis & Synthesis IP Cores Summary                                                                                                                                                                                        ;
++--------+--------------+---------+--------------+--------------+--------------------------------------------------------+-----------------------------------------------------------------------------------------------------+
+; Vendor ; IP Core Name ; Version ; Release Date ; License Type ; Entity Instance                                        ; IP Include File                                                                                     ;
++--------+--------------+---------+--------------+--------------+--------------------------------------------------------+-----------------------------------------------------------------------------------------------------+
+; N/A    ; altclkctrl   ; 25.1    ; N/A          ; N/A          ; |Clock_Gen|Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL ; C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Mic_Clk_Ctrl.qsys ;
+; Altera ; altera_pll   ; 25.1    ; N/A          ; N/A          ; |Clock_Gen|Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL       ; Mic_Clk_Pll.v                                                                                       ;
++--------+--------------+---------+--------------+--------------+--------------------------------------------------------+-----------------------------------------------------------------------------------------------------+
+
+
+Encoding Type:  One-Hot
++-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; State Machine - |Clock_Gen|Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|dps_extra_kick:dps_extra_inst|dps_current_state                                                                                      ;
++------------------------------------+------------------------------------+------------------------------------+------------------------------------+------------------------------------+------------------------------------+-----------------------------------+
+; Name                               ; dps_current_state.PHASE_DONE_LOW_0 ; dps_current_state.PHASE_DONE_LOW_4 ; dps_current_state.PHASE_DONE_LOW_3 ; dps_current_state.PHASE_DONE_LOW_2 ; dps_current_state.PHASE_DONE_LOW_1 ; dps_current_state.PHASE_DONE_HIGH ;
++------------------------------------+------------------------------------+------------------------------------+------------------------------------+------------------------------------+------------------------------------+-----------------------------------+
+; dps_current_state.PHASE_DONE_HIGH  ; 0                                  ; 0                                  ; 0                                  ; 0                                  ; 0                                  ; 0                                 ;
+; dps_current_state.PHASE_DONE_LOW_1 ; 0                                  ; 0                                  ; 0                                  ; 0                                  ; 1                                  ; 1                                 ;
+; dps_current_state.PHASE_DONE_LOW_2 ; 0                                  ; 0                                  ; 0                                  ; 1                                  ; 0                                  ; 1                                 ;
+; dps_current_state.PHASE_DONE_LOW_3 ; 0                                  ; 0                                  ; 1                                  ; 0                                  ; 0                                  ; 1                                 ;
+; dps_current_state.PHASE_DONE_LOW_4 ; 0                                  ; 1                                  ; 0                                  ; 0                                  ; 0                                  ; 1                                 ;
+; dps_current_state.PHASE_DONE_LOW_0 ; 1                                  ; 0                                  ; 0                                  ; 0                                  ; 0                                  ; 1                                 ;
++------------------------------------+------------------------------------+------------------------------------+------------------------------------+------------------------------------+------------------------------------+-----------------------------------+
+
+
+Encoding Type:  One-Hot
++----------------------------------------------------------------------------------------------------+
+; State Machine - |Clock_Gen|Mic_Clk_Gen:iCLK_GEN|Mic_Mode_Fsm:iMIC_FSM|state                        ;
++---------------+-----------+------------+--------------+---------------+---------------+------------+
+; Name          ; state.RUN ; state.WAIT ; state.CLK_EN ; state.CLK_SEL ; state.CLK_DIS ; state.IDLE ;
++---------------+-----------+------------+--------------+---------------+---------------+------------+
+; state.IDLE    ; 0         ; 0          ; 0            ; 0             ; 0             ; 0          ;
+; state.CLK_DIS ; 0         ; 0          ; 0            ; 0             ; 1             ; 1          ;
+; state.CLK_SEL ; 0         ; 0          ; 0            ; 1             ; 0             ; 1          ;
+; state.CLK_EN  ; 0         ; 0          ; 1            ; 0             ; 0             ; 1          ;
+; state.WAIT    ; 0         ; 1          ; 0            ; 0             ; 0             ; 1          ;
+; state.RUN     ; 1         ; 0          ; 0            ; 0             ; 0             ; 1          ;
++---------------+-----------+------------+--------------+---------------+---------------+------------+
+
+
+Encoding Type:  One-Hot
++---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; State Machine - |Clock_Gen|ADC_Controller:iADC_CTRL|ADC_Controller_adc_mega_0:adc_mega_0|altera_up_avalon_adv_adc:ADC_CTRL|currState                                                                          ;
++--------------------------------+--------------------------------+----------------------------+----------------------+---------------------+----------------------+---------------------+----------------------+
+; Name                           ; currState.pauseStateNoAddrIncr ; currState.initCtrlRegState ; currState.pauseState ; currState.doneState ; currState.transState ; currState.waitState ; currState.resetState ;
++--------------------------------+--------------------------------+----------------------------+----------------------+---------------------+----------------------+---------------------+----------------------+
+; currState.resetState           ; 0                              ; 0                          ; 0                    ; 0                   ; 0                    ; 0                   ; 0                    ;
+; currState.waitState            ; 0                              ; 0                          ; 0                    ; 0                   ; 0                    ; 1                   ; 1                    ;
+; currState.transState           ; 0                              ; 0                          ; 0                    ; 0                   ; 1                    ; 0                   ; 1                    ;
+; currState.doneState            ; 0                              ; 0                          ; 0                    ; 1                   ; 0                    ; 0                   ; 1                    ;
+; currState.pauseState           ; 0                              ; 0                          ; 1                    ; 0                   ; 0                    ; 0                   ; 1                    ;
+; currState.initCtrlRegState     ; 0                              ; 1                          ; 0                    ; 0                   ; 0                    ; 0                   ; 1                    ;
+; currState.pauseStateNoAddrIncr ; 1                              ; 0                          ; 0                    ; 0                   ; 0                    ; 0                   ; 1                    ;
++--------------------------------+--------------------------------+----------------------------+----------------------+---------------------+----------------------+---------------------+----------------------+
+
+
++-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Registers Removed During Synthesis                                                                                                                                                                        ;
++------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------+
+; Register name                                                                                                                                                    ; Reason for Removal                     ;
++------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------+
+; ADC_Controller:iADC_CTRL|ADC_Controller_adc_mega_0:adc_mega_0|altera_up_avalon_adv_adc:ADC_CTRL|din_shift_reg[0..6]                                              ; Stuck at GND due to stuck port data_in ;
+; ADC_Controller:iADC_CTRL|ADC_Controller_adc_mega_0:adc_mega_0|altera_up_avalon_adv_adc:ADC_CTRL|next_addr[0..2]                                                  ; Lost fanout                            ;
+; ADC_Controller:iADC_CTRL|ADC_Controller_adc_mega_0:adc_mega_0|altera_up_avalon_adv_adc:ADC_CTRL|address[0..2]                                                    ; Stuck at GND due to stuck port data_in ;
+; Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|dps_extra_kick:dps_extra_inst|dps_current_state~2                ; Lost fanout                            ;
+; Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|dps_extra_kick:dps_extra_inst|dps_current_state~3                ; Lost fanout                            ;
+; Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|dps_extra_kick:dps_extra_inst|dps_current_state~4                ; Lost fanout                            ;
+; Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|dps_extra_kick:dps_extra_inst|dps_current_state~5                ; Lost fanout                            ;
+; Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|dps_extra_kick:dps_extra_inst|dps_current_state.PHASE_DONE_HIGH  ; Stuck at GND due to stuck port clock   ;
+; Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|dps_extra_kick:dps_extra_inst|dps_current_state.PHASE_DONE_LOW_1 ; Stuck at GND due to stuck port clock   ;
+; Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|dps_extra_kick:dps_extra_inst|dps_current_state.PHASE_DONE_LOW_0 ; Lost fanout                            ;
+; Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|dps_extra_kick:dps_extra_inst|dps_current_state.PHASE_DONE_LOW_2 ; Stuck at GND due to stuck port clock   ;
+; Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|dps_extra_kick:dps_extra_inst|dps_current_state.PHASE_DONE_LOW_3 ; Stuck at GND due to stuck port clock   ;
+; Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|dps_extra_kick:dps_extra_inst|dps_current_state.PHASE_DONE_LOW_4 ; Stuck at GND due to stuck port clock   ;
+; Mic_Clk_Gen:iCLK_GEN|Mic_Mode_Fsm:iMIC_FSM|state~2                                                                                                               ; Lost fanout                            ;
+; Mic_Clk_Gen:iCLK_GEN|Mic_Mode_Fsm:iMIC_FSM|state~3                                                                                                               ; Lost fanout                            ;
+; Mic_Clk_Gen:iCLK_GEN|Mic_Mode_Fsm:iMIC_FSM|state~4                                                                                                               ; Lost fanout                            ;
+; ADC_Controller:iADC_CTRL|ADC_Controller_adc_mega_0:adc_mega_0|altera_up_avalon_adv_adc:ADC_CTRL|currState~2                                                      ; Lost fanout                            ;
+; ADC_Controller:iADC_CTRL|ADC_Controller_adc_mega_0:adc_mega_0|altera_up_avalon_adv_adc:ADC_CTRL|currState~3                                                      ; Lost fanout                            ;
+; ADC_Controller:iADC_CTRL|ADC_Controller_adc_mega_0:adc_mega_0|altera_up_avalon_adv_adc:ADC_CTRL|currState~4                                                      ; Lost fanout                            ;
+; ADC_Controller:iADC_CTRL|ADC_Controller_adc_mega_0:adc_mega_0|altera_up_avalon_adv_adc:ADC_CTRL|currState.waitState                                              ; Stuck at GND due to stuck port data_in ;
+; Total Number of Removed Registers = 30                                                                                                                           ;                                        ;
++------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------+
+
+
++------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Removed Registers Triggering Further Register Optimizations                                                                                                                                                                                                                                                                                                      ;
++------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Register name                                                                                                                                                    ; Reason for Removal        ; Registers Removed due to This Register                                                                                                                            ;
++------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; ADC_Controller:iADC_CTRL|ADC_Controller_adc_mega_0:adc_mega_0|altera_up_avalon_adv_adc:ADC_CTRL|din_shift_reg[0]                                                 ; Stuck at GND              ; ADC_Controller:iADC_CTRL|ADC_Controller_adc_mega_0:adc_mega_0|altera_up_avalon_adv_adc:ADC_CTRL|din_shift_reg[1],                                                 ;
+;                                                                                                                                                                  ; due to stuck port data_in ; ADC_Controller:iADC_CTRL|ADC_Controller_adc_mega_0:adc_mega_0|altera_up_avalon_adv_adc:ADC_CTRL|din_shift_reg[2],                                                 ;
+;                                                                                                                                                                  ;                           ; ADC_Controller:iADC_CTRL|ADC_Controller_adc_mega_0:adc_mega_0|altera_up_avalon_adv_adc:ADC_CTRL|din_shift_reg[3],                                                 ;
+;                                                                                                                                                                  ;                           ; ADC_Controller:iADC_CTRL|ADC_Controller_adc_mega_0:adc_mega_0|altera_up_avalon_adv_adc:ADC_CTRL|din_shift_reg[4],                                                 ;
+;                                                                                                                                                                  ;                           ; ADC_Controller:iADC_CTRL|ADC_Controller_adc_mega_0:adc_mega_0|altera_up_avalon_adv_adc:ADC_CTRL|din_shift_reg[5],                                                 ;
+;                                                                                                                                                                  ;                           ; ADC_Controller:iADC_CTRL|ADC_Controller_adc_mega_0:adc_mega_0|altera_up_avalon_adv_adc:ADC_CTRL|din_shift_reg[6]                                                  ;
+; Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|dps_extra_kick:dps_extra_inst|dps_current_state.PHASE_DONE_LOW_1 ; Stuck at GND              ; Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|dps_extra_kick:dps_extra_inst|dps_current_state.PHASE_DONE_LOW_0, ;
+;                                                                                                                                                                  ; due to stuck port clock   ; Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|dps_extra_kick:dps_extra_inst|dps_current_state.PHASE_DONE_LOW_2, ;
+;                                                                                                                                                                  ;                           ; Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|dps_extra_kick:dps_extra_inst|dps_current_state.PHASE_DONE_LOW_3, ;
+;                                                                                                                                                                  ;                           ; Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|dps_extra_kick:dps_extra_inst|dps_current_state.PHASE_DONE_LOW_4  ;
++------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+
++------------------------------------------------------+
+; General Register Statistics                          ;
++----------------------------------------------+-------+
+; Statistic                                    ; Value ;
++----------------------------------------------+-------+
+; Total registers                              ; 113   ;
+; Number of registers using Synchronous Clear  ; 64    ;
+; Number of registers using Synchronous Load   ; 25    ;
+; Number of registers using Asynchronous Clear ; 9     ;
+; Number of registers using Asynchronous Load  ; 0     ;
+; Number of registers using Clock Enable       ; 72    ;
+; Number of registers using Preset             ; 0     ;
++----------------------------------------------+-------+
+
+
++----------------------------------------------------------------------------------------------------------------------+
+; Inverted Register Statistics                                                                                         ;
++------------------------------------------------------------------------------------------------------------+---------+
+; Inverted Register                                                                                          ; Fan out ;
++------------------------------------------------------------------------------------------------------------+---------+
+; ADC_Controller:iADC_CTRL|ADC_Controller_adc_mega_0:adc_mega_0|altera_up_avalon_adv_adc:ADC_CTRL|counter[0] ; 2       ;
+; Total number of inverted registers = 1                                                                     ;         ;
++------------------------------------------------------------------------------------------------------------+---------+
+
+
++--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Multiplexer Restructuring Statistics (Restructuring Performed)                                                                                                                                                                             ;
++--------------------+-----------+---------------+----------------------+------------------------+------------+------------------------------------------------------------------------------------------------------------------------------+
+; Multiplexer Inputs ; Bus Width ; Baseline Area ; Area if Restructured ; Saving if Restructured ; Registered ; Example Multiplexer Output                                                                                                   ;
++--------------------+-----------+---------------+----------------------+------------------------+------------+------------------------------------------------------------------------------------------------------------------------------+
+; 3:1                ; 12 bits   ; 24 LEs        ; 0 LEs                ; 24 LEs                 ; Yes        ; |Clock_Gen|ADC_Controller:iADC_CTRL|ADC_Controller_adc_mega_0:adc_mega_0|CH0[8]                                              ;
+; 3:1                ; 7 bits    ; 14 LEs        ; 14 LEs               ; 0 LEs                  ; Yes        ; |Clock_Gen|ADC_Controller:iADC_CTRL|ADC_Controller_adc_mega_0:adc_mega_0|altera_up_avalon_adv_adc:ADC_CTRL|counter[4]        ;
+; 3:1                ; 4 bits    ; 8 LEs         ; 4 LEs                ; 4 LEs                  ; Yes        ; |Clock_Gen|ADC_Controller:iADC_CTRL|ADC_Controller_adc_mega_0:adc_mega_0|altera_up_avalon_adv_adc:ADC_CTRL|sclk_counter[2]   ;
+; 3:1                ; 12 bits   ; 24 LEs        ; 0 LEs                ; 24 LEs                 ; Yes        ; |Clock_Gen|ADC_Controller:iADC_CTRL|ADC_Controller_adc_mega_0:adc_mega_0|altera_up_avalon_adv_adc:ADC_CTRL|reading0[6]       ;
+; 3:1                ; 11 bits   ; 22 LEs        ; 0 LEs                ; 22 LEs                 ; Yes        ; |Clock_Gen|ADC_Controller:iADC_CTRL|ADC_Controller_adc_mega_0:adc_mega_0|altera_up_avalon_adv_adc:ADC_CTRL|dout_shift_reg[8] ;
+; 4:1                ; 3 bits    ; 6 LEs         ; 6 LEs                ; 0 LEs                  ; Yes        ; |Clock_Gen|ADC_Controller:iADC_CTRL|ADC_Controller_adc_mega_0:adc_mega_0|altera_up_avalon_adv_adc:ADC_CTRL|din_shift_reg[8]  ;
+; 4:1                ; 7 bits    ; 14 LEs        ; 14 LEs               ; 0 LEs                  ; Yes        ; |Clock_Gen|Mic_Clk_Gen:iCLK_GEN|Mic_Mode_Fsm:iMIC_FSM|wait_cntr[11]                                                          ;
+; 4:1                ; 11 bits   ; 22 LEs        ; 0 LEs                ; 22 LEs                 ; Yes        ; |Clock_Gen|Mic_Clk_Gen:iCLK_GEN|Mic_Mode_Fsm:iMIC_FSM|wait_cntr[5]                                                           ;
+; 12:1               ; 2 bits    ; 16 LEs        ; 4 LEs                ; 12 LEs                 ; Yes        ; |Clock_Gen|Mic_Clk_Gen:iCLK_GEN|Mic_Mode_Fsm:iMIC_FSM|pending_mode[1]                                                        ;
+; 17:1               ; 2 bits    ; 22 LEs        ; 16 LEs               ; 6 LEs                  ; Yes        ; |Clock_Gen|Mic_Clk_Gen:iCLK_GEN|Mic_Mode_Fsm:iMIC_FSM|wait_cntr[16]                                                          ;
+; 3:1                ; 2 bits    ; 4 LEs         ; 4 LEs                ; 0 LEs                  ; No         ; |Clock_Gen|Mic_Clk_Gen:iCLK_GEN|Mic_Mode_Fsm:iMIC_FSM|dec                                                                    ;
+; 11:1               ; 3 bits    ; 21 LEs        ; 18 LEs               ; 3 LEs                  ; No         ; |Clock_Gen|Mic_Clk_Gen:iCLK_GEN|Mic_Mode_Fsm:iMIC_FSM|state                                                                  ;
++--------------------+-----------+---------------+----------------------+------------------------+------------+------------------------------------------------------------------------------------------------------------------------------+
+
+
++------------------------------------------------------------------------------------------------------------------------+
+; Source assignments for Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i ;
++------------------------------+-------+------+--------------------------------------------------------------------------+
+; Assignment                   ; Value ; From ; To                                                                       ;
++------------------------------+-------+------+--------------------------------------------------------------------------+
+; IGNORE_LCELL_BUFFERS         ; off   ; -    ; cntsel_temp[4]                                                           ;
+; REMOVE_REDUNDANT_LOGIC_CELLS ; off   ; -    ; cntsel_temp[4]                                                           ;
+; IGNORE_LCELL_BUFFERS         ; off   ; -    ; cntsel_temp[3]                                                           ;
+; REMOVE_REDUNDANT_LOGIC_CELLS ; off   ; -    ; cntsel_temp[3]                                                           ;
+; IGNORE_LCELL_BUFFERS         ; off   ; -    ; cntsel_temp[2]                                                           ;
+; REMOVE_REDUNDANT_LOGIC_CELLS ; off   ; -    ; cntsel_temp[2]                                                           ;
+; IGNORE_LCELL_BUFFERS         ; off   ; -    ; cntsel_temp[1]                                                           ;
+; REMOVE_REDUNDANT_LOGIC_CELLS ; off   ; -    ; cntsel_temp[1]                                                           ;
+; IGNORE_LCELL_BUFFERS         ; off   ; -    ; cntsel_temp[0]                                                           ;
+; REMOVE_REDUNDANT_LOGIC_CELLS ; off   ; -    ; cntsel_temp[0]                                                           ;
+; IGNORE_LCELL_BUFFERS         ; off   ; -    ; gnd                                                                      ;
+; REMOVE_REDUNDANT_LOGIC_CELLS ; off   ; -    ; gnd                                                                      ;
++------------------------------+-------+------+--------------------------------------------------------------------------+
+
+
++---------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Source assignments for Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|altera_pll_dps_lcell_comb:lcell_cntsel_int_0 ;
++--------------------------------------+-------+------+---------------------------------------------------------------------------------------------------------------+
+; Assignment                           ; Value ; From ; To                                                                                                            ;
++--------------------------------------+-------+------+---------------------------------------------------------------------------------------------------------------+
+; PHYSICAL_SYNTHESIS_COMBO_LOGIC       ; OFF   ; -    ; -                                                                                                             ;
+; PHYSICAL_SYNTHESIS_REGISTER_RETIMING ; OFF   ; -    ; -                                                                                                             ;
+; ADV_NETLIST_OPT_SYNTH_WYSIWYG_REMAP  ; OFF   ; -    ; -                                                                                                             ;
+; REMOVE_REDUNDANT_LOGIC_CELLS         ; OFF   ; -    ; -                                                                                                             ;
++--------------------------------------+-------+------+---------------------------------------------------------------------------------------------------------------+
+
+
++---------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Source assignments for Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|altera_pll_dps_lcell_comb:lcell_cntsel_int_1 ;
++--------------------------------------+-------+------+---------------------------------------------------------------------------------------------------------------+
+; Assignment                           ; Value ; From ; To                                                                                                            ;
++--------------------------------------+-------+------+---------------------------------------------------------------------------------------------------------------+
+; PHYSICAL_SYNTHESIS_COMBO_LOGIC       ; OFF   ; -    ; -                                                                                                             ;
+; PHYSICAL_SYNTHESIS_REGISTER_RETIMING ; OFF   ; -    ; -                                                                                                             ;
+; ADV_NETLIST_OPT_SYNTH_WYSIWYG_REMAP  ; OFF   ; -    ; -                                                                                                             ;
+; REMOVE_REDUNDANT_LOGIC_CELLS         ; OFF   ; -    ; -                                                                                                             ;
++--------------------------------------+-------+------+---------------------------------------------------------------------------------------------------------------+
+
+
++---------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Source assignments for Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|altera_pll_dps_lcell_comb:lcell_cntsel_int_2 ;
++--------------------------------------+-------+------+---------------------------------------------------------------------------------------------------------------+
+; Assignment                           ; Value ; From ; To                                                                                                            ;
++--------------------------------------+-------+------+---------------------------------------------------------------------------------------------------------------+
+; PHYSICAL_SYNTHESIS_COMBO_LOGIC       ; OFF   ; -    ; -                                                                                                             ;
+; PHYSICAL_SYNTHESIS_REGISTER_RETIMING ; OFF   ; -    ; -                                                                                                             ;
+; ADV_NETLIST_OPT_SYNTH_WYSIWYG_REMAP  ; OFF   ; -    ; -                                                                                                             ;
+; REMOVE_REDUNDANT_LOGIC_CELLS         ; OFF   ; -    ; -                                                                                                             ;
++--------------------------------------+-------+------+---------------------------------------------------------------------------------------------------------------+
+
+
++---------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Source assignments for Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|altera_pll_dps_lcell_comb:lcell_cntsel_int_3 ;
++--------------------------------------+-------+------+---------------------------------------------------------------------------------------------------------------+
+; Assignment                           ; Value ; From ; To                                                                                                            ;
++--------------------------------------+-------+------+---------------------------------------------------------------------------------------------------------------+
+; PHYSICAL_SYNTHESIS_COMBO_LOGIC       ; OFF   ; -    ; -                                                                                                             ;
+; PHYSICAL_SYNTHESIS_REGISTER_RETIMING ; OFF   ; -    ; -                                                                                                             ;
+; ADV_NETLIST_OPT_SYNTH_WYSIWYG_REMAP  ; OFF   ; -    ; -                                                                                                             ;
+; REMOVE_REDUNDANT_LOGIC_CELLS         ; OFF   ; -    ; -                                                                                                             ;
++--------------------------------------+-------+------+---------------------------------------------------------------------------------------------------------------+
+
+
++---------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Source assignments for Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|altera_pll_dps_lcell_comb:lcell_cntsel_int_4 ;
++--------------------------------------+-------+------+---------------------------------------------------------------------------------------------------------------+
+; Assignment                           ; Value ; From ; To                                                                                                            ;
++--------------------------------------+-------+------+---------------------------------------------------------------------------------------------------------------+
+; PHYSICAL_SYNTHESIS_COMBO_LOGIC       ; OFF   ; -    ; -                                                                                                             ;
+; PHYSICAL_SYNTHESIS_REGISTER_RETIMING ; OFF   ; -    ; -                                                                                                             ;
+; ADV_NETLIST_OPT_SYNTH_WYSIWYG_REMAP  ; OFF   ; -    ; -                                                                                                             ;
+; REMOVE_REDUNDANT_LOGIC_CELLS         ; OFF   ; -    ; -                                                                                                             ;
++--------------------------------------+-------+------+---------------------------------------------------------------------------------------------------------------+
+
+
++---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Source assignments for Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL|Mic_Clk_Ctrl_altclkctrl_0:altclkctrl_0|Mic_Clk_Ctrl_altclkctrl_0_sub:Mic_Clk_Ctrl_altclkctrl_0_sub_component ;
++----------------+-------+------+-------------------------------------------------------------------------------------------------------------------------------------------------+
+; Assignment     ; Value ; From ; To                                                                                                                                              ;
++----------------+-------+------+-------------------------------------------------------------------------------------------------------------------------------------------------+
+; POWER_UP_LEVEL ; LOW   ; -    ; select_reg[0]                                                                                                                                   ;
+; POWER_UP_LEVEL ; LOW   ; -    ; select_reg[1]                                                                                                                                   ;
++----------------+-------+------+-------------------------------------------------------------------------------------------------------------------------------------------------+
+
+
++------------------------------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: ADC_Controller:iADC_CTRL|ADC_Controller_adc_mega_0:adc_mega_0 ;
++----------------+---------------+---------------------------------------------------------------------------+
+; Parameter Name ; Value         ; Type                                                                      ;
++----------------+---------------+---------------------------------------------------------------------------+
+; tsclk          ; 4             ; Signed Integer                                                            ;
+; numch          ; 0             ; Signed Integer                                                            ;
+; board          ; DE10-Standard ; String                                                                    ;
+; board_rev      ; Autodetect    ; String                                                                    ;
+; max10pllmultby ; 1             ; Signed Integer                                                            ;
+; max10plldivby  ; 1             ; Signed Integer                                                            ;
++----------------+---------------+---------------------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++----------------------------------------------------------------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: ADC_Controller:iADC_CTRL|ADC_Controller_adc_mega_0:adc_mega_0|altera_up_avalon_adv_adc:ADC_CTRL ;
++-----------------------+---------------+------------------------------------------------------------------------------------------------------+
+; Parameter Name        ; Value         ; Type                                                                                                 ;
++-----------------------+---------------+------------------------------------------------------------------------------------------------------+
+; T_SCLK                ; 4             ; Signed Integer                                                                                       ;
+; NUM_CH                ; 0             ; Signed Integer                                                                                       ;
+; BOARD                 ; DE10-Standard ; String                                                                                               ;
+; BOARD_REV             ; Autodetect    ; String                                                                                               ;
+; MAX10_PLL_MULTIPLY_BY ; 1             ; Signed Integer                                                                                       ;
+; MAX10_PLL_DIVIDE_BY   ; 10            ; Signed Integer                                                                                       ;
++-----------------------+---------------+------------------------------------------------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++---------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: Mic_Clk_Gen:iCLK_GEN   ;
++----------------+----------------------------------+-----------------+
+; Parameter Name ; Value                            ; Type            ;
++----------------+----------------------------------+-----------------+
+; SYS_CLK_HZ     ; 00000010111110101111000010000000 ; Unsigned Binary ;
+; FAST_SIM       ; 0                                ; Unsigned Binary ;
+; FAST_SIM_DIV   ; 00000000000000000000000000000001 ; Unsigned Binary ;
++----------------+----------------------------------+-----------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++-----------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: Mic_Clk_Gen:iCLK_GEN|Mic_Mode_Fsm:iMIC_FSM ;
++----------------+----------------------------------+-------------------------------------+
+; Parameter Name ; Value                            ; Type                                ;
++----------------+----------------------------------+-------------------------------------+
+; SYS_CLK_HZ     ; 00000010111110101111000010000000 ; Unsigned Binary                     ;
+; FAST_SIM       ; 0                                ; Unsigned Binary                     ;
+; FAST_SIM_DIV   ; 00000000000000000000000000000001 ; Unsigned Binary                     ;
++----------------+----------------------------------+-------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++----------------------------------------------------------------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i ;
++--------------------------------------+------------------------+------------------------------------------------------------------------------+
+; Parameter Name                       ; Value                  ; Type                                                                         ;
++--------------------------------------+------------------------+------------------------------------------------------------------------------+
+; reference_clock_frequency            ; 50.0 MHz               ; String                                                                       ;
+; fractional_vco_multiplier            ; false                  ; String                                                                       ;
+; pll_type                             ; Cyclone V              ; String                                                                       ;
+; pll_subtype                          ; General                ; String                                                                       ;
+; number_of_clocks                     ; 2                      ; Signed Integer                                                               ;
+; operation_mode                       ; normal                 ; String                                                                       ;
+; deserialization_factor               ; 4                      ; Signed Integer                                                               ;
+; data_rate                            ; 0                      ; Signed Integer                                                               ;
+; sim_additional_refclk_cycles_to_lock ; 0                      ; Signed Integer                                                               ;
+; output_clock_frequency0              ; 2.460000 MHz           ; String                                                                       ;
+; phase_shift0                         ; 0 ps                   ; String                                                                       ;
+; duty_cycle0                          ; 50                     ; Signed Integer                                                               ;
+; output_clock_frequency1              ; 3.075000 MHz           ; String                                                                       ;
+; phase_shift1                         ; 0 ps                   ; String                                                                       ;
+; duty_cycle1                          ; 50                     ; Signed Integer                                                               ;
+; output_clock_frequency2              ; 0 MHz                  ; String                                                                       ;
+; phase_shift2                         ; 0 ps                   ; String                                                                       ;
+; duty_cycle2                          ; 50                     ; Signed Integer                                                               ;
+; output_clock_frequency3              ; 0 MHz                  ; String                                                                       ;
+; phase_shift3                         ; 0 ps                   ; String                                                                       ;
+; duty_cycle3                          ; 50                     ; Signed Integer                                                               ;
+; output_clock_frequency4              ; 0 MHz                  ; String                                                                       ;
+; phase_shift4                         ; 0 ps                   ; String                                                                       ;
+; duty_cycle4                          ; 50                     ; Signed Integer                                                               ;
+; output_clock_frequency5              ; 0 MHz                  ; String                                                                       ;
+; phase_shift5                         ; 0 ps                   ; String                                                                       ;
+; duty_cycle5                          ; 50                     ; Signed Integer                                                               ;
+; output_clock_frequency6              ; 0 MHz                  ; String                                                                       ;
+; phase_shift6                         ; 0 ps                   ; String                                                                       ;
+; duty_cycle6                          ; 50                     ; Signed Integer                                                               ;
+; output_clock_frequency7              ; 0 MHz                  ; String                                                                       ;
+; phase_shift7                         ; 0 ps                   ; String                                                                       ;
+; duty_cycle7                          ; 50                     ; Signed Integer                                                               ;
+; output_clock_frequency8              ; 0 MHz                  ; String                                                                       ;
+; phase_shift8                         ; 0 ps                   ; String                                                                       ;
+; duty_cycle8                          ; 50                     ; Signed Integer                                                               ;
+; output_clock_frequency9              ; 0 MHz                  ; String                                                                       ;
+; phase_shift9                         ; 0 ps                   ; String                                                                       ;
+; duty_cycle9                          ; 50                     ; Signed Integer                                                               ;
+; output_clock_frequency10             ; 0 MHz                  ; String                                                                       ;
+; phase_shift10                        ; 0 ps                   ; String                                                                       ;
+; duty_cycle10                         ; 50                     ; Signed Integer                                                               ;
+; output_clock_frequency11             ; 0 MHz                  ; String                                                                       ;
+; phase_shift11                        ; 0 ps                   ; String                                                                       ;
+; duty_cycle11                         ; 50                     ; Signed Integer                                                               ;
+; output_clock_frequency12             ; 0 MHz                  ; String                                                                       ;
+; phase_shift12                        ; 0 ps                   ; String                                                                       ;
+; duty_cycle12                         ; 50                     ; Signed Integer                                                               ;
+; output_clock_frequency13             ; 0 MHz                  ; String                                                                       ;
+; phase_shift13                        ; 0 ps                   ; String                                                                       ;
+; duty_cycle13                         ; 50                     ; Signed Integer                                                               ;
+; output_clock_frequency14             ; 0 MHz                  ; String                                                                       ;
+; phase_shift14                        ; 0 ps                   ; String                                                                       ;
+; duty_cycle14                         ; 50                     ; Signed Integer                                                               ;
+; output_clock_frequency15             ; 0 MHz                  ; String                                                                       ;
+; phase_shift15                        ; 0 ps                   ; String                                                                       ;
+; duty_cycle15                         ; 50                     ; Signed Integer                                                               ;
+; output_clock_frequency16             ; 0 MHz                  ; String                                                                       ;
+; phase_shift16                        ; 0 ps                   ; String                                                                       ;
+; duty_cycle16                         ; 50                     ; Signed Integer                                                               ;
+; output_clock_frequency17             ; 0 MHz                  ; String                                                                       ;
+; phase_shift17                        ; 0 ps                   ; String                                                                       ;
+; duty_cycle17                         ; 50                     ; Signed Integer                                                               ;
+; clock_name_0                         ;                        ; String                                                                       ;
+; clock_name_1                         ;                        ; String                                                                       ;
+; clock_name_2                         ;                        ; String                                                                       ;
+; clock_name_3                         ;                        ; String                                                                       ;
+; clock_name_4                         ;                        ; String                                                                       ;
+; clock_name_5                         ;                        ; String                                                                       ;
+; clock_name_6                         ;                        ; String                                                                       ;
+; clock_name_7                         ;                        ; String                                                                       ;
+; clock_name_8                         ;                        ; String                                                                       ;
+; clock_name_global_0                  ; false                  ; String                                                                       ;
+; clock_name_global_1                  ; false                  ; String                                                                       ;
+; clock_name_global_2                  ; false                  ; String                                                                       ;
+; clock_name_global_3                  ; false                  ; String                                                                       ;
+; clock_name_global_4                  ; false                  ; String                                                                       ;
+; clock_name_global_5                  ; false                  ; String                                                                       ;
+; clock_name_global_6                  ; false                  ; String                                                                       ;
+; clock_name_global_7                  ; false                  ; String                                                                       ;
+; clock_name_global_8                  ; false                  ; String                                                                       ;
+; m_cnt_hi_div                         ; 62                     ; Signed Integer                                                               ;
+; m_cnt_lo_div                         ; 61                     ; Signed Integer                                                               ;
+; m_cnt_bypass_en                      ; false                  ; String                                                                       ;
+; m_cnt_odd_div_duty_en                ; true                   ; String                                                                       ;
+; n_cnt_hi_div                         ; 5                      ; Signed Integer                                                               ;
+; n_cnt_lo_div                         ; 5                      ; Signed Integer                                                               ;
+; n_cnt_bypass_en                      ; false                  ; String                                                                       ;
+; n_cnt_odd_div_duty_en                ; false                  ; String                                                                       ;
+; c_cnt_hi_div0                        ; 125                    ; Signed Integer                                                               ;
+; c_cnt_lo_div0                        ; 125                    ; Signed Integer                                                               ;
+; c_cnt_bypass_en0                     ; false                  ; String                                                                       ;
+; c_cnt_in_src0                        ; ph_mux_clk             ; String                                                                       ;
+; c_cnt_odd_div_duty_en0               ; false                  ; String                                                                       ;
+; c_cnt_prst0                          ; 1                      ; Signed Integer                                                               ;
+; c_cnt_ph_mux_prst0                   ; 0                      ; Signed Integer                                                               ;
+; c_cnt_hi_div1                        ; 100                    ; Signed Integer                                                               ;
+; c_cnt_lo_div1                        ; 100                    ; Signed Integer                                                               ;
+; c_cnt_bypass_en1                     ; false                  ; String                                                                       ;
+; c_cnt_in_src1                        ; ph_mux_clk             ; String                                                                       ;
+; c_cnt_odd_div_duty_en1               ; false                  ; String                                                                       ;
+; c_cnt_prst1                          ; 1                      ; Signed Integer                                                               ;
+; c_cnt_ph_mux_prst1                   ; 0                      ; Signed Integer                                                               ;
+; c_cnt_hi_div2                        ; 1                      ; Signed Integer                                                               ;
+; c_cnt_lo_div2                        ; 1                      ; Signed Integer                                                               ;
+; c_cnt_bypass_en2                     ; true                   ; String                                                                       ;
+; c_cnt_in_src2                        ; ph_mux_clk             ; String                                                                       ;
+; c_cnt_odd_div_duty_en2               ; false                  ; String                                                                       ;
+; c_cnt_prst2                          ; 1                      ; Signed Integer                                                               ;
+; c_cnt_ph_mux_prst2                   ; 0                      ; Signed Integer                                                               ;
+; c_cnt_hi_div3                        ; 1                      ; Signed Integer                                                               ;
+; c_cnt_lo_div3                        ; 1                      ; Signed Integer                                                               ;
+; c_cnt_bypass_en3                     ; true                   ; String                                                                       ;
+; c_cnt_in_src3                        ; ph_mux_clk             ; String                                                                       ;
+; c_cnt_odd_div_duty_en3               ; false                  ; String                                                                       ;
+; c_cnt_prst3                          ; 1                      ; Signed Integer                                                               ;
+; c_cnt_ph_mux_prst3                   ; 0                      ; Signed Integer                                                               ;
+; c_cnt_hi_div4                        ; 1                      ; Signed Integer                                                               ;
+; c_cnt_lo_div4                        ; 1                      ; Signed Integer                                                               ;
+; c_cnt_bypass_en4                     ; true                   ; String                                                                       ;
+; c_cnt_in_src4                        ; ph_mux_clk             ; String                                                                       ;
+; c_cnt_odd_div_duty_en4               ; false                  ; String                                                                       ;
+; c_cnt_prst4                          ; 1                      ; Signed Integer                                                               ;
+; c_cnt_ph_mux_prst4                   ; 0                      ; Signed Integer                                                               ;
+; c_cnt_hi_div5                        ; 1                      ; Signed Integer                                                               ;
+; c_cnt_lo_div5                        ; 1                      ; Signed Integer                                                               ;
+; c_cnt_bypass_en5                     ; true                   ; String                                                                       ;
+; c_cnt_in_src5                        ; ph_mux_clk             ; String                                                                       ;
+; c_cnt_odd_div_duty_en5               ; false                  ; String                                                                       ;
+; c_cnt_prst5                          ; 1                      ; Signed Integer                                                               ;
+; c_cnt_ph_mux_prst5                   ; 0                      ; Signed Integer                                                               ;
+; c_cnt_hi_div6                        ; 1                      ; Signed Integer                                                               ;
+; c_cnt_lo_div6                        ; 1                      ; Signed Integer                                                               ;
+; c_cnt_bypass_en6                     ; true                   ; String                                                                       ;
+; c_cnt_in_src6                        ; ph_mux_clk             ; String                                                                       ;
+; c_cnt_odd_div_duty_en6               ; false                  ; String                                                                       ;
+; c_cnt_prst6                          ; 1                      ; Signed Integer                                                               ;
+; c_cnt_ph_mux_prst6                   ; 0                      ; Signed Integer                                                               ;
+; c_cnt_hi_div7                        ; 1                      ; Signed Integer                                                               ;
+; c_cnt_lo_div7                        ; 1                      ; Signed Integer                                                               ;
+; c_cnt_bypass_en7                     ; true                   ; String                                                                       ;
+; c_cnt_in_src7                        ; ph_mux_clk             ; String                                                                       ;
+; c_cnt_odd_div_duty_en7               ; false                  ; String                                                                       ;
+; c_cnt_prst7                          ; 1                      ; Signed Integer                                                               ;
+; c_cnt_ph_mux_prst7                   ; 0                      ; Signed Integer                                                               ;
+; c_cnt_hi_div8                        ; 1                      ; Signed Integer                                                               ;
+; c_cnt_lo_div8                        ; 1                      ; Signed Integer                                                               ;
+; c_cnt_bypass_en8                     ; true                   ; String                                                                       ;
+; c_cnt_in_src8                        ; ph_mux_clk             ; String                                                                       ;
+; c_cnt_odd_div_duty_en8               ; false                  ; String                                                                       ;
+; c_cnt_prst8                          ; 1                      ; Signed Integer                                                               ;
+; c_cnt_ph_mux_prst8                   ; 0                      ; Signed Integer                                                               ;
+; c_cnt_hi_div9                        ; 1                      ; Signed Integer                                                               ;
+; c_cnt_lo_div9                        ; 1                      ; Signed Integer                                                               ;
+; c_cnt_bypass_en9                     ; true                   ; String                                                                       ;
+; c_cnt_in_src9                        ; ph_mux_clk             ; String                                                                       ;
+; c_cnt_odd_div_duty_en9               ; false                  ; String                                                                       ;
+; c_cnt_prst9                          ; 1                      ; Signed Integer                                                               ;
+; c_cnt_ph_mux_prst9                   ; 0                      ; Signed Integer                                                               ;
+; c_cnt_hi_div10                       ; 1                      ; Signed Integer                                                               ;
+; c_cnt_lo_div10                       ; 1                      ; Signed Integer                                                               ;
+; c_cnt_bypass_en10                    ; true                   ; String                                                                       ;
+; c_cnt_in_src10                       ; ph_mux_clk             ; String                                                                       ;
+; c_cnt_odd_div_duty_en10              ; false                  ; String                                                                       ;
+; c_cnt_prst10                         ; 1                      ; Signed Integer                                                               ;
+; c_cnt_ph_mux_prst10                  ; 0                      ; Signed Integer                                                               ;
+; c_cnt_hi_div11                       ; 1                      ; Signed Integer                                                               ;
+; c_cnt_lo_div11                       ; 1                      ; Signed Integer                                                               ;
+; c_cnt_bypass_en11                    ; true                   ; String                                                                       ;
+; c_cnt_in_src11                       ; ph_mux_clk             ; String                                                                       ;
+; c_cnt_odd_div_duty_en11              ; false                  ; String                                                                       ;
+; c_cnt_prst11                         ; 1                      ; Signed Integer                                                               ;
+; c_cnt_ph_mux_prst11                  ; 0                      ; Signed Integer                                                               ;
+; c_cnt_hi_div12                       ; 1                      ; Signed Integer                                                               ;
+; c_cnt_lo_div12                       ; 1                      ; Signed Integer                                                               ;
+; c_cnt_bypass_en12                    ; true                   ; String                                                                       ;
+; c_cnt_in_src12                       ; ph_mux_clk             ; String                                                                       ;
+; c_cnt_odd_div_duty_en12              ; false                  ; String                                                                       ;
+; c_cnt_prst12                         ; 1                      ; Signed Integer                                                               ;
+; c_cnt_ph_mux_prst12                  ; 0                      ; Signed Integer                                                               ;
+; c_cnt_hi_div13                       ; 1                      ; Signed Integer                                                               ;
+; c_cnt_lo_div13                       ; 1                      ; Signed Integer                                                               ;
+; c_cnt_bypass_en13                    ; true                   ; String                                                                       ;
+; c_cnt_in_src13                       ; ph_mux_clk             ; String                                                                       ;
+; c_cnt_odd_div_duty_en13              ; false                  ; String                                                                       ;
+; c_cnt_prst13                         ; 1                      ; Signed Integer                                                               ;
+; c_cnt_ph_mux_prst13                  ; 0                      ; Signed Integer                                                               ;
+; c_cnt_hi_div14                       ; 1                      ; Signed Integer                                                               ;
+; c_cnt_lo_div14                       ; 1                      ; Signed Integer                                                               ;
+; c_cnt_bypass_en14                    ; true                   ; String                                                                       ;
+; c_cnt_in_src14                       ; ph_mux_clk             ; String                                                                       ;
+; c_cnt_odd_div_duty_en14              ; false                  ; String                                                                       ;
+; c_cnt_prst14                         ; 1                      ; Signed Integer                                                               ;
+; c_cnt_ph_mux_prst14                  ; 0                      ; Signed Integer                                                               ;
+; c_cnt_hi_div15                       ; 1                      ; Signed Integer                                                               ;
+; c_cnt_lo_div15                       ; 1                      ; Signed Integer                                                               ;
+; c_cnt_bypass_en15                    ; true                   ; String                                                                       ;
+; c_cnt_in_src15                       ; ph_mux_clk             ; String                                                                       ;
+; c_cnt_odd_div_duty_en15              ; false                  ; String                                                                       ;
+; c_cnt_prst15                         ; 1                      ; Signed Integer                                                               ;
+; c_cnt_ph_mux_prst15                  ; 0                      ; Signed Integer                                                               ;
+; c_cnt_hi_div16                       ; 1                      ; Signed Integer                                                               ;
+; c_cnt_lo_div16                       ; 1                      ; Signed Integer                                                               ;
+; c_cnt_bypass_en16                    ; true                   ; String                                                                       ;
+; c_cnt_in_src16                       ; ph_mux_clk             ; String                                                                       ;
+; c_cnt_odd_div_duty_en16              ; false                  ; String                                                                       ;
+; c_cnt_prst16                         ; 1                      ; Signed Integer                                                               ;
+; c_cnt_ph_mux_prst16                  ; 0                      ; Signed Integer                                                               ;
+; c_cnt_hi_div17                       ; 1                      ; Signed Integer                                                               ;
+; c_cnt_lo_div17                       ; 1                      ; Signed Integer                                                               ;
+; c_cnt_bypass_en17                    ; true                   ; String                                                                       ;
+; c_cnt_in_src17                       ; ph_mux_clk             ; String                                                                       ;
+; c_cnt_odd_div_duty_en17              ; false                  ; String                                                                       ;
+; c_cnt_prst17                         ; 1                      ; Signed Integer                                                               ;
+; c_cnt_ph_mux_prst17                  ; 0                      ; Signed Integer                                                               ;
+; pll_vco_div                          ; 1                      ; Signed Integer                                                               ;
+; pll_slf_rst                          ; false                  ; String                                                                       ;
+; pll_bw_sel                           ; low                    ; String                                                                       ;
+; pll_output_clk_frequency             ; 615.0 MHz              ; String                                                                       ;
+; pll_cp_current                       ; 20                     ; Signed Integer                                                               ;
+; pll_bwctrl                           ; 10000                  ; Signed Integer                                                               ;
+; pll_fractional_division              ; 1                      ; String                                                                       ;
+; pll_fractional_cout                  ; 32                     ; Signed Integer                                                               ;
+; pll_dsm_out_sel                      ; 1st_order              ; String                                                                       ;
+; mimic_fbclk_type                     ; gclk                   ; String                                                                       ;
+; pll_fbclk_mux_1                      ; glb                    ; String                                                                       ;
+; pll_fbclk_mux_2                      ; fb_1                   ; String                                                                       ;
+; pll_m_cnt_in_src                     ; ph_mux_clk             ; String                                                                       ;
+; pll_vcoph_div                        ; 1                      ; Signed Integer                                                               ;
+; refclk1_frequency                    ; 0 MHz                  ; String                                                                       ;
+; pll_clkin_0_src                      ; clk_0                  ; String                                                                       ;
+; pll_clkin_1_src                      ; clk_0                  ; String                                                                       ;
+; pll_clk_loss_sw_en                   ; false                  ; String                                                                       ;
+; pll_auto_clk_sw_en                   ; false                  ; String                                                                       ;
+; pll_manu_clk_sw_en                   ; false                  ; String                                                                       ;
+; pll_clk_sw_dly                       ; 0                      ; Signed Integer                                                               ;
+; pll_extclk_0_cnt_src                 ; pll_extclk_cnt_src_vss ; String                                                                       ;
+; pll_extclk_1_cnt_src                 ; pll_extclk_cnt_src_vss ; String                                                                       ;
++--------------------------------------+------------------------+------------------------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++------------------------------------------------------+
+; Port Connectivity Checks: "ADC_Controller:iADC_CTRL" ;
++------+--------+----------+---------------------------+
+; Port ; Type   ; Severity ; Details                   ;
++------+--------+----------+---------------------------+
+; CH1  ; Output ; Info     ; Explicitly unconnected    ;
+; CH2  ; Output ; Info     ; Explicitly unconnected    ;
+; CH3  ; Output ; Info     ; Explicitly unconnected    ;
+; CH4  ; Output ; Info     ; Explicitly unconnected    ;
+; CH5  ; Output ; Info     ; Explicitly unconnected    ;
+; CH6  ; Output ; Info     ; Explicitly unconnected    ;
+; CH7  ; Output ; Info     ; Explicitly unconnected    ;
++------+--------+----------+---------------------------+
+
+
++-----------------------------------------------------+
+; Post-Synthesis Netlist Statistics for Top Partition ;
++-----------------------------+-----------------------+
+; Type                        ; Count                 ;
++-----------------------------+-----------------------+
+; arriav_clkena               ; 1                     ;
+; arriav_clkselect            ; 1                     ;
+; arriav_ff                   ; 113                   ;
+;     CLR                     ; 2                     ;
+;     CLR SCLR                ; 7                     ;
+;     ENA                     ; 22                    ;
+;     ENA SCLR                ; 38                    ;
+;     ENA SCLR SLD            ; 12                    ;
+;     SCLR                    ; 7                     ;
+;     SLD                     ; 13                    ;
+;     plain                   ; 12                    ;
+; arriav_io_obuf              ; 36                    ;
+; arriav_lcell_comb           ; 208                   ;
+;     arith                   ; 43                    ;
+;         1 data inputs       ; 43                    ;
+;     normal                  ; 165                   ;
+;         0 data inputs       ; 2                     ;
+;         1 data inputs       ; 7                     ;
+;         2 data inputs       ; 29                    ;
+;         3 data inputs       ; 10                    ;
+;         4 data inputs       ; 49                    ;
+;         5 data inputs       ; 32                    ;
+;         6 data inputs       ; 36                    ;
+; boundary_port               ; 100                   ;
+; cyclonev_fractional_pll     ; 1                     ;
+; cyclonev_pll_output_counter ; 2                     ;
+; cyclonev_pll_reconfig       ; 1                     ;
+; cyclonev_pll_refclk_select  ; 1                     ;
+;                             ;                       ;
+; Max LUT depth               ; 5.00                  ;
+; Average LUT depth           ; 2.27                  ;
++-----------------------------+-----------------------+
+
+
++-------------------------------+
+; Elapsed Time Per Partition    ;
++----------------+--------------+
+; Partition Name ; Elapsed Time ;
++----------------+--------------+
+; Top            ; 00:00:02     ;
++----------------+--------------+
+
+
++-------------------------------+
+; Analysis & Synthesis Messages ;
++-------------------------------+
+Info: *******************************************************************
+Info: Running Quartus Prime Analysis & Synthesis
+    Info: Version 25.1std.0 Build 1129 10/21/2025 SC Lite Edition
+    Info: Processing started: Mon Apr  6 20:55:25 2026
+Info: Command: quartus_map --read_settings_files=on --write_settings_files=off Clock_Gen -c Clock_Gen
+Warning (125092): Tcl Script File Mic_Clk_Pll/Mic_Clk_Pll_0002.qip not found
+    Info (125063): set_global_assignment -name QIP_FILE Mic_Clk_Pll/Mic_Clk_Pll_0002.qip -qip Mic_Clk_Pll.qip -library Mic_Clk_Pll
+Warning (18236): Number of processors has not been specified which may cause overloading on shared machines.  Set the global assignment NUM_PARALLEL_PROCESSORS in your QSF to an appropriate value for best performance.
+Info (20030): Parallel compilation is enabled and will use 12 of the 12 processors detected
+Info (12248): Elaborating Platform Designer system entity "ADC_Controller.qsys"
+Info (12250): 2026.04.06.20:55:45 Progress: Loading Clock_Gen/ADC_Controller.qsys
+Info (12250): 2026.04.06.20:55:48 Progress: Reading input file
+Info (12250): 2026.04.06.20:55:48 Progress: Adding adc_mega_0 [altera_up_avalon_adc_mega 18.0]
+Info (12250): 2026.04.06.20:55:50 Progress: Parameterizing module adc_mega_0
+Info (12250): 2026.04.06.20:55:50 Progress: Building connections
+Info (12250): 2026.04.06.20:55:50 Progress: Parameterizing connections
+Info (12250): 2026.04.06.20:55:50 Progress: Validating
+Info (12250): 2026.04.06.20:55:50 Progress: Done reading input file
+Info (12250): ADC_Controller: Generating "ADC_Controller" for QUARTUS_SYNTH
+Info (12250): Adc_mega_0: Starting Generation of ADC Controller for DE-series Board
+Info (12250): Adc_mega_0: C:/altera_lite/25.1std/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/altera_up_avalon_adv_adc.v C:/Users/owner/AppData/Local/Temp/alt0550_2055232785822804433.dir/0002_sopcgen/ADC_Controller_adc_mega_0.v
+Info (12250): Adc_mega_0: "ADC_Controller" instantiated altera_up_avalon_adc_mega "adc_mega_0"
+Info (12250): ADC_Controller: Done "ADC_Controller" with 2 modules, 3 files
+Info (12249): Finished elaborating Platform Designer system entity "ADC_Controller.qsys"
+Info (12248): Elaborating Platform Designer system entity "Mic_Clk_Ctrl.qsys"
+Info (12250): 2026.04.06.20:56:05 Progress: Loading Clock_Gen/Mic_Clk_Ctrl.qsys
+Info (12250): 2026.04.06.20:56:07 Progress: Reading input file
+Info (12250): 2026.04.06.20:56:07 Progress: Adding altclkctrl_0 [altclkctrl 25.1]
+Info (12250): 2026.04.06.20:56:08 Progress: Parameterizing module altclkctrl_0
+Info (12250): 2026.04.06.20:56:08 Progress: Building connections
+Info (12250): 2026.04.06.20:56:08 Progress: Parameterizing connections
+Info (12250): 2026.04.06.20:56:08 Progress: Validating
+Info (12250): 2026.04.06.20:56:09 Progress: Done reading input file
+Info (12250): 2026.04.06.20:56:11 : Mic_Clk_Ctrl.altclkctrl_0: Targeting device family: Cyclone V.
+Info (12250): 2026.04.06.20:56:11 : Mic_Clk_Ctrl.altclkctrl_0: Global clock network allows a clock signal to reach all parts of the chip with the same amount of skew. Input port 'clkselect' can be used to switch between four clock inputs.
+Info (12250): Mic_Clk_Ctrl: Generating "Mic_Clk_Ctrl" for QUARTUS_SYNTH
+Info (12250): Altclkctrl_0: Generating top-level entity Mic_Clk_Ctrl_altclkctrl_0.
+Info (12250): Altclkctrl_0: "Mic_Clk_Ctrl" instantiated altclkctrl "altclkctrl_0"
+Info (12250): Mic_Clk_Ctrl: Done "Mic_Clk_Ctrl" with 2 modules, 2 files
+Info (12249): Finished elaborating Platform Designer system entity "Mic_Clk_Ctrl.qsys"
+Info (12021): Found 1 design units, including 1 entities, in source file seven_seg.sv
+    Info (12023): Found entity 1: Seven_Seg File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Seven_Seg.sv Line: 8
+Info (12021): Found 1 design units, including 1 entities, in source file mic_clk_pll_0002.v
+    Info (12023): Found entity 1: Mic_Clk_Pll_0002 File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Mic_Clk_Pll_0002.v Line: 2
+Info (12021): Found 1 design units, including 1 entities, in source file mic_clk_ctrl_altclkctrl_0_sub.v
+    Info (12023): Found entity 1: Mic_Clk_Ctrl_altclkctrl_0_sub File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Mic_Clk_Ctrl_altclkctrl_0_sub.v Line: 29
+Info (12021): Found 1 design units, including 1 entities, in source file mic_clk_ctrl_altclkctrl_0.v
+    Info (12023): Found entity 1: Mic_Clk_Ctrl_altclkctrl_0 File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Mic_Clk_Ctrl_altclkctrl_0.v Line: 18
+Info (12021): Found 1 design units, including 1 entities, in source file adc_controller.v
+    Info (12023): Found entity 1: ADC_Controller File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/ADC_Controller.v Line: 6
+Info (12021): Found 1 design units, including 0 entities, in source file mic_time_pkg.sv
+    Info (12022): Found design unit 1: Mic_Time_pkg (SystemVerilog) File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Mic_Time_pkg.sv Line: 12
+Info (12021): Found 1 design units, including 1 entities, in source file mic_mode_fsm.sv
+    Info (12023): Found entity 1: Mic_Mode_Fsm File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Mic_Mode_Fsm.sv Line: 15
+Info (12021): Found 1 design units, including 1 entities, in source file mic_clk_pll.v
+    Info (12023): Found entity 1: Mic_Clk_Pll File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Mic_Clk_Pll.v Line: 8
+Warning (12019): Can't analyze file -- file Mic_Clk_Pll/Mic_Clk_Pll_0002.v is missing
+Info (12021): Found 1 design units, including 1 entities, in source file mic_clk_gen.sv
+    Info (12023): Found entity 1: Mic_Clk_Gen File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Mic_Clk_Gen.sv Line: 13
+Info (12021): Found 1 design units, including 1 entities, in source file clock_gen.v
+    Info (12023): Found entity 1: Clock_Gen File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Clock_Gen.v Line: 6
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/adc_controller/adc_controller.v
+    Info (12023): Found entity 1: ADC_Controller File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/db/ip/adc_controller/adc_controller.v Line: 6
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/adc_controller/submodules/adc_controller_adc_mega_0.v
+    Info (12023): Found entity 1: ADC_Controller_adc_mega_0 File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/db/ip/adc_controller/submodules/adc_controller_adc_mega_0.v Line: 22
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/adc_controller/submodules/altera_up_avalon_adv_adc.v
+    Info (12023): Found entity 1: altera_up_avalon_adv_adc File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/db/ip/adc_controller/submodules/altera_up_avalon_adv_adc.v Line: 23
+Info (12021): Found 1 design units, including 1 entities, in source file db/ip/mic_clk_ctrl/mic_clk_ctrl.v
+    Info (12023): Found entity 1: Mic_Clk_Ctrl File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/db/ip/mic_clk_ctrl/mic_clk_ctrl.v Line: 6
+Info (12021): Found 2 design units, including 2 entities, in source file db/ip/mic_clk_ctrl/submodules/mic_clk_ctrl_altclkctrl_0.v
+    Info (12023): Found entity 1: Mic_Clk_Ctrl_altclkctrl_0_sub File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/db/ip/mic_clk_ctrl/submodules/mic_clk_ctrl_altclkctrl_0.v Line: 29
+    Info (12023): Found entity 2: Mic_Clk_Ctrl_altclkctrl_0 File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/db/ip/mic_clk_ctrl/submodules/mic_clk_ctrl_altclkctrl_0.v Line: 102
+Info (12127): Elaborating entity "Clock_Gen" for the top level hierarchy
+Info (12128): Elaborating entity "ADC_Controller" for hierarchy "ADC_Controller:iADC_CTRL" File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Clock_Gen.v Line: 66
+Info (12128): Elaborating entity "ADC_Controller_adc_mega_0" for hierarchy "ADC_Controller:iADC_CTRL|ADC_Controller_adc_mega_0:adc_mega_0" File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/ADC_Controller.v Line: 45
+Info (12128): Elaborating entity "altera_up_avalon_adv_adc" for hierarchy "ADC_Controller:iADC_CTRL|ADC_Controller_adc_mega_0:adc_mega_0|altera_up_avalon_adv_adc:ADC_CTRL" File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/db/ip/adc_controller/submodules/adc_controller_adc_mega_0.v Line: 58
+Info (12128): Elaborating entity "Mic_Clk_Gen" for hierarchy "Mic_Clk_Gen:iCLK_GEN" File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Clock_Gen.v Line: 87
+Info (12128): Elaborating entity "Mic_Mode_Fsm" for hierarchy "Mic_Clk_Gen:iCLK_GEN|Mic_Mode_Fsm:iMIC_FSM" File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Mic_Clk_Gen.sv Line: 56
+Warning (10230): Verilog HDL assignment warning at Mic_Time_pkg.sv(58): truncated value with size 64 to match size of target (32) File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Mic_Time_pkg.sv Line: 58
+Warning (10230): Verilog HDL assignment warning at Mic_Mode_Fsm.sv(202): truncated value with size 32 to match size of target (22) File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Mic_Mode_Fsm.sv Line: 202
+Warning (10230): Verilog HDL assignment warning at Mic_Mode_Fsm.sv(207): truncated value with size 32 to match size of target (22) File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Mic_Mode_Fsm.sv Line: 207
+Warning (10230): Verilog HDL assignment warning at Mic_Mode_Fsm.sv(222): truncated value with size 32 to match size of target (22) File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Mic_Mode_Fsm.sv Line: 222
+Warning (10230): Verilog HDL assignment warning at Mic_Mode_Fsm.sv(229): truncated value with size 32 to match size of target (22) File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Mic_Mode_Fsm.sv Line: 229
+Warning (10230): Verilog HDL assignment warning at Mic_Mode_Fsm.sv(233): truncated value with size 32 to match size of target (22) File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Mic_Mode_Fsm.sv Line: 233
+Warning (10230): Verilog HDL assignment warning at Mic_Mode_Fsm.sv(250): truncated value with size 32 to match size of target (22) File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Mic_Mode_Fsm.sv Line: 250
+Warning (10230): Verilog HDL assignment warning at Mic_Mode_Fsm.sv(254): truncated value with size 32 to match size of target (22) File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Mic_Mode_Fsm.sv Line: 254
+Warning (10230): Verilog HDL assignment warning at Mic_Mode_Fsm.sv(271): truncated value with size 32 to match size of target (22) File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Mic_Mode_Fsm.sv Line: 271
+Info (10264): Verilog HDL Case Statement information at Mic_Mode_Fsm.sv(347): all case item expressions in this case statement are onehot File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Mic_Mode_Fsm.sv Line: 347
+Info (12128): Elaborating entity "Mic_Clk_Pll" for hierarchy "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL" File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Mic_Clk_Gen.sv Line: 66
+Info (12128): Elaborating entity "Mic_Clk_Pll_0002" for hierarchy "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst" File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Mic_Clk_Pll.v Line: 22
+Info (12128): Elaborating entity "altera_pll" for hierarchy "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i" File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Mic_Clk_Pll_0002.v Line: 234
+Warning (10034): Output port "lvds_clk" at altera_pll.v(320) has no driver File: c:/altera_lite/25.1std/quartus/libraries/megafunctions/altera_pll.v Line: 320
+Warning (10034): Output port "loaden" at altera_pll.v(321) has no driver File: c:/altera_lite/25.1std/quartus/libraries/megafunctions/altera_pll.v Line: 321
+Warning (10034): Output port "extclk_out" at altera_pll.v(322) has no driver File: c:/altera_lite/25.1std/quartus/libraries/megafunctions/altera_pll.v Line: 322
+Info (10008): Verilog HDL or VHDL information: EDA Netlist Writer cannot regroup multidimensional array "wire_to_nowhere_64" into its bus
+Info (12130): Elaborated megafunction instantiation "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i" File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Mic_Clk_Pll_0002.v Line: 234
+Info (12133): Instantiated megafunction "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i" with the following parameter: File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Mic_Clk_Pll_0002.v Line: 234
+    Info (12134): Parameter "fractional_vco_multiplier" = "false"
+    Info (12134): Parameter "reference_clock_frequency" = "50.0 MHz"
+    Info (12134): Parameter "pll_fractional_cout" = "32"
+    Info (12134): Parameter "pll_dsm_out_sel" = "1st_order"
+    Info (12134): Parameter "operation_mode" = "normal"
+    Info (12134): Parameter "number_of_clocks" = "2"
+    Info (12134): Parameter "output_clock_frequency0" = "2.460000 MHz"
+    Info (12134): Parameter "phase_shift0" = "0 ps"
+    Info (12134): Parameter "duty_cycle0" = "50"
+    Info (12134): Parameter "output_clock_frequency1" = "3.075000 MHz"
+    Info (12134): Parameter "phase_shift1" = "0 ps"
+    Info (12134): Parameter "duty_cycle1" = "50"
+    Info (12134): Parameter "output_clock_frequency2" = "0 MHz"
+    Info (12134): Parameter "phase_shift2" = "0 ps"
+    Info (12134): Parameter "duty_cycle2" = "50"
+    Info (12134): Parameter "output_clock_frequency3" = "0 MHz"
+    Info (12134): Parameter "phase_shift3" = "0 ps"
+    Info (12134): Parameter "duty_cycle3" = "50"
+    Info (12134): Parameter "output_clock_frequency4" = "0 MHz"
+    Info (12134): Parameter "phase_shift4" = "0 ps"
+    Info (12134): Parameter "duty_cycle4" = "50"
+    Info (12134): Parameter "output_clock_frequency5" = "0 MHz"
+    Info (12134): Parameter "phase_shift5" = "0 ps"
+    Info (12134): Parameter "duty_cycle5" = "50"
+    Info (12134): Parameter "output_clock_frequency6" = "0 MHz"
+    Info (12134): Parameter "phase_shift6" = "0 ps"
+    Info (12134): Parameter "duty_cycle6" = "50"
+    Info (12134): Parameter "output_clock_frequency7" = "0 MHz"
+    Info (12134): Parameter "phase_shift7" = "0 ps"
+    Info (12134): Parameter "duty_cycle7" = "50"
+    Info (12134): Parameter "output_clock_frequency8" = "0 MHz"
+    Info (12134): Parameter "phase_shift8" = "0 ps"
+    Info (12134): Parameter "duty_cycle8" = "50"
+    Info (12134): Parameter "output_clock_frequency9" = "0 MHz"
+    Info (12134): Parameter "phase_shift9" = "0 ps"
+    Info (12134): Parameter "duty_cycle9" = "50"
+    Info (12134): Parameter "output_clock_frequency10" = "0 MHz"
+    Info (12134): Parameter "phase_shift10" = "0 ps"
+    Info (12134): Parameter "duty_cycle10" = "50"
+    Info (12134): Parameter "output_clock_frequency11" = "0 MHz"
+    Info (12134): Parameter "phase_shift11" = "0 ps"
+    Info (12134): Parameter "duty_cycle11" = "50"
+    Info (12134): Parameter "output_clock_frequency12" = "0 MHz"
+    Info (12134): Parameter "phase_shift12" = "0 ps"
+    Info (12134): Parameter "duty_cycle12" = "50"
+    Info (12134): Parameter "output_clock_frequency13" = "0 MHz"
+    Info (12134): Parameter "phase_shift13" = "0 ps"
+    Info (12134): Parameter "duty_cycle13" = "50"
+    Info (12134): Parameter "output_clock_frequency14" = "0 MHz"
+    Info (12134): Parameter "phase_shift14" = "0 ps"
+    Info (12134): Parameter "duty_cycle14" = "50"
+    Info (12134): Parameter "output_clock_frequency15" = "0 MHz"
+    Info (12134): Parameter "phase_shift15" = "0 ps"
+    Info (12134): Parameter "duty_cycle15" = "50"
+    Info (12134): Parameter "output_clock_frequency16" = "0 MHz"
+    Info (12134): Parameter "phase_shift16" = "0 ps"
+    Info (12134): Parameter "duty_cycle16" = "50"
+    Info (12134): Parameter "output_clock_frequency17" = "0 MHz"
+    Info (12134): Parameter "phase_shift17" = "0 ps"
+    Info (12134): Parameter "duty_cycle17" = "50"
+    Info (12134): Parameter "pll_type" = "Cyclone V"
+    Info (12134): Parameter "pll_subtype" = "General"
+    Info (12134): Parameter "m_cnt_hi_div" = "62"
+    Info (12134): Parameter "m_cnt_lo_div" = "61"
+    Info (12134): Parameter "n_cnt_hi_div" = "5"
+    Info (12134): Parameter "n_cnt_lo_div" = "5"
+    Info (12134): Parameter "m_cnt_bypass_en" = "false"
+    Info (12134): Parameter "n_cnt_bypass_en" = "false"
+    Info (12134): Parameter "m_cnt_odd_div_duty_en" = "true"
+    Info (12134): Parameter "n_cnt_odd_div_duty_en" = "false"
+    Info (12134): Parameter "c_cnt_hi_div0" = "125"
+    Info (12134): Parameter "c_cnt_lo_div0" = "125"
+    Info (12134): Parameter "c_cnt_prst0" = "1"
+    Info (12134): Parameter "c_cnt_ph_mux_prst0" = "0"
+    Info (12134): Parameter "c_cnt_in_src0" = "ph_mux_clk"
+    Info (12134): Parameter "c_cnt_bypass_en0" = "false"
+    Info (12134): Parameter "c_cnt_odd_div_duty_en0" = "false"
+    Info (12134): Parameter "c_cnt_hi_div1" = "100"
+    Info (12134): Parameter "c_cnt_lo_div1" = "100"
+    Info (12134): Parameter "c_cnt_prst1" = "1"
+    Info (12134): Parameter "c_cnt_ph_mux_prst1" = "0"
+    Info (12134): Parameter "c_cnt_in_src1" = "ph_mux_clk"
+    Info (12134): Parameter "c_cnt_bypass_en1" = "false"
+    Info (12134): Parameter "c_cnt_odd_div_duty_en1" = "false"
+    Info (12134): Parameter "c_cnt_hi_div2" = "1"
+    Info (12134): Parameter "c_cnt_lo_div2" = "1"
+    Info (12134): Parameter "c_cnt_prst2" = "1"
+    Info (12134): Parameter "c_cnt_ph_mux_prst2" = "0"
+    Info (12134): Parameter "c_cnt_in_src2" = "ph_mux_clk"
+    Info (12134): Parameter "c_cnt_bypass_en2" = "true"
+    Info (12134): Parameter "c_cnt_odd_div_duty_en2" = "false"
+    Info (12134): Parameter "c_cnt_hi_div3" = "1"
+    Info (12134): Parameter "c_cnt_lo_div3" = "1"
+    Info (12134): Parameter "c_cnt_prst3" = "1"
+    Info (12134): Parameter "c_cnt_ph_mux_prst3" = "0"
+    Info (12134): Parameter "c_cnt_in_src3" = "ph_mux_clk"
+    Info (12134): Parameter "c_cnt_bypass_en3" = "true"
+    Info (12134): Parameter "c_cnt_odd_div_duty_en3" = "false"
+    Info (12134): Parameter "c_cnt_hi_div4" = "1"
+    Info (12134): Parameter "c_cnt_lo_div4" = "1"
+    Info (12134): Parameter "c_cnt_prst4" = "1"
+    Info (12134): Parameter "c_cnt_ph_mux_prst4" = "0"
+    Info (12134): Parameter "c_cnt_in_src4" = "ph_mux_clk"
+    Info (12134): Parameter "c_cnt_bypass_en4" = "true"
+    Info (12134): Parameter "c_cnt_odd_div_duty_en4" = "false"
+    Info (12134): Parameter "c_cnt_hi_div5" = "1"
+    Info (12134): Parameter "c_cnt_lo_div5" = "1"
+    Info (12134): Parameter "c_cnt_prst5" = "1"
+    Info (12134): Parameter "c_cnt_ph_mux_prst5" = "0"
+    Info (12134): Parameter "c_cnt_in_src5" = "ph_mux_clk"
+    Info (12134): Parameter "c_cnt_bypass_en5" = "true"
+    Info (12134): Parameter "c_cnt_odd_div_duty_en5" = "false"
+    Info (12134): Parameter "c_cnt_hi_div6" = "1"
+    Info (12134): Parameter "c_cnt_lo_div6" = "1"
+    Info (12134): Parameter "c_cnt_prst6" = "1"
+    Info (12134): Parameter "c_cnt_ph_mux_prst6" = "0"
+    Info (12134): Parameter "c_cnt_in_src6" = "ph_mux_clk"
+    Info (12134): Parameter "c_cnt_bypass_en6" = "true"
+    Info (12134): Parameter "c_cnt_odd_div_duty_en6" = "false"
+    Info (12134): Parameter "c_cnt_hi_div7" = "1"
+    Info (12134): Parameter "c_cnt_lo_div7" = "1"
+    Info (12134): Parameter "c_cnt_prst7" = "1"
+    Info (12134): Parameter "c_cnt_ph_mux_prst7" = "0"
+    Info (12134): Parameter "c_cnt_in_src7" = "ph_mux_clk"
+    Info (12134): Parameter "c_cnt_bypass_en7" = "true"
+    Info (12134): Parameter "c_cnt_odd_div_duty_en7" = "false"
+    Info (12134): Parameter "c_cnt_hi_div8" = "1"
+    Info (12134): Parameter "c_cnt_lo_div8" = "1"
+    Info (12134): Parameter "c_cnt_prst8" = "1"
+    Info (12134): Parameter "c_cnt_ph_mux_prst8" = "0"
+    Info (12134): Parameter "c_cnt_in_src8" = "ph_mux_clk"
+    Info (12134): Parameter "c_cnt_bypass_en8" = "true"
+    Info (12134): Parameter "c_cnt_odd_div_duty_en8" = "false"
+    Info (12134): Parameter "c_cnt_hi_div9" = "1"
+    Info (12134): Parameter "c_cnt_lo_div9" = "1"
+    Info (12134): Parameter "c_cnt_prst9" = "1"
+    Info (12134): Parameter "c_cnt_ph_mux_prst9" = "0"
+    Info (12134): Parameter "c_cnt_in_src9" = "ph_mux_clk"
+    Info (12134): Parameter "c_cnt_bypass_en9" = "true"
+    Info (12134): Parameter "c_cnt_odd_div_duty_en9" = "false"
+    Info (12134): Parameter "c_cnt_hi_div10" = "1"
+    Info (12134): Parameter "c_cnt_lo_div10" = "1"
+    Info (12134): Parameter "c_cnt_prst10" = "1"
+    Info (12134): Parameter "c_cnt_ph_mux_prst10" = "0"
+    Info (12134): Parameter "c_cnt_in_src10" = "ph_mux_clk"
+    Info (12134): Parameter "c_cnt_bypass_en10" = "true"
+    Info (12134): Parameter "c_cnt_odd_div_duty_en10" = "false"
+    Info (12134): Parameter "c_cnt_hi_div11" = "1"
+    Info (12134): Parameter "c_cnt_lo_div11" = "1"
+    Info (12134): Parameter "c_cnt_prst11" = "1"
+    Info (12134): Parameter "c_cnt_ph_mux_prst11" = "0"
+    Info (12134): Parameter "c_cnt_in_src11" = "ph_mux_clk"
+    Info (12134): Parameter "c_cnt_bypass_en11" = "true"
+    Info (12134): Parameter "c_cnt_odd_div_duty_en11" = "false"
+    Info (12134): Parameter "c_cnt_hi_div12" = "1"
+    Info (12134): Parameter "c_cnt_lo_div12" = "1"
+    Info (12134): Parameter "c_cnt_prst12" = "1"
+    Info (12134): Parameter "c_cnt_ph_mux_prst12" = "0"
+    Info (12134): Parameter "c_cnt_in_src12" = "ph_mux_clk"
+    Info (12134): Parameter "c_cnt_bypass_en12" = "true"
+    Info (12134): Parameter "c_cnt_odd_div_duty_en12" = "false"
+    Info (12134): Parameter "c_cnt_hi_div13" = "1"
+    Info (12134): Parameter "c_cnt_lo_div13" = "1"
+    Info (12134): Parameter "c_cnt_prst13" = "1"
+    Info (12134): Parameter "c_cnt_ph_mux_prst13" = "0"
+    Info (12134): Parameter "c_cnt_in_src13" = "ph_mux_clk"
+    Info (12134): Parameter "c_cnt_bypass_en13" = "true"
+    Info (12134): Parameter "c_cnt_odd_div_duty_en13" = "false"
+    Info (12134): Parameter "c_cnt_hi_div14" = "1"
+    Info (12134): Parameter "c_cnt_lo_div14" = "1"
+    Info (12134): Parameter "c_cnt_prst14" = "1"
+    Info (12134): Parameter "c_cnt_ph_mux_prst14" = "0"
+    Info (12134): Parameter "c_cnt_in_src14" = "ph_mux_clk"
+    Info (12134): Parameter "c_cnt_bypass_en14" = "true"
+    Info (12134): Parameter "c_cnt_odd_div_duty_en14" = "false"
+    Info (12134): Parameter "c_cnt_hi_div15" = "1"
+    Info (12134): Parameter "c_cnt_lo_div15" = "1"
+    Info (12134): Parameter "c_cnt_prst15" = "1"
+    Info (12134): Parameter "c_cnt_ph_mux_prst15" = "0"
+    Info (12134): Parameter "c_cnt_in_src15" = "ph_mux_clk"
+    Info (12134): Parameter "c_cnt_bypass_en15" = "true"
+    Info (12134): Parameter "c_cnt_odd_div_duty_en15" = "false"
+    Info (12134): Parameter "c_cnt_hi_div16" = "1"
+    Info (12134): Parameter "c_cnt_lo_div16" = "1"
+    Info (12134): Parameter "c_cnt_prst16" = "1"
+    Info (12134): Parameter "c_cnt_ph_mux_prst16" = "0"
+    Info (12134): Parameter "c_cnt_in_src16" = "ph_mux_clk"
+    Info (12134): Parameter "c_cnt_bypass_en16" = "true"
+    Info (12134): Parameter "c_cnt_odd_div_duty_en16" = "false"
+    Info (12134): Parameter "c_cnt_hi_div17" = "1"
+    Info (12134): Parameter "c_cnt_lo_div17" = "1"
+    Info (12134): Parameter "c_cnt_prst17" = "1"
+    Info (12134): Parameter "c_cnt_ph_mux_prst17" = "0"
+    Info (12134): Parameter "c_cnt_in_src17" = "ph_mux_clk"
+    Info (12134): Parameter "c_cnt_bypass_en17" = "true"
+    Info (12134): Parameter "c_cnt_odd_div_duty_en17" = "false"
+    Info (12134): Parameter "pll_vco_div" = "1"
+    Info (12134): Parameter "pll_cp_current" = "20"
+    Info (12134): Parameter "pll_bwctrl" = "10000"
+    Info (12134): Parameter "pll_output_clk_frequency" = "615.0 MHz"
+    Info (12134): Parameter "pll_fractional_division" = "1"
+    Info (12134): Parameter "mimic_fbclk_type" = "gclk"
+    Info (12134): Parameter "pll_fbclk_mux_1" = "glb"
+    Info (12134): Parameter "pll_fbclk_mux_2" = "fb_1"
+    Info (12134): Parameter "pll_m_cnt_in_src" = "ph_mux_clk"
+    Info (12134): Parameter "pll_slf_rst" = "false"
+Info (12128): Elaborating entity "dps_extra_kick" for hierarchy "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|dps_extra_kick:dps_extra_inst" File: c:/altera_lite/25.1std/quartus/libraries/megafunctions/altera_pll.v Line: 769
+Info (12131): Elaborated megafunction instantiation "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|dps_extra_kick:dps_extra_inst", which is child of megafunction instantiation "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i" File: c:/altera_lite/25.1std/quartus/libraries/megafunctions/altera_pll.v Line: 769
+Info (12128): Elaborating entity "dprio_init" for hierarchy "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|dprio_init:dprio_init_inst" File: c:/altera_lite/25.1std/quartus/libraries/megafunctions/altera_pll.v Line: 784
+Info (12131): Elaborated megafunction instantiation "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|dprio_init:dprio_init_inst", which is child of megafunction instantiation "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i" File: c:/altera_lite/25.1std/quartus/libraries/megafunctions/altera_pll.v Line: 784
+Info (12128): Elaborating entity "altera_pll_dps_lcell_comb" for hierarchy "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|altera_pll_dps_lcell_comb:lcell_cntsel_int_0" File: c:/altera_lite/25.1std/quartus/libraries/megafunctions/altera_pll.v Line: 1961
+Info (12131): Elaborated megafunction instantiation "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|altera_pll_dps_lcell_comb:lcell_cntsel_int_0", which is child of megafunction instantiation "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i" File: c:/altera_lite/25.1std/quartus/libraries/megafunctions/altera_pll.v Line: 1961
+Info (12128): Elaborating entity "altera_pll_dps_lcell_comb" for hierarchy "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|altera_pll_dps_lcell_comb:lcell_cntsel_int_1" File: c:/altera_lite/25.1std/quartus/libraries/megafunctions/altera_pll.v Line: 1972
+Info (12131): Elaborated megafunction instantiation "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|altera_pll_dps_lcell_comb:lcell_cntsel_int_1", which is child of megafunction instantiation "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i" File: c:/altera_lite/25.1std/quartus/libraries/megafunctions/altera_pll.v Line: 1972
+Info (12128): Elaborating entity "altera_pll_dps_lcell_comb" for hierarchy "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|altera_pll_dps_lcell_comb:lcell_cntsel_int_2" File: c:/altera_lite/25.1std/quartus/libraries/megafunctions/altera_pll.v Line: 1983
+Info (12131): Elaborated megafunction instantiation "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|altera_pll_dps_lcell_comb:lcell_cntsel_int_2", which is child of megafunction instantiation "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i" File: c:/altera_lite/25.1std/quartus/libraries/megafunctions/altera_pll.v Line: 1983
+Info (12128): Elaborating entity "altera_pll_dps_lcell_comb" for hierarchy "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|altera_pll_dps_lcell_comb:lcell_cntsel_int_3" File: c:/altera_lite/25.1std/quartus/libraries/megafunctions/altera_pll.v Line: 1994
+Info (12131): Elaborated megafunction instantiation "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|altera_pll_dps_lcell_comb:lcell_cntsel_int_3", which is child of megafunction instantiation "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i" File: c:/altera_lite/25.1std/quartus/libraries/megafunctions/altera_pll.v Line: 1994
+Info (12128): Elaborating entity "altera_pll_dps_lcell_comb" for hierarchy "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|altera_pll_dps_lcell_comb:lcell_cntsel_int_4" File: c:/altera_lite/25.1std/quartus/libraries/megafunctions/altera_pll.v Line: 2005
+Info (12131): Elaborated megafunction instantiation "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|altera_pll_dps_lcell_comb:lcell_cntsel_int_4", which is child of megafunction instantiation "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i" File: c:/altera_lite/25.1std/quartus/libraries/megafunctions/altera_pll.v Line: 2005
+Info (12128): Elaborating entity "altera_cyclonev_pll" for hierarchy "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|altera_cyclonev_pll:cyclonev_pll" File: c:/altera_lite/25.1std/quartus/libraries/megafunctions/altera_pll.v Line: 2224
+Warning (10034): Output port "extclk" at altera_cyclonev_pll.v(632) has no driver File: c:/altera_lite/25.1std/quartus/libraries/megafunctions/altera_cyclonev_pll.v Line: 632
+Warning (10034): Output port "clkout[0]" at altera_cyclonev_pll.v(637) has no driver File: c:/altera_lite/25.1std/quartus/libraries/megafunctions/altera_cyclonev_pll.v Line: 637
+Warning (10034): Output port "loaden" at altera_cyclonev_pll.v(641) has no driver File: c:/altera_lite/25.1std/quartus/libraries/megafunctions/altera_cyclonev_pll.v Line: 641
+Warning (10034): Output port "lvdsclk" at altera_cyclonev_pll.v(642) has no driver File: c:/altera_lite/25.1std/quartus/libraries/megafunctions/altera_cyclonev_pll.v Line: 642
+Info (12131): Elaborated megafunction instantiation "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|altera_cyclonev_pll:cyclonev_pll", which is child of megafunction instantiation "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i" File: c:/altera_lite/25.1std/quartus/libraries/megafunctions/altera_pll.v Line: 2224
+Info (12128): Elaborating entity "altera_cyclonev_pll_base" for hierarchy "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|altera_cyclonev_pll:cyclonev_pll|altera_cyclonev_pll_base:fpll_0" File: c:/altera_lite/25.1std/quartus/libraries/megafunctions/altera_cyclonev_pll.v Line: 1153
+Info (12131): Elaborated megafunction instantiation "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|altera_cyclonev_pll:cyclonev_pll|altera_cyclonev_pll_base:fpll_0", which is child of megafunction instantiation "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i" File: c:/altera_lite/25.1std/quartus/libraries/megafunctions/altera_cyclonev_pll.v Line: 1153
+Info (12128): Elaborating entity "Mic_Clk_Ctrl" for hierarchy "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL" File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Mic_Clk_Gen.sv Line: 81
+Info (12128): Elaborating entity "Mic_Clk_Ctrl_altclkctrl_0" for hierarchy "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL|Mic_Clk_Ctrl_altclkctrl_0:altclkctrl_0" File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/db/ip/mic_clk_ctrl/mic_clk_ctrl.v Line: 24
+Info (12128): Elaborating entity "Mic_Clk_Ctrl_altclkctrl_0_sub" for hierarchy "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL|Mic_Clk_Ctrl_altclkctrl_0:altclkctrl_0|Mic_Clk_Ctrl_altclkctrl_0_sub:Mic_Clk_Ctrl_altclkctrl_0_sub_component" File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/db/ip/mic_clk_ctrl/submodules/mic_clk_ctrl_altclkctrl_0.v Line: 146
+Info (12128): Elaborating entity "Seven_Seg" for hierarchy "Seven_Seg:s2" File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Clock_Gen.v Line: 93
+Warning (12030): Port "extclk" on the entity instantiation of "cyclonev_pll" is connected to a signal of width 1. The formal width of the signal in the module is 2.  The extra bits will be left dangling without any fan-out logic. File: c:/altera_lite/25.1std/quartus/libraries/megafunctions/altera_pll.v Line: 2224
+Warning (14284): Synthesized away the following node(s):
+    Warning (14285): Synthesized away the following LCELL buffer node(s):
+        Warning (14320): Synthesized away node "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|cntsel_temp[4]" File: c:/altera_lite/25.1std/quartus/libraries/megafunctions/altera_pll.v Line: 425
+        Warning (14320): Synthesized away node "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|cntsel_temp[3]" File: c:/altera_lite/25.1std/quartus/libraries/megafunctions/altera_pll.v Line: 425
+        Warning (14320): Synthesized away node "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|cntsel_temp[2]" File: c:/altera_lite/25.1std/quartus/libraries/megafunctions/altera_pll.v Line: 425
+        Warning (14320): Synthesized away node "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|cntsel_temp[1]" File: c:/altera_lite/25.1std/quartus/libraries/megafunctions/altera_pll.v Line: 425
+        Warning (14320): Synthesized away node "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|cntsel_temp[0]" File: c:/altera_lite/25.1std/quartus/libraries/megafunctions/altera_pll.v Line: 425
+        Warning (14320): Synthesized away node "Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Pll:iPLL|Mic_Clk_Pll_0002:mic_clk_pll_inst|altera_pll:altera_pll_i|gnd" File: c:/altera_lite/25.1std/quartus/libraries/megafunctions/altera_pll.v Line: 427
+Warning (13034): The following nodes have both tri-state and non-tri-state drivers
+    Warning (13035): Inserted always-enabled tri-state buffer between "GPIO[0]" and its non-tri-state driver. File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Clock_Gen.v Line: 36
+    Warning (13035): Inserted always-enabled tri-state buffer between "GPIO[1]" and its non-tri-state driver. File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Clock_Gen.v Line: 36
+Warning (13039): The following bidirectional pins have no drivers
+    Warning (13040): bidirectional pin "GPIO[2]" has no driver File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Clock_Gen.v Line: 36
+Warning (13009): TRI or OPNDRN buffers permanently enabled
+    Warning (13010): Node "GPIO[0]~synth" File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Clock_Gen.v Line: 36
+    Warning (13010): Node "GPIO[1]~synth" File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Clock_Gen.v Line: 36
+Warning (13024): Output pins are stuck at VCC or GND
+    Warning (13410): Pin "HEX0[1]" is stuck at GND File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Clock_Gen.v Line: 21
+    Warning (13410): Pin "HEX1[0]" is stuck at VCC File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Clock_Gen.v Line: 22
+    Warning (13410): Pin "HEX1[3]" is stuck at GND File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Clock_Gen.v Line: 22
+    Warning (13410): Pin "HEX1[4]" is stuck at GND File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Clock_Gen.v Line: 22
+    Warning (13410): Pin "HEX1[5]" is stuck at GND File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Clock_Gen.v Line: 22
+    Warning (13410): Pin "HEX1[6]" is stuck at VCC File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Clock_Gen.v Line: 22
+    Warning (13410): Pin "HEX5[0]" is stuck at VCC File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Clock_Gen.v Line: 26
+    Warning (13410): Pin "HEX5[1]" is stuck at VCC File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Clock_Gen.v Line: 26
+    Warning (13410): Pin "HEX5[2]" is stuck at VCC File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Clock_Gen.v Line: 26
+    Warning (13410): Pin "HEX5[3]" is stuck at VCC File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Clock_Gen.v Line: 26
+    Warning (13410): Pin "HEX5[4]" is stuck at VCC File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Clock_Gen.v Line: 26
+    Warning (13410): Pin "HEX5[5]" is stuck at VCC File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Clock_Gen.v Line: 26
+    Warning (13410): Pin "HEX5[6]" is stuck at VCC File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Clock_Gen.v Line: 26
+Info (286030): Timing-Driven Synthesis is running
+Info (17049): 14 registers lost all their fanouts during netlist optimizations.
+Info (16010): Generating hard_block partition "hard_block:auto_generated_inst"
+    Info (16011): Adding 12 node(s), including 0 DDIO, 0 PLL, 0 transceiver and 0 LCELL
+Warning (21074): Design contains 14 input pin(s) that do not drive logic
+    Warning (15610): No output dependent on input pin "CLOCK2_50" File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Clock_Gen.v Line: 15
+    Warning (15610): No output dependent on input pin "CLOCK3_50" File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Clock_Gen.v Line: 16
+    Warning (15610): No output dependent on input pin "CLOCK4_50" File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Clock_Gen.v Line: 17
+    Warning (15610): No output dependent on input pin "KEY[1]" File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Clock_Gen.v Line: 29
+    Warning (15610): No output dependent on input pin "KEY[2]" File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Clock_Gen.v Line: 29
+    Warning (15610): No output dependent on input pin "KEY[3]" File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Clock_Gen.v Line: 29
+    Warning (15610): No output dependent on input pin "SW[2]" File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Clock_Gen.v Line: 32
+    Warning (15610): No output dependent on input pin "SW[3]" File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Clock_Gen.v Line: 32
+    Warning (15610): No output dependent on input pin "SW[4]" File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Clock_Gen.v Line: 32
+    Warning (15610): No output dependent on input pin "SW[5]" File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Clock_Gen.v Line: 32
+    Warning (15610): No output dependent on input pin "SW[6]" File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Clock_Gen.v Line: 32
+    Warning (15610): No output dependent on input pin "SW[7]" File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Clock_Gen.v Line: 32
+    Warning (15610): No output dependent on input pin "SW[8]" File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Clock_Gen.v Line: 32
+    Warning (15610): No output dependent on input pin "SW[9]" File: C:/Users/owner/ECE554/DE1_SoC/Tools/SystemBuilder/CodeGenerated/DE1_SOC/Clock_Gen/Clock_Gen.v Line: 32
+Info (21057): Implemented 346 device resources after synthesis - the final resource count might be different
+    Info (21058): Implemented 19 input pins
+    Info (21059): Implemented 45 output pins
+    Info (21060): Implemented 36 bidirectional pins
+    Info (21061): Implemented 239 logic cells
+Info: Quartus Prime Analysis & Synthesis was successful. 0 errors, 65 warnings
+    Info: Peak virtual memory: 4927 megabytes
+    Info: Processing ended: Mon Apr  6 20:56:21 2026
+    Info: Elapsed time: 00:00:56
+    Info: Total CPU time (on all processors): 00:01:59
+
+

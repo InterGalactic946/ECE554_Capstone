@@ -1,0 +1,16 @@
+<sld_project_info>
+  <project>
+    <hash md5_digest_80b="1a9df65d393a6ed45896"/>
+  </project>
+  <file_info>
+    <file device="5CSEMA5F31C6" path="Clock_Gen.sof" usercode="0xFFFFFFFF"/>
+  </file_info>
+  <sld_infos>
+    <sld_info hpath="Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL" name="iCLK_CTRL">
+      <assignment_values>
+        <assignment_value text="QSYS_NAME Mic_Clk_Ctrl HAS_SOPCINFO 1 GENERATION_ID 1775526971"/>
+      </assignment_values>
+      <parameters/>
+    </sld_info>
+  </sld_infos>
+</sld_project_info>
