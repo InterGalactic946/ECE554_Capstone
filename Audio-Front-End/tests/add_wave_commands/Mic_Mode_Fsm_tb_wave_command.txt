@@ -1,0 +1,1 @@
+add wave /Mic_Mode_Fsm_tb/clk; add wave /Mic_Mode_Fsm_tb/rst; add wave /Mic_Mode_Fsm_tb/mode_req; add wave /Mic_Mode_Fsm_tb/pll_locked; add wave /Mic_Mode_Fsm_tb/clk_en; add wave /Mic_Mode_Fsm_tb/clk_sel; add wave /Mic_Mode_Fsm_tb/curr_mode; add wave /Mic_Mode_Fsm_tb/data_val; add wave /Mic_Mode_Fsm_tb/volt_on; add wave /Mic_Mode_Fsm_tb/iDUT/nxt_state;
