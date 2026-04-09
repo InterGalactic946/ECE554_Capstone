@@ -26,6 +26,7 @@ SIM_LIBRARY_PATH = None
 TESTS_DIR = None
 DESIGNS_DIR = None
 PACKAGES_DIR = None
+INTERFACES_DIR = None
 TEST_FILE = None
 OUTPUTS_DIR = None
 
@@ -175,7 +176,7 @@ def setup_directories(name):
         return
     
     # Modifying the global directory variables declared above.
-    global TEST_DIR, OUTPUTS_DIR, TESTS_DIR, CELL_LIBRARY_PATH, SIM_LIBRARY_PATH, DESIGNS_DIR, PACKAGES_DIR, TEST_PROGRAMS_DIR, WAVE_CMD_DIR, OUTPUT_DIR, WAVES_DIR, LOGS_DIR, TRANSCRIPT_DIR, COMPILATION_DIR, SYNTHESIS_DIR, WORK_DIR, BUILD_DIR, DEPENDENCY_GRAPH
+    global TEST_DIR, OUTPUTS_DIR, TESTS_DIR, CELL_LIBRARY_PATH, SIM_LIBRARY_PATH, DESIGNS_DIR, PACKAGES_DIR, INTERFACES_DIR, TEST_PROGRAMS_DIR, WAVE_CMD_DIR, OUTPUT_DIR, WAVES_DIR, LOGS_DIR, TRANSCRIPT_DIR, COMPILATION_DIR, SYNTHESIS_DIR, WORK_DIR, BUILD_DIR, DEPENDENCY_GRAPH
     
     # Set the path for the main test directory using the provided 'name'.
     TEST_DIR = os.path.join(ROOT_DIR, name)
@@ -188,6 +189,9 @@ def setup_directories(name):
 
     # Set the path for the directory containing package files.
     PACKAGES_DIR = os.path.join(TEST_DIR, "packages")
+
+    # Set the path for the directory containing interface files (optional).
+    INTERFACES_DIR = os.path.join(TEST_DIR, "interfaces")
 
     # Define the path for the synthesis directory.
     SYNTHESIS_DIR = os.path.join(TEST_DIR, "synthesis")
