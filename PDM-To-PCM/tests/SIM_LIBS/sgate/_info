@@ -15,19 +15,19 @@ Z2 DPx3 std 6 textio 0 22 zE1`LPoLg^DX3Oz^4Fj1K3
 Z3 DPx4 ieee 14 std_logic_1164 0 22 cVAk:aDinOX8^VGI1ekP<3
 !i122 1
 R0
-Z4 8/filespace/s/sjonnalagad2/SIM_FILES/sgate.vhd
-Z5 F/filespace/s/sjonnalagad2/SIM_FILES/sgate.vhd
+Z4 8./../../SIM_FILES/sgate.vhd
+Z5 F./../../SIM_FILES/sgate.vhd
 l0
 L265 1
 VY1N^a8Coj[7IeAo6eUPhS3
 !s100 MEZXb?NKA_Yi6aNN[@b7D3
 Z6 OE;C;2024.3_2;79
 32
-Z7 !s110 1775242445
+Z7 !s110 1775787607
 !i10b 1
-Z8 !s108 1775242445.000000
-Z9 !s90 /filespace/s/sjonnalagad2/SIM_FILES/sgate.vhd|-work|sgate|
-!s107 /filespace/s/sjonnalagad2/SIM_FILES/sgate.vhd|
+Z8 !s108 1775787607.000000
+Z9 !s90 ./../../SIM_FILES/sgate.vhd|-work|sgate|
+!s107 ./../../SIM_FILES/sgate.vhd|
 !i113 0
 Z10 o-work sgate
 Z11 tExplicit 1 CvgOpt 0
@@ -46,7 +46,7 @@ R7
 !i10b 1
 R8
 R9
-Z12 !s107 /filespace/s/sjonnalagad2/SIM_FILES/sgate.vhd|
+Z12 !s107 ./../../SIM_FILES/sgate.vhd|
 !i113 0
 R10
 R11
@@ -836,8 +836,8 @@ R3
 !i122 0
 Z18 w1775183295
 R0
-Z19 8/filespace/s/sjonnalagad2/SIM_FILES/sgate_pack.vhd
-Z20 F/filespace/s/sjonnalagad2/SIM_FILES/sgate_pack.vhd
+Z19 8./../../SIM_FILES/sgate_pack.vhd
+Z20 F./../../SIM_FILES/sgate_pack.vhd
 l0
 L20 296
 V3POWb?Hi?;k3LlcL2;LzA1
@@ -848,8 +848,8 @@ b1
 R7
 !i10b 1
 R8
-Z21 !s90 /filespace/s/sjonnalagad2/SIM_FILES/sgate_pack.vhd|-work|sgate|
-Z22 !s107 /filespace/s/sjonnalagad2/SIM_FILES/sgate_pack.vhd|
+Z21 !s90 ./../../SIM_FILES/sgate_pack.vhd|-work|sgate|
+Z22 !s107 ./../../SIM_FILES/sgate_pack.vhd|
 !i113 0
 R10
 R11
