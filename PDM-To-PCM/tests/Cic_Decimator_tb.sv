@@ -20,7 +20,6 @@ module Cic_Decimator_tb ();
   logic [ 1:0] out_error;
   logic        out_valid;
   logic        out_ready;
-  logic        clken;
   logic        clk;
   logic        reset_n;
   int          error_count;
@@ -29,7 +28,7 @@ module Cic_Decimator_tb ();
   //////////////////////
   // Instantiate DUT //
   ////////////////////
-  Cic_Decimator iDUT (
+  Cic_Decimator_192 iDUT (
       .in_error (in_error),
       .in_valid (in_valid),
       .in_ready (in_ready),
@@ -38,7 +37,6 @@ module Cic_Decimator_tb ();
       .out_error(out_error),
       .out_valid(out_valid),
       .out_ready(out_ready),
-      .clken    (clken),
       .clk      (clk),
       .reset_n  (reset_n)
   );
@@ -53,7 +51,6 @@ module Cic_Decimator_tb ();
   initial begin
     clk = 1'b0;
     reset_n = 1'b0;
-    clken = 1'b1;
     in_valid = 1'b0;
     in_data = 2'b00;
     in_error = 2'b00;
@@ -108,32 +105,7 @@ module Cic_Decimator_tb ();
       error_count += 1;
     end
 
-    // TEST 5: With clken low, the DUT should not accept/output new activity.
-    output_count = 0;
-    clken = 1'b0;
-
-    repeat (16) begin
-      @(negedge clk) begin
-        in_valid = 1'b1;
-        in_data  = 2'b11;
-      end
-    end
-
-    @(negedge clk) begin
-      in_valid = 1'b0;
-      in_data  = 2'b00;
-    end
-
-    repeat (32) @(posedge clk);
-
-    if (output_count != 0) begin
-      $error("ERROR: Output activity was observed while clken was low!");
-      error_count += 1;
-    end
-
-    clken = 1'b1;
-
-    // TEST 6: With out_ready low, out_valid may assert but the accepted output count should not change.
+    // TEST 5: With out_ready low, out_valid may assert but the accepted output count should not change.
     repeat (32) begin
       @(negedge clk) begin
         in_valid = 1'b1;
@@ -159,7 +131,7 @@ module Cic_Decimator_tb ();
     out_ready = 1'b1;
     repeat (16) @(posedge clk);
 
-    // TEST 7: Alternating edge-case inputs should still produce output.
+    // TEST 6: Alternating edge-case inputs should still produce output.
     output_count = 0;
 
     repeat (16) begin
@@ -185,7 +157,7 @@ module Cic_Decimator_tb ();
       error_count += 1;
     end
 
-    // TEST 8: Mid-stream reset should force the interface back to a safe state.
+    // TEST 7: Mid-stream reset should force the interface back to a safe state.
     @(negedge clk) begin
       in_valid = 1'b1;
       in_data  = 2'b01;

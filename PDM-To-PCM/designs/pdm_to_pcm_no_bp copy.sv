@@ -16,17 +16,19 @@ module Pdm_To_Pcm (
     input logic mic_clk_i,
     input logic mic_clk_val_i,
     input logic mic_data_i,
-    input logic [1:0] mic_mode_i,
+    input logic pos_pcm_cap_rdy_i,
+    input logic neg_pcm_cap_rdy_i,
 
-    output logic [15:0] pcm_pos_o,
+    output logic signed [15:0] pcm_pos_o,
     output logic pcm_valid_pos_o,
-    output logic [15:0] pcm_neg_o,
+    output logic signed [15:0] pcm_neg_o,
     output logic pcm_valid_neg_o
 );
 
   /////////////////////////////////////////////////
   // Declare any internal signals as type logic //
   ///////////////////////////////////////////////
+  logic rst_n;
   logic mic_clk_step, mic_clk_stable;
   logic mic_clk_stable_prev;
   logic mic_clk_en;
@@ -36,12 +38,16 @@ module Pdm_To_Pcm (
   logic [1:0] data_in_pos, data_in_neg;
   logic cic_valid_pos, cic_valid_neg;
   logic [17:0] cic_out_pos, cic_out_neg;
-  logic [17:0] comp_out_pos, comp_out_neg;
-
-  logic [7:0] clk_cnt;
-  logic volt_on;
-  logic [11:0] volt_lvl;
+  logic [1:0] cic_error_pos, cic_error_neg;
+  logic fir_pos_ready, fir_neg_ready;
+  logic [40:0] comp_out_pos, comp_out_neg;
+  logic output_valid_pos, output_valid_neg;
+  logic fir_error_pos, fir_error_neg;
+  logic pcm_valid_pos, pcm_valid_neg;
   ///////////////////////////////////////////////
+
+  // Get active low rst.
+  assign rst_n = ~rst_i;
 
   // Synchronize the microphone clock and generate an enable signal for sampling.
   always_ff @(posedge clk_i) begin
@@ -66,7 +72,7 @@ module Pdm_To_Pcm (
   // Detect an edge on mic_clk.
   assign mic_clk_rising = (~mic_clk_stable_prev & mic_clk_stable);
   assign mic_clk_falling = (mic_clk_stable_prev & ~mic_clk_stable);
-  assign mic_clk_en = mic_clk_val_i & (mic_clk_rising | mic_clk_falling);
+  assign mic_clk_en = mic_clk_rising | mic_clk_falling;
 
   // 1-cycle delay to align valid signals with DDIO output latency
   always_ff @(posedge clk_i) begin
@@ -75,9 +81,9 @@ module Pdm_To_Pcm (
       pdm_neg_valid <= 1'b0;
     end else begin
       // Mic (High) is valid after falling edge
-      pdm_pos_valid <= mic_clk_falling;
+      pdm_pos_valid <= mic_clk_falling & mic_clk_val_i;
       // Mic (Low) is valid on rising edge
-      pdm_neg_valid <= mic_clk_rising;
+      pdm_neg_valid <= mic_clk_rising & mic_clk_val_i;
     end
   end
 
@@ -109,118 +115,128 @@ module Pdm_To_Pcm (
   end
 
   // CIC for Mic High (sampled on falling Edge)
-  Cic_Decimator iPOS_MIC (
+  Cic_Decimator_192 iPOS_MIC (
       .clk    (clk_i),
-      .clken  (1'b1),
-      .reset_n(~rst_i),
+      .reset_n(rst_n),
 
       .in_error (2'b00),
       .in_data  (data_in_pos),
       .in_valid (pdm_pos_valid),
-      .out_ready(1'b1),
+      .out_ready(fir_pos_ready),  // Backpressure from FIR filter
 
       .in_ready (),
       .out_data (cic_out_pos),
       .out_valid(cic_valid_pos),
-      .out_error()
+      .out_error(cic_error_pos)
   );
 
   // CIC for Mic Low (sampled on rising Edge)
-  Cic_Decimator iNEG_MIC (
+  Cic_Decimator_192 iNEG_MIC (
       .clk    (clk_i),
-      .clken  (1'b1),
-      .reset_n(~rst_i),
+      .reset_n(rst_n),
 
       .in_error (2'b00),
       .in_data  (data_in_neg),
       .in_valid (pdm_neg_valid),
-      .out_ready(1'b1),
+      .out_ready(fir_neg_ready),  // Backpressure from FIR filter
 
       .in_ready (),
       .out_data (cic_out_neg),
       .out_valid(cic_valid_neg),
-      .out_error()
+      .out_error(cic_error_neg)
   );
 
-  fir_comp iPOSCOMP (
-      .clk(mic_clk),
-      .rst_n(rst_n),
-      .in_valid(output_valid_pos),
-      .in_data(cic_out_pos),
-      .out_data(comp_out_pos)
+  // Instantiate the POS FIR filter.
+  FIR iPOS_FIR (
+      .clk    (clk_i),
+      .reset_n(rst_n),
+
+      // input stream
+      .ast_sink_data (cic_out_pos),
+      .ast_sink_valid(cic_valid_pos),
+      .ast_sink_error(cic_error_pos),
+      .ast_sink_ready(fir_pos_ready),
+
+      // output stream
+      .ast_source_data (comp_out_pos),
+      .ast_source_valid(output_valid_pos),
+      .ast_source_error(fir_error_pos),
+      .ast_source_ready(pos_pcm_cap_rdy_i)
   );
 
-  fir_comp iNEGCOMP (
-      .clk(mic_clk),
-      .rst_n(rst_n),
-      .in_valid(output_valid_neg),
-      .in_data(cic_out_neg),
-      .out_data(comp_out_neg)
+  // Instantiate the NEG FIR filter.
+  FIR iNEG_FIR (
+      .clk    (clk_i),
+      .reset_n(rst_n),
+
+      // input stream
+      .ast_sink_data (cic_out_neg),
+      .ast_sink_valid(cic_valid_neg),
+      .ast_sink_error(cic_error_neg),
+      .ast_sink_ready(fir_neg_ready),
+
+      // output stream
+      .ast_source_data (comp_out_neg),
+      .ast_source_valid(output_valid_neg),
+      .ast_source_error(fir_error_neg),
+      .ast_source_ready(neg_pcm_cap_rdy_i)
   );
 
-  assign pcm_valid_pos = output_valid_pos & ~output_valid_pos_delayed;
-  assign pcm_valid_neg = output_valid_neg & ~output_valid_neg_delayed;
+  // Convert the FIR output to 16-bit PCM with saturation logic.
+  function automatic logic signed [15:0] fir41_to_pcm16(input logic signed [40:0] fir_sample);
+    logic sign_bit;
+    logic positive_overflow;
+    logic negative_overflow;
 
-  assign pcm_pos = comp_out_pos[17] ? (~&comp_out_pos[16:15] ? 16'h800 : comp_out_pos[15:0]) 
-                                      : (|comp_out_pos[16:15] ? 16'h7FF : comp_out_pos[15:0]);
+    begin
+      // The FIR output is a 41-bit signed fixed point value. Bits [30:15] represent the scaled PCM value after shifting right by 15. Bit 30 is the sign bit for the PCM output.
+      sign_bit = fir_sample[30];
 
-  assign pcm_neg = comp_out_neg[17] ? (~&comp_out_neg[16:15] ? 16'h800 : comp_out_neg[15:0]) 
-                                      : (|comp_out_neg[16:15] ? 16'h7FF : comp_out_neg[15:0]);
+      // After shifting right by 15, bit 30 becomes the 16-bit PCM sign bit.
+      // Bits [40:31] must all match bit 30. If not, saturation is needed.
+      positive_overflow = ~sign_bit & (|fir_sample[40:31]);
+      negative_overflow = sign_bit & (~&fir_sample[40:31]);
 
-  always @(posedge clk, negedge rst_n) begin
-    if (!rst_n) begin
-      pdm_pos <= 1'b0;
-      pdm_neg <= 1'b0;
-    end else begin
-      if (mic_mode == 2'b10) begin
-        if (clk_cnt == 6) begin
-          pdm_pos <= mic_raw;
-        end else if (clk_cnt == 16) begin
-          pdm_neg <= mic_raw;
-        end
-      end else if (mic_mode == 2'b11) begin
-        if (clk_cnt == 4) begin
-          pdm_pos <= mic_raw;
-        end else if (clk_cnt == 13) begin
-          pdm_neg <= mic_raw;
-        end
-      end
-    end
-  end
-
-  always @(posedge clk, negedge rst_n) begin
-    if (!rst_n) begin
-      clk_cnt <= 1'b0;
-    end else begin
-      if (mic_clk && !mic_clk_delayed) begin
-        clk_cnt <= 1'b0;
+      if (positive_overflow) begin
+        fir41_to_pcm16 = 16'sh7FFF;
+      end else if (negative_overflow) begin
+        fir41_to_pcm16 = 16'sh8000;
       end else begin
-        clk_cnt <= clk_cnt + 1;
+        fir41_to_pcm16 = fir_sample[30:15];
+      end
+    end
+  endfunction
+
+  // The PCM output is valid when the FIR output is valid and the capture interface is ready to accept data and
+  // we also check that there are no errors from the FIR filter before asserting valid.
+  assign pcm_valid_pos = output_valid_pos && pos_pcm_cap_rdy_i && (fir_error_pos == 2'b00);
+  assign pcm_valid_neg = output_valid_neg && neg_pcm_cap_rdy_i && (fir_error_neg == 2'b00);
+
+  // Register the final PCM pos outputs and valid signals, applying backpressure from the capture interface.
+  always_ff @(posedge clk_i) begin
+    if (rst_i) begin
+      pcm_pos_o       <= 16'sh0;
+      pcm_valid_pos_o <= 1'b0;
+    end else begin
+      pcm_valid_pos_o <= pcm_valid_pos;
+
+      if (pcm_valid_pos) begin
+        pcm_pos_o <= fir41_to_pcm16($signed(comp_out_pos));
       end
     end
   end
 
-  always @(posedge clk, negedge rst_n) begin
-    if (!rst_n) begin
-      mic_clk_delayed <= 1'b0;
+  // Register the final PCM negoutputs and valid signals, applying backpressure from the capture interface.
+  always_ff @(posedge clk_i) begin
+    if (rst_i) begin
+      pcm_neg_o       <= 16'sh0;
+      pcm_valid_neg_o <= 1'b0;
     end else begin
-      mic_clk_delayed <= mic_clk;
-    end
-  end
+      pcm_valid_neg_o <= pcm_valid_neg;
 
-  always @(posedge clk, negedge rst_n) begin
-    if (!rst_n) begin
-      output_valid_pos_delayed <= 1'b0;
-    end else begin
-      output_valid_pos_delayed <= output_valid_pos;
-    end
-  end
-
-  always @(posedge clk, negedge rst_n) begin
-    if (!rst_n) begin
-      output_valid_neg_delayed <= 1'b0;
-    end else begin
-      output_valid_neg_delayed <= output_valid_neg;
+      if (pcm_valid_neg) begin
+        pcm_neg_o <= fir41_to_pcm16($signed(comp_out_neg));
+      end
     end
   end
 

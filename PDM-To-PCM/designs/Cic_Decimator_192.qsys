@@ -20,7 +20,7 @@
 }
 ]]></parameter>
  <parameter name="clockCrossingAdapter" value="HANDSHAKE" />
- <parameter name="device" value="5CSEMA6F31C6" />
+ <parameter name="device" value="5CSEMA5F31C6" />
  <parameter name="deviceFamily" value="Cyclone V" />
  <parameter name="deviceSpeedGrade" value="6" />
  <parameter name="fabricMode" value="QSYS" />
@@ -54,13 +54,9 @@
   <port name="out_valid" internal="out_valid" />
   <port name="out_ready" internal="out_ready" />
  </interface>
- <interface name="clken" internal="cic_ii_0.clken" type="conduit" dir="end">
-  <port name="clken" internal="clken" />
- </interface>
  <interface name="clock" internal="cic_ii_0.clock" type="clock" dir="end">
   <port name="clk" internal="clk" />
  </interface>
- <interface name="rate" internal="cic_ii_0.rate" />
  <interface name="reset" internal="cic_ii_0.reset" type="reset" dir="end">
   <port name="reset_n" internal="reset_n" />
  </interface>
@@ -71,12 +67,12 @@
    enabled="1"
    autoexport="1">
   <parameter name="CH_PER_INT" value="1" />
-  <parameter name="CLK_EN_PORT" value="true" />
-  <parameter name="D_DELAY" value="2" />
+  <parameter name="CLK_EN_PORT" value="false" />
+  <parameter name="D_DELAY" value="1" />
   <parameter name="FILTER_TYPE" value="decimator" />
   <parameter name="INTERFACES" value="1" />
   <parameter name="IN_WIDTH" value="2" />
-  <parameter name="RCF_FIX" value="8" />
+  <parameter name="RCF_FIX" value="16" />
   <parameter name="RCF_LB" value="8" />
   <parameter name="RCF_UB" value="21" />
   <parameter name="REQ_DIF_MEM" value="logic_element" />
