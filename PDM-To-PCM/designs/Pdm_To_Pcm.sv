@@ -10,7 +10,9 @@
 // Author: Nate Parmley
 // Date: 04-01-2026
 // ------------------------------------------------------------
-module Pdm_To_Pcm (
+module Pdm_To_Pcm #(
+    parameter int unsigned SYS_CLK_HZ = 50_000_000
+) (
     input logic clk_i,
     input logic rst_i,
     input logic mic_clk_i,
@@ -25,14 +27,39 @@ module Pdm_To_Pcm (
     output logic pcm_valid_neg_o
 );
 
+  localparam int unsigned NS_PER_SEC = 1_000_000_000;
+  localparam int unsigned SYS_CLK_PERIOD_NS = NS_PER_SEC / SYS_CLK_HZ;
+
+  // SPH0641LU4H-1 datasheet worst-case DATA timing:
+  // tDD max = 40 ns, tDZ max = 16 ns. tDD dominates, so sample after
+  // tDD plus guard while staying safely before the next mic-clock edge.
+  localparam int unsigned MIC_TDD_MAX_NS = 40;
+  localparam int unsigned MIC_TDZ_MAX_NS = 16;
+
+  // Add a buffer to ensure we sample after the data is stable.
+  localparam int unsigned MIC_DATA_SAMPLE_GUARD_NS = 10;
+
+  // Total time for data to settle.
+  localparam int unsigned MIC_DATA_SETTLE_NS = MIC_TDD_MAX_NS + MIC_DATA_SAMPLE_GUARD_NS;
+
+  // Calculate the number of system clock cycles needed to meet the data settle time.
+  localparam int unsigned MIC_DATA_SETTLE_CYCLES =
+      (MIC_DATA_SETTLE_NS + SYS_CLK_PERIOD_NS - 1) / SYS_CLK_PERIOD_NS;
+
+  // Set the capture cycles of the data after the mic clock edge to ensure we sample after the data is stable.
+  localparam int unsigned MIC_CAPTURE_DELAY_CYCLES = (MIC_DATA_SETTLE_CYCLES - 1);
+  localparam int unsigned MIC_CAPTURE_COUNTER_W = $clog2(MIC_CAPTURE_DELAY_CYCLES + 1);
+
   /////////////////////////////////////////////////
   // Declare any internal signals as type logic //
   ///////////////////////////////////////////////
   logic rst_n;
   logic mic_clk_step, mic_clk_stable;
   logic mic_clk_stable_prev;
-  logic mic_clk_en;
   logic mic_clk_rising, mic_clk_falling;
+  logic [MIC_CAPTURE_COUNTER_W-1:0] capture_cycles;
+  logic [MIC_CAPTURE_COUNTER_W-1:0] pos_capture_cntr, neg_capture_cntr;
+  logic pos_pdm_cap, neg_pdm_cap;
   logic pdm_pos_valid, pdm_neg_valid;
   logic pdm_pos, pdm_neg;
   logic [1:0] data_in_pos, data_in_neg;
@@ -42,7 +69,7 @@ module Pdm_To_Pcm (
   logic fir_pos_ready, fir_neg_ready;
   logic [40:0] comp_out_pos, comp_out_neg;
   logic output_valid_pos, output_valid_neg;
-  logic fir_error_pos, fir_error_neg;
+  logic [1:0] fir_error_pos, fir_error_neg;
   logic pcm_valid_pos, pcm_valid_neg;
   ///////////////////////////////////////////////
 
@@ -70,48 +97,52 @@ module Pdm_To_Pcm (
   end
 
   // Detect an edge on mic_clk.
-  assign mic_clk_rising = (~mic_clk_stable_prev & mic_clk_stable);
+  assign mic_clk_rising  = (~mic_clk_stable_prev & mic_clk_stable);
   assign mic_clk_falling = (mic_clk_stable_prev & ~mic_clk_stable);
-  assign mic_clk_en = mic_clk_rising | mic_clk_falling;
 
-  // 1-cycle delay to align valid signals with DDIO output latency
+  // Capture each mic after the datasheet DATA timing has elapsed.
   always_ff @(posedge clk_i) begin
-    if (rst_i) begin
-      pdm_pos_valid <= 1'b0;
-      pdm_neg_valid <= 1'b0;
-    end else begin
-      // Mic (High) is valid after falling edge
-      pdm_pos_valid <= mic_clk_falling & mic_clk_val_i;
-      // Mic (Low) is valid on rising edge
-      pdm_neg_valid <= mic_clk_rising & mic_clk_val_i;
-    end
+    if (rst_i) pos_capture_cntr <= '0;
+    else if (~mic_clk_val_i) pos_capture_cntr <= '0;
+    else if (mic_clk_falling) pos_capture_cntr <= MIC_CAPTURE_DELAY_CYCLES;
+    else if (pos_capture_cntr != '0) pos_capture_cntr <= pos_capture_cntr - 1'b1;
   end
 
-  // Instantiate the PDM data sampler.
-  // NOTE: We latch the Hi-Mic's data on clk low and the Lo-Mic's data
-  // on clk high to ensure we capture the correct bits for each mic mode.
-  Mic_Data_In iPDM_Sampler (
-      .inclock(clk_i),
-      .sclr(rst_i),
-      .inclocken(mic_clk_en),
-      .datain(mic_data_i),
+  // Pulse when the counter is about to expire so the data is sampled once per mic edge.
+  assign pos_pdm_cap = (pos_capture_cntr == 1'b1);
 
-      .dataout_h(pdm_neg),
-      .dataout_l(pdm_pos)
-  );
-
-  // Convert the latched PDM bits into 2-bit values for the CIC decimator.
-  // If pdm data is 1, we input 2'b01 to represent a positive pulse;
-  // if it's 0, we input 2'b11 to represent a negative pulse.
   always_ff @(posedge clk_i) begin
-    if (rst_i) begin
-      data_in_pos <= 2'b00;
-      data_in_neg <= 2'b00;
-    end else begin
-      // Makes data_in stable for the CIC exactly when the valid pulses are high
-      data_in_pos <= (pdm_pos) ? 2'b01 : 2'b11;
-      data_in_neg <= (pdm_neg) ? 2'b01 : 2'b11;
-    end
+    if (rst_i) neg_capture_cntr <= '0;
+    else if (~mic_clk_val_i) neg_capture_cntr <= '0;
+    else if (mic_clk_rising) neg_capture_cntr <= MIC_CAPTURE_DELAY_CYCLES;
+    else if (neg_capture_cntr != '0) neg_capture_cntr <= neg_capture_cntr - 1'b1;
+  end
+
+  // Pulse when the counter is about to expire so the data is sampled once per mic edge.
+  assign neg_pdm_cap = (neg_capture_cntr == 1'b1);
+
+  always_ff @(posedge clk_i) begin
+    if (rst_i) data_in_pos <= 2'h0;
+    else if (pos_pdm_cap) data_in_pos <= (mic_data_i) ? 2'b01 : 2'b11;
+    else data_in_pos <= 2'h0;
+  end
+
+  always_ff @(posedge clk_i) begin
+    if (rst_i) data_in_neg <= 2'h0;
+    else if (neg_pdm_cap) data_in_neg <= (mic_data_i) ? 2'b01 : 2'b11;
+    else data_in_neg <= 2'h0;
+  end
+
+  always_ff @(posedge clk_i) begin
+    if (rst_i) pdm_pos_valid <= 1'b0;
+    else if (pos_pdm_cap) pdm_pos_valid <= 1'b1;
+    else pdm_pos_valid <= 1'b0;
+  end
+
+  always_ff @(posedge clk_i) begin
+    if (rst_i) pdm_neg_valid <= 1'b0;
+    else if (neg_pdm_cap) pdm_neg_valid <= 1'b1;
+    else pdm_neg_valid <= 1'b0;
   end
 
   // CIC for Mic High (sampled on falling Edge)

@@ -145,18 +145,47 @@ def form_sim_libs():
     Returns:
         str: A string containing the -L arguments for each valid library found in the SIM_LIBRARY_PATH directory.
     """
-    sim_libs_arg = ""
+    # Prefer Verilog Intel libraries before same-family VHDL libraries.
+    # Generated Verilog IP uses defparams that must bind to the *_ver models.
+    preferred_order = [
+        "altera_ver",
+        "lpm_ver",
+        "sgate_ver",
+        "altera_mf_ver",
+        "altera_lnsim_ver",
+        "cyclonev_ver",
+        "cyclonev_hssi_ver",
+        "cyclonev_pcie_hip_ver",
+    ]
+
+    sim_lib_paths = []
     if os.path.exists(config.SIM_LIBRARY_PATH):
-        for item in os.listdir(config.SIM_LIBRARY_PATH):
+        sim_lib_dirs = [
+            item for item in os.listdir(config.SIM_LIBRARY_PATH)
+            if os.path.isdir(os.path.join(config.SIM_LIBRARY_PATH, item))
+        ]
+
+        ordered_libs = []
+        # First add libraries in the preferred order if they exist.
+        for lib_name in preferred_order:
+            if lib_name in sim_lib_dirs:
+                ordered_libs.append(lib_name)
+                
+        # Then add any remaining libraries that were not in the preferred order.
+        for lib_name in sorted(sim_lib_dirs):
+            if lib_name not in ordered_libs:
+                ordered_libs.append(lib_name)
+
+        # Add the libraries to the sim_lib_paths list with the -L flag.
+        for item in ordered_libs:
             # Get the library path.
             item_path = os.path.join(config.SIM_LIBRARY_PATH, item)
-                
+
             # If it's a directory, assume it's a compiled library and add it to the sim libs argument.
-            if os.path.isdir(item_path):
-                sim_libs_arg += f"-L {item_path} "
+            sim_lib_paths.append(f"-L {item_path}")
         
     # Return the formatted argument string for the simulation command.
-    return sim_libs_arg.strip()
+    return " ".join(sim_lib_paths)
 
 
 def get_gui_command(test_name, log_file, args):
