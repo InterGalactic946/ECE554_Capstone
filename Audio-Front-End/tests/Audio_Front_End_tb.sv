@@ -99,7 +99,7 @@ module Audio_Front_End_tb ();
   // Sample the left microphone on falling mic-clock edges.
   always @(negedge mic_clk) begin
     if (data_val && iMIC_MODEL_L.model_active) begin
-      #1;
+      #(MIC_TIMING_DATA_SAMPLE_SKEW_NS);
       if ((data_l !== 1'b0) && (data_l !== 1'b1)) begin
         $error("ERROR: Left microphone did not drive DATA on its active edge!");
         error_count += 1;
@@ -132,7 +132,7 @@ module Audio_Front_End_tb ();
   // Sample the right microphone on rising mic-clock edges.
   always @(posedge mic_clk) begin
     if (data_val && iMIC_MODEL_R.model_active) begin
-      #1;
+      #(MIC_TIMING_DATA_SAMPLE_SKEW_NS);
       if ((data_r !== 1'b0) && (data_r !== 1'b1)) begin
         $error("ERROR: Right microphone did not drive DATA on its active edge!");
         error_count += 1;
@@ -421,7 +421,7 @@ module Audio_Front_End_tb ();
     expect_clock_quiet(clk, mic_clk_edge_count, error_count, CLOCK_ACTIVITY_OBSERVE_CYCLES,
                        "sleep after disabling while powered");
 
-    #1;
+    #(MIC_TIMING_DATA_SAMPLE_SKEW_NS);
     if (data_l !== 1'bz) begin
       $error("ERROR: Left microphone did not release DATA after returning to SLEEP!");
       error_count += 1;

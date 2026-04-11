@@ -15,6 +15,7 @@ package Tb_Util_pkg;
   localparam realtime MIC_TIMING_TYP_DATA_HIGH_Z_NS = 3.0;
   localparam realtime MIC_TIMING_WORST_DATA_ASSERT_NS = 40.0;
   localparam realtime MIC_TIMING_WORST_DATA_HIGH_Z_NS = 16.0;
+  localparam realtime MIC_TIMING_DATA_SAMPLE_SKEW_NS = MIC_TIMING_WORST_DATA_ASSERT_NS + 1.0;
   
   // Allow either sleep-style clock select encoding while transitions settle.
   function automatic bit verify_clk_sel(input logic [1:0] val);
@@ -165,14 +166,14 @@ package Tb_Util_pkg;
     begin
       for (pair_idx = 0; pair_idx < edge_pairs; pair_idx += 1) begin
         @(posedge mic_clk);
-        #1;
+        #(MIC_TIMING_DATA_SAMPLE_SKEW_NS);
         if (data_bus_mon !== 1'bz) begin
           $error("ERROR: Shared data bus was not high-Z on a right-channel edge during %s!", label);
           error_count += 1;
         end
 
         @(negedge mic_clk);
-        #1;
+        #(MIC_TIMING_DATA_SAMPLE_SKEW_NS);
         if (data_bus_mon !== 1'bz) begin
           $error("ERROR: Shared data bus was not high-Z on a left-channel edge during %s!", label);
           error_count += 1;

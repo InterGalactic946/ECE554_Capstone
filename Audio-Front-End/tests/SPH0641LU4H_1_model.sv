@@ -12,20 +12,20 @@
 // Author: Srivibhav Jonnalagadda
 // Date: 03-24-2026
 // ------------------------------------------------------------
+import Mic_Time_pkg::*;
+import Tb_Util_pkg::*;
 module SPH0641LU4H_1_model #(
     parameter bit FAST_SIM = 1'b0,
     parameter int unsigned FAST_SIM_DIV = 1,
     parameter int unsigned TONE_FREQ_HZ = 1_000,
-    parameter realtime MIC_DATA_ASSERT_TIME_NS = Tb_Util_pkg::MIC_TIMING_TYP_DATA_ASSERT_NS,
-    parameter realtime MIC_DATA_HIGH_Z_TIME_NS = Tb_Util_pkg::MIC_TIMING_TYP_DATA_HIGH_Z_NS
+    parameter realtime MIC_DATA_ASSERT_TIME_NS = Tb_Util_pkg::MIC_TIMING_WORST_DATA_ASSERT_NS,
+    parameter realtime MIC_DATA_HIGH_Z_TIME_NS = Tb_Util_pkg::MIC_TIMING_WORST_DATA_HIGH_Z_NS
 ) (
     input logic vdd_i,    // Digital abstraction of microphone supply being present.
     input logic clock_i,  // Applied microphone clock.
     input logic select_i, // Chooses which clock edge DATA is driven on.
     output tri data_o     // Microphone DATA pin. Driven only on the selected edge.
 );
-
-  import Mic_Time_pkg::*;
 
   ///////////////////////////////////////
   // Declare state type as enumerated //
@@ -593,21 +593,21 @@ module SPH0641LU4H_1_model #(
       pdm_accum      <= 16'h0000;
       tone_phase     <= 16'h0000;
     end else if (!model_active) begin
-      data_drive_en  <= 1'b0;  // Keep DATA high-Z in OFF, SLEEP, INVALID, WAIT, or FAULT.
+      data_drive_en <= 1'b0;  // Keep DATA high-Z in OFF, SLEEP, INVALID, WAIT, or FAULT.
       data_drive_val <= 1'b0;
-      data_o_drv     <= #(MIC_DATA_HIGH_Z_TIME_NS) 1'bz;
-      pdm_accum      <= 16'h0000;  // Restart the PDM stream when the mic becomes active again.
-      tone_phase     <= 16'h0000;  // Restart the internal tone phase when the mic becomes active again.
+      data_o_drv <= #(MIC_DATA_HIGH_Z_TIME_NS) 1'bz;
+      pdm_accum <= 16'h0000;  // Restart the PDM stream when the mic becomes active again.
+      tone_phase <= 16'h0000;  // Restart the internal tone phase when the mic becomes active again.
     end else if (is_active_edge(select_i, clock_i)) begin
       // Advance the internal test tone and emit a 1-bit PDM representation of it.
       phase_next      = tone_phase + tone_phase_step(clock_period_ns);
       tone_sample_now = sine_sample(phase_next);
       pdm_sum         = {1'b0, pdm_accum} + {1'b0, tone_sample_now};
-      pdm_accum       <= pdm_sum[15:0];
-      tone_phase      <= phase_next;
-      data_drive_val  <= pdm_sum[16];
-      data_drive_en   <= 1'b1;
-      data_o_drv      <= #(MIC_DATA_ASSERT_TIME_NS) pdm_sum[16];
+      pdm_accum      <= pdm_sum[15:0];
+      tone_phase     <= phase_next;
+      data_drive_val <= pdm_sum[16];
+      data_drive_en  <= 1'b1;
+      data_o_drv     <= #(MIC_DATA_ASSERT_TIME_NS) pdm_sum[16];
     end else begin
       data_drive_en <= 1'b0;  // Release DATA on the non-selected edge.
       data_o_drv    <= #(MIC_DATA_HIGH_Z_TIME_NS) 1'bz;
