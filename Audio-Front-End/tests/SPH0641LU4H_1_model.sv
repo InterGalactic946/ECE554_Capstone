@@ -79,6 +79,7 @@ module SPH0641LU4H_1_model #(
 
   localparam realtime MIC_SLEEP_CLOCK_MAX_PERIOD_NS = 4_000.0;
   localparam realtime MIC_STOPPED_CLOCK_DETECT_NS = MIC_SLEEP_CLOCK_MAX_PERIOD_NS + 1.0;
+  localparam realtime MIC_FREQ_CLASS_TOL_HZ = 500.0;  // Allows small PLL/period quantization near band edges.
 
   // Drive DATA from a delayed registered pin driver.
   assign data_o = data_o_drv;
@@ -183,13 +184,16 @@ module SPH0641LU4H_1_model #(
       end else begin
         freq_hz = 1.0e9 / period_ns;
 
-        if (freq_hz <= 250_000.0) begin
+        if (freq_hz <= (250_000.0 + MIC_FREQ_CLASS_TOL_HZ)) begin
           classify_mode = MODE_SLEEP;
-        end else if ((freq_hz >= 351_000.0) && (freq_hz <= 815_000.0)) begin
+        end else if ((freq_hz >= (351_000.0 - MIC_FREQ_CLASS_TOL_HZ)) &&
+                     (freq_hz <= (815_000.0 + MIC_FREQ_CLASS_TOL_HZ))) begin
           classify_mode = MODE_LOW_PWR;
-        end else if ((freq_hz >= 1_024_000.0) && (freq_hz <= 2_475_000.0)) begin
+        end else if ((freq_hz >= (1_024_000.0 - MIC_FREQ_CLASS_TOL_HZ)) &&
+                     (freq_hz <= (2_475_000.0 + MIC_FREQ_CLASS_TOL_HZ))) begin
           classify_mode = MODE_STD;
-        end else if ((freq_hz >= 3_072_000.0) && (freq_hz <= 4_800_000.0)) begin
+        end else if ((freq_hz >= (3_072_000.0 - MIC_FREQ_CLASS_TOL_HZ)) &&
+                     (freq_hz <= (4_800_000.0 + MIC_FREQ_CLASS_TOL_HZ))) begin
           classify_mode = MODE_ULT;
         end else begin
           classify_mode = MODE_INVALID;  // Clock is outside all legal datasheet ranges.

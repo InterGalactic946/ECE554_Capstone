@@ -22,7 +22,7 @@ package Mic_Time_pkg;
   localparam int unsigned MIC_WAKEUP_MS = 15;
   localparam int unsigned MIC_MODECHANGE_MS = 10;
   localparam int unsigned MIC_FALLASLEEP_MS = 10;
-  localparam int unsigned MIC_SETTLE_GUARD_CYCLES = 64;
+  localparam int unsigned MIC_SETTLE_GUARD_CYCLES = 256;
 
   localparam realtime MIC_POWERUP_TIME_NS = 50_000_000.0;
   localparam realtime MIC_WAKEUP_TIME_NS = 15_000_000.0;
