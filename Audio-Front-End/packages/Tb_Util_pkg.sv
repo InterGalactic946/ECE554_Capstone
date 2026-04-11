@@ -8,6 +8,14 @@
 // ------------------------------------------------------------
 package Tb_Util_pkg;
 
+  // SPH0641LU4H-1 DATA output timing corners from the datasheet.
+  // tDD has a typical and max value; tDZ only provides min/max, so
+  // the typical corner uses the fast/min release and worst uses max.
+  localparam realtime MIC_TIMING_TYP_DATA_ASSERT_NS = 28.0;
+  localparam realtime MIC_TIMING_TYP_DATA_HIGH_Z_NS = 3.0;
+  localparam realtime MIC_TIMING_WORST_DATA_ASSERT_NS = 40.0;
+  localparam realtime MIC_TIMING_WORST_DATA_HIGH_Z_NS = 16.0;
+  
   // Allow either sleep-style clock select encoding while transitions settle.
   function automatic bit verify_clk_sel(input logic [1:0] val);
     verify_clk_sel = (val === 2'h0) || (val === 2'h1);

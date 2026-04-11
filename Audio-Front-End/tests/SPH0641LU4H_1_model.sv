@@ -15,7 +15,9 @@
 module SPH0641LU4H_1_model #(
     parameter bit FAST_SIM = 1'b0,
     parameter int unsigned FAST_SIM_DIV = 1,
-    parameter int unsigned TONE_FREQ_HZ = 1_000
+    parameter int unsigned TONE_FREQ_HZ = 1_000,
+    parameter realtime MIC_DATA_ASSERT_TIME_NS = Tb_Util_pkg::MIC_TIMING_TYP_DATA_ASSERT_NS,
+    parameter realtime MIC_DATA_HIGH_Z_TIME_NS = Tb_Util_pkg::MIC_TIMING_TYP_DATA_HIGH_Z_NS
 ) (
     input logic vdd_i,    // Digital abstraction of microphone supply being present.
     input logic clock_i,  // Applied microphone clock.
@@ -63,6 +65,7 @@ module SPH0641LU4H_1_model #(
   logic period_valid;  // Indicates a valid clock period measurement exists.
   logic data_drive_en;  // Enables the DATA output driver.
   logic data_drive_val;  // Value driven onto DATA when enabled.
+  logic data_o_drv;  // Delayed registered DATA pin driver.
   logic set_warning, clr_warning;  // Set/clear signals for illegal-transition warning latch.
   logic load, dec;  // Load/decrement controls for settle counter.
   logic tmr_empty;  // Indicates the settle counter is empty.
@@ -77,8 +80,8 @@ module SPH0641LU4H_1_model #(
   localparam realtime MIC_SLEEP_CLOCK_MAX_PERIOD_NS = 4_000.0;
   localparam realtime MIC_STOPPED_CLOCK_DETECT_NS = MIC_SLEEP_CLOCK_MAX_PERIOD_NS + 1.0;
 
-  // Drive DATA only when allowed to, else back off the bus.
-  assign data_o = (data_drive_en) ? data_drive_val : 1'bz;
+  // Drive DATA from a delayed registered pin driver.
+  assign data_o = data_o_drv;
 
   // ====================================================================
   // Functions to help manage state transitions and mode change requests
@@ -111,18 +114,25 @@ module SPH0641LU4H_1_model #(
     end
   endfunction : tone_phase_step
 
-  // Converts the internal phase ramp into an unsigned triangle-wave sample.
-  // This gives the PDM modulator a time-varying stimulus instead of a constant
-  // density value, which is a closer behavioral match to a real microphone stream.
-  function automatic logic [15:0] triangle_sample(input logic [15:0] phase);
+  // Converts the internal phase ramp into an unsigned sine-wave sample.
+  // The first-order PDM accumulator expects an unsigned density target, so
+  // the sine is centered at mid-scale and spans the full 16-bit range.
+  function automatic logic [15:0] sine_sample(input logic [15:0] phase);
+    real phase_radians;
+    real sine_value;
+    int unsigned sample_value;
     begin
-      if (phase[15]) begin
-        triangle_sample = {~phase[14:0], 1'b0};
+      phase_radians = (6.283185307179586 * real'(phase)) / 65536.0;
+      sine_value = $sin(phase_radians);
+      sample_value = int'((((sine_value + 1.0) * 65535.0) / 2.0) + 0.5);
+
+      if (sample_value > 65535) begin
+        sine_sample = 16'hFFFF;
       end else begin
-        triangle_sample = {phase[14:0], 1'b0};
+        sine_sample = sample_value[15:0];
       end
     end
-  endfunction : triangle_sample
+  endfunction : sine_sample
 
   // Scale a wall-clock delay for FAST_SIM the same way we shorten datasheet waits elsewhere.
   function automatic realtime scale_wait_ns(input realtime wait_ns);
@@ -556,7 +566,7 @@ module SPH0641LU4H_1_model #(
   // PDM algorithm used here:                                  //
   // 1. Advance an internal phase accumulator at a fixed       //
   //    behavioral tone frequency.                             //
-  // 2. Convert that phase into an unsigned triangle-wave      //
+  // 2. Convert that phase into an unsigned sine-wave          //
   //    sample.                                                //
   // 3. Feed the sample into a first-order accumulator         //
   //    modulator.                                             //
@@ -571,31 +581,36 @@ module SPH0641LU4H_1_model #(
     logic [15:0] tone_sample_now;
 
     if (!vdd_i) begin
-      data_drive_en <= 1'b0;  // Release DATA when power is removed.
+      data_drive_en  <= 1'b0;  // Release DATA when power is removed.
       data_drive_val <= 1'b0;  // Clear the last driven value.
-      pdm_accum <= 16'h0000;  // Reset the pulse-density accumulator.
-      tone_phase <= 16'h0000;  // Reset the internal tone phase.
+      data_o_drv     <= 1'bz;  // Powered-off mic releases DATA.
+      pdm_accum      <= 16'h0000;  // Reset the pulse-density accumulator.
+      tone_phase     <= 16'h0000;  // Reset the internal tone phase.
     end else if (clock_stopped_sleep_ev.triggered) begin
-      data_drive_en <= 1'b0;  // Release DATA once a stopped clock has settled into SLEEP.
+      data_drive_en  <= 1'b0;  // Release DATA once a stopped clock has settled into SLEEP.
       data_drive_val <= 1'b0;
-      pdm_accum <= 16'h0000;
-      tone_phase <= 16'h0000;
+      data_o_drv     <= #(MIC_DATA_HIGH_Z_TIME_NS) 1'bz;
+      pdm_accum      <= 16'h0000;
+      tone_phase     <= 16'h0000;
     end else if (!model_active) begin
-      data_drive_en <= 1'b0;  // Keep DATA high-Z in OFF, SLEEP, INVALID, WAIT, or FAULT.
+      data_drive_en  <= 1'b0;  // Keep DATA high-Z in OFF, SLEEP, INVALID, WAIT, or FAULT.
       data_drive_val <= 1'b0;
-      pdm_accum <= 16'h0000;  // Restart the PDM stream when the mic becomes active again.
-      tone_phase <= 16'h0000;  // Restart the internal tone phase when the mic becomes active again.
+      data_o_drv     <= #(MIC_DATA_HIGH_Z_TIME_NS) 1'bz;
+      pdm_accum      <= 16'h0000;  // Restart the PDM stream when the mic becomes active again.
+      tone_phase     <= 16'h0000;  // Restart the internal tone phase when the mic becomes active again.
     end else if (is_active_edge(select_i, clock_i)) begin
       // Advance the internal test tone and emit a 1-bit PDM representation of it.
-      phase_next = tone_phase + tone_phase_step(clock_period_ns);
-      tone_sample_now = triangle_sample(phase_next);
-      pdm_sum = {1'b0, pdm_accum} + {1'b0, tone_sample_now};
-      pdm_accum <= pdm_sum[15:0];
-      tone_phase <= phase_next;
-      data_drive_val <= pdm_sum[16];
-      data_drive_en <= 1'b1;
+      phase_next      = tone_phase + tone_phase_step(clock_period_ns);
+      tone_sample_now = sine_sample(phase_next);
+      pdm_sum         = {1'b0, pdm_accum} + {1'b0, tone_sample_now};
+      pdm_accum       <= pdm_sum[15:0];
+      tone_phase      <= phase_next;
+      data_drive_val  <= pdm_sum[16];
+      data_drive_en   <= 1'b1;
+      data_o_drv      <= #(MIC_DATA_ASSERT_TIME_NS) pdm_sum[16];
     end else begin
       data_drive_en <= 1'b0;  // Release DATA on the non-selected edge.
+      data_o_drv    <= #(MIC_DATA_HIGH_Z_TIME_NS) 1'bz;
     end
   end : data_drive_proc
 endmodule : SPH0641LU4H_1_model
