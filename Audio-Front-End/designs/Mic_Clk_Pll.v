@@ -6,20 +6,20 @@
 
 `timescale 1 ps / 1 ps
 module Mic_Clk_Pll (
-		input  wire  refclk,   //  refclk.clk
-		input  wire  rst,      //   reset.reset
-		output wire  outclk_0, // outclk0.clk
-		output wire  outclk_1, // outclk1.clk
-		output wire  locked    //  locked.export
-	);
+    input  wire refclk,    //  refclk.clk
+    input  wire rst,       //   reset.reset
+    output wire outclk_0,  // outclk0.clk
+    output wire outclk_1,  // outclk1.clk
+    output wire locked     //  locked.export
+);
 
-	Mic_Clk_Pll_0002 mic_clk_pll_inst (
-		.refclk   (refclk),   //  refclk.clk
-		.rst      (rst),      //   reset.reset
-		.outclk_0 (outclk_0), // outclk0.clk
-		.outclk_1 (outclk_1), // outclk1.clk
-		.locked   (locked)    //  locked.export
-	);
+  Mic_Clk_Pll_0002 mic_clk_pll_inst (
+      .refclk  (refclk),    //  refclk.clk
+      .rst     (rst),       //   reset.reset
+      .outclk_0(outclk_0),  // outclk0.clk
+      .outclk_1(outclk_1),  // outclk1.clk
+      .locked  (locked)     //  locked.export
+  );
 
 endmodule
 // Retrieval info: <?xml version="1.0"?>

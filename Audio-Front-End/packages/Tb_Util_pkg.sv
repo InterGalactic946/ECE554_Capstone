@@ -16,7 +16,7 @@ package Tb_Util_pkg;
   localparam realtime MIC_TIMING_WORST_DATA_ASSERT_NS = 40.0;
   localparam realtime MIC_TIMING_WORST_DATA_HIGH_Z_NS = 16.0;
   localparam realtime MIC_TIMING_DATA_SAMPLE_SKEW_NS = MIC_TIMING_WORST_DATA_ASSERT_NS + 1.0;
-  
+
   // Allow either sleep-style clock select encoding while transitions settle.
   function automatic bit verify_clk_sel(input logic [1:0] val);
     verify_clk_sel = (val === 2'h0) || (val === 2'h1);
