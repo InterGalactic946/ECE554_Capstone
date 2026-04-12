@@ -25,6 +25,7 @@ module SPH0641LU4H_1_model #(
     input logic vdd_i,    // Digital abstraction of microphone supply being present.
     input logic clock_i,  // Applied microphone clock.
     input logic select_i, // Chooses which clock edge DATA is driven on.
+    input logic [31:0] tone_freq_hz_i,  // Runtime behavioral tone frequency.
     output tri data_o     // Microphone DATA pin. Driven only on the selected edge.
 );
 
@@ -99,14 +100,18 @@ module SPH0641LU4H_1_model #(
   endfunction : is_active_mode
 
   // Computes the phase increment required to keep the behavioral test tone at
-  // approximately TONE_FREQ_HZ regardless of the active microphone clock rate.
-  function automatic logic [15:0] tone_phase_step(input realtime period_ns);
+  // the requested frequency regardless of the active microphone clock rate.
+  function automatic logic [15:0] tone_phase_step(input realtime period_ns,
+                                                  input logic [31:0] tone_freq_hz);
     realtime raw_step;
+    int unsigned active_tone_freq_hz;
     begin
+      active_tone_freq_hz = (tone_freq_hz == 0) ? TONE_FREQ_HZ : tone_freq_hz;
+
       if (period_ns <= 0.0) begin
         tone_phase_step = 16'h0001;
       end else begin
-        raw_step = (TONE_FREQ_HZ * 65536.0 * period_ns) / 1.0e9;
+        raw_step = (active_tone_freq_hz * 65536.0 * period_ns) / 1.0e9;
 
         if (raw_step < 1.0) begin
           tone_phase_step = 16'h0001;
@@ -637,7 +642,7 @@ module SPH0641LU4H_1_model #(
       tone_phase <= 16'h0000;  // Restart the internal tone phase when the mic becomes active again.
     end else if (is_active_edge(select_i, clock_i)) begin
       // Advance the internal test tone and emit a 1-bit PDM representation of it.
-      phase_next      = tone_phase + tone_phase_step(clock_period_ns);
+      phase_next      = tone_phase + tone_phase_step(clock_period_ns, tone_freq_hz_i);
       tone_sample_now = sine_sample(phase_next);
       pdm_sum         = {1'b0, pdm_accum} + {1'b0, tone_sample_now};
       pdm_accum      <= pdm_sum[15:0];
