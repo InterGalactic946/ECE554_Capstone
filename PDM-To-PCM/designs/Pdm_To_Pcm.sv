@@ -7,7 +7,7 @@
 //              and applies FIR compensation to produce the final
 //              PCM output. The design supports both single and dual
 //              microphone modes based on the mic_mode input.
-// Author: Nate Parmley
+// Author(s): Nate Parmley and Srivibhav Jonnalagadda
 // Date: 04-01-2026
 // ------------------------------------------------------------
 module Pdm_To_Pcm #(
@@ -17,6 +17,13 @@ module Pdm_To_Pcm #(
     input logic rst_i,
     input logic mic_clk_i,
     input logic mic_clk_val_i,
+
+    // 2'b00: 10kHz to 18kHz Band
+    // 2'b01: 18kHz to 25kHz Band
+    // 2'b10: 25kHz to 32kHz Band
+    // 2'b11: 32kHz to 40kHz Band
+    input logic [1:0] freq_sel_i,
+
     input logic mic_data_i,
     input logic pos_pcm_cap_rdy_i,
     input logic neg_pcm_cap_rdy_i,
@@ -57,16 +64,18 @@ module Pdm_To_Pcm #(
   logic mic_clk_step, mic_clk_stable;
   logic mic_clk_stable_prev;
   logic mic_clk_rising, mic_clk_falling;
-  logic [MIC_CAPTURE_COUNTER_W-1:0] capture_cycles;
   logic [MIC_CAPTURE_COUNTER_W-1:0] pos_capture_cntr, neg_capture_cntr;
   logic pos_pdm_cap, neg_pdm_cap;
   logic pdm_pos_valid, pdm_neg_valid;
   logic pdm_pos, pdm_neg;
   logic [1:0] data_in_pos, data_in_neg;
   logic cic_valid_pos, cic_valid_neg;
+  logic cic_valid_pos_q, cic_valid_neg_q;
   logic [17:0] cic_out_pos, cic_out_neg;
   logic [1:0] cic_error_pos, cic_error_neg;
+  logic [1:0] cic_error_pos_q, cic_error_neg_q;
   logic fir_pos_ready, fir_neg_ready;
+  logic [21:0] fir_in_pos, fir_in_neg;
   logic [40:0] comp_out_pos, comp_out_neg;
   logic output_valid_pos, output_valid_neg;
   logic [1:0] fir_error_pos, fir_error_neg;
@@ -177,15 +186,53 @@ module Pdm_To_Pcm #(
       .out_error(cic_error_neg)
   );
 
+  // Package the input to the FIR filter with the frequency band selection for compensation.
+  always_ff @(posedge clk_i) begin
+    if (rst_i) begin
+      fir_in_pos <= '0;
+      cic_error_pos_q <= '0;
+    end else if (cic_valid_pos) begin
+      fir_in_pos <= {2'b00, freq_sel_i, cic_out_pos};
+      cic_error_pos_q <= cic_error_pos;
+    end else begin
+      fir_in_pos <= '0;
+      cic_error_pos_q <= '0;
+    end
+  end
+
+  always_ff @(posedge clk_i) begin
+    if (rst_i) begin
+      fir_in_neg <= '0;
+      cic_error_neg_q <= '0;
+    end else if (cic_valid_neg) begin
+      fir_in_neg <= {2'b00, freq_sel_i, cic_out_neg};
+      cic_error_neg_q <= cic_error_neg;
+    end else begin
+      fir_in_neg <= '0;
+      cic_error_neg_q <= '0;
+    end
+  end
+
+  // Delay the CIC valid signals to align with the FIR input data.
+  always_ff @(posedge clk_i) begin
+    if (rst_i) cic_valid_pos_q <= 1'b0;
+    else cic_valid_pos_q <= cic_valid_pos;
+  end
+
+  always_ff @(posedge clk_i) begin
+    if (rst_i) cic_valid_neg_q <= 1'b0;
+    else cic_valid_neg_q <= cic_valid_neg;
+  end
+
   // Instantiate the POS FIR filter.
   FIR iPOS_FIR (
       .clk    (clk_i),
       .reset_n(rst_n),
 
       // input stream
-      .ast_sink_data (cic_out_pos),
-      .ast_sink_valid(cic_valid_pos),
-      .ast_sink_error(cic_error_pos),
+      .ast_sink_data (fir_in_pos),
+      .ast_sink_valid(cic_valid_pos_q),
+      .ast_sink_error(cic_error_pos_q),
       .ast_sink_ready(fir_pos_ready),
 
       // output stream
@@ -201,9 +248,9 @@ module Pdm_To_Pcm #(
       .reset_n(rst_n),
 
       // input stream
-      .ast_sink_data (cic_out_neg),
-      .ast_sink_valid(cic_valid_neg),
-      .ast_sink_error(cic_error_neg),
+      .ast_sink_data (fir_in_neg),
+      .ast_sink_valid(cic_valid_neg_q),
+      .ast_sink_error(cic_error_neg_q),
       .ast_sink_ready(fir_neg_ready),
 
       // output stream
