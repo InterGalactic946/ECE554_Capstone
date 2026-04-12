@@ -1,0 +1,321 @@
+m255
+K4
+z2
+Z0 !s12c _opt1
+Z1 !s99 nomlopt
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+R0
+R1
+Z2 !s12c _opt2
+R1
+R2
+R1
+R2
+R1
+R2
+R1
+R2
+R1
+R2
+R1
+R2
+R1
+R2
+R1
+R0
+R1
+Z3 !s12c _opt
+R1
+R3
+R1
+R3
+R1
+R3
+R1
+R3
+R1
+R3
+R1
+R3
+R1
+R3
+R1
+R3
+R1
+R3
+R1
+R3
+R1
+R3
+R1
+R3
+R1
+R3
+R1
+R3
+R1
+R3
+R1
+R3
+R1
+R3
+R1
+R3
+R1
+R3
+R1
+R3
+R1
+R3
+R1
+!s11f vlog 2024.3_2 2024.11, Nov 25 2024
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+Z4 d/filespace/d/deapen/ECE554/Minilab3
+T_opt
+!s110 1775530239
+Vn@]mUWY0A;>hZ6`jCGnQT2
+Z5 04 11 4 work pl_to_ps_tb fast 0
+=18-000ae431a4f1-69d470ff-7464a-9268b
+R1
+Z6 !s12f OEM100
+Z7 !s12b OEM100
+Z8 !s124 OEM100
+Z9 !s135 nogc
+Z10 o-quiet -auto_acc_if_foreign -work work +acc
+Z11 tCvgOpt 0
+n@_opt
+Z12 OE;O;2024.3_2;79
+R4
+T_opt1
+!s110 1775778450
+V6C_9h2U[VdST6JGYF4P7^3
+R5
+=37-000ae431a4f1-69d83a92-84f0c-3201ad
+R1
+R6
+R7
+R8
+R9
+R10
+R11
+n@_opt1
+R12
+T_opt2
+!s110 1775533266
+V6F:8`:3kkCVldE19Y9N?D3
+R5
+=14-000ae431a4f1-69d47cd2-268f5-a9a8c
+R1
+R6
+R7
+R8
+R9
+R10
+R11
+n@_opt2
+R12
+R4
+vFIFO
+2/filespace/d/deapen/ECE554/DE1_SOC_Linux_FB/verilog/fifo.sv
+Z13 DXx6 sv_std 3 std 0 22 9oUSJO;AeEaW`l:M@^WG92
+Z14 !s110 1775778448
+!i10b 1
+!s100 JSPo]N=TBiiFEdcZY<:U71
+IO79OOE2FCS<Xb@b8BlR9]0
+S1
+Z15 d/filespace/d/deapen/ECE554/DE1_SOC_Linux_FB
+w1775700713
+8/filespace/d/deapen/ECE554/DE1_SOC_Linux_FB/verilog/fifo.sv
+F/filespace/d/deapen/ECE554/DE1_SOC_Linux_FB/verilog/fifo.sv
+!i122 294
+L0 7 66
+Z16 VDg1SIo80bB@j0V0VzS_@n1
+Z17 OE;L;2024.3_2;79
+r1
+!s85 0
+31
+Z18 !s108 1775778448.000000
+!s107 /filespace/d/deapen/ECE554/DE1_SOC_Linux_FB/verilog/fifo.sv|
+!s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|/filespace/d/deapen/ECE554/DE1_SOC_Linux_FB/verilog/fifo.sv|
+!i113 0
+Z19 o-work work -sv -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+R11
+n@f@i@f@o
+vmock_data
+2/filespace/d/deapen/ECE554/DE1_SOC_Linux_FB/verilog/mock_data.sv
+R13
+R14
+!i10b 1
+!s100 blJj;cQO80iN46?ZfIe5S1
+IX@IZ@a16;Sl2@IQF2kfO<3
+S1
+R15
+w1775778141
+8/filespace/d/deapen/ECE554/DE1_SOC_Linux_FB/verilog/mock_data.sv
+F/filespace/d/deapen/ECE554/DE1_SOC_Linux_FB/verilog/mock_data.sv
+!i122 295
+L0 1 22
+R16
+R17
+r1
+!s85 0
+31
+R18
+!s107 /filespace/d/deapen/ECE554/DE1_SOC_Linux_FB/verilog/mock_data.sv|
+!s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|/filespace/d/deapen/ECE554/DE1_SOC_Linux_FB/verilog/mock_data.sv|
+!i113 0
+R19
+R11
+vpl_to_ps
+2/filespace/d/deapen/ECE554/DE1_SOC_Linux_FB/verilog/pl_to_ps.sv
+R13
+R14
+!i10b 1
+!s100 PHL5hhEd:AfVK:VPgQaJ20
+I;G<G0@9D`5I@3?Ca^;A>W3
+S1
+R15
+w1775777809
+8/filespace/d/deapen/ECE554/DE1_SOC_Linux_FB/verilog/pl_to_ps.sv
+F/filespace/d/deapen/ECE554/DE1_SOC_Linux_FB/verilog/pl_to_ps.sv
+!i122 296
+L0 1 111
+R16
+R17
+r1
+!s85 0
+31
+R18
+!s107 /filespace/d/deapen/ECE554/DE1_SOC_Linux_FB/verilog/pl_to_ps.sv|
+!s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|/filespace/d/deapen/ECE554/DE1_SOC_Linux_FB/verilog/pl_to_ps.sv|
+!i113 0
+R19
+R11
+vpl_to_ps_tb
+2/filespace/d/deapen/ECE554/DE1_SOC_Linux_FB/tests/pl_to_ps_tb.sv
+R13
+R14
+!i10b 1
+!s100 DeDAznnYVlgRJ0Ij_2iaQ1
+IIHkW^MQM<=8h5fo8M_QMC0
+S1
+R15
+w1775778436
+8/filespace/d/deapen/ECE554/DE1_SOC_Linux_FB/tests/pl_to_ps_tb.sv
+F/filespace/d/deapen/ECE554/DE1_SOC_Linux_FB/tests/pl_to_ps_tb.sv
+!i122 297
+L0 1 144
+R16
+R17
+r1
+!s85 0
+31
+R18
+!s107 /filespace/d/deapen/ECE554/DE1_SOC_Linux_FB/tests/pl_to_ps_tb.sv|
+!s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|/filespace/d/deapen/ECE554/DE1_SOC_Linux_FB/tests/pl_to_ps_tb.sv|
+!i113 0
+R19
+R11
+vstream_pcm
+2/filespace/d/deapen/ECE554/DE1_SOC_Linux_FB/verilog/stream_pcm.sv
+R13
+R14
+!i10b 1
+!s100 Xz;Jo19`bW1^aYme><m0G0
+I0=fjWS01EabWhif?F8S<I2
+S1
+R15
+w1775602396
+8/filespace/d/deapen/ECE554/DE1_SOC_Linux_FB/verilog/stream_pcm.sv
+F/filespace/d/deapen/ECE554/DE1_SOC_Linux_FB/verilog/stream_pcm.sv
+!i122 298
+L0 1 50
+R16
+R17
+r1
+!s85 0
+31
+R18
+!s107 /filespace/d/deapen/ECE554/DE1_SOC_Linux_FB/verilog/stream_pcm.sv|
+!s90 -reportprogress|300|-work|work|-vopt|-sv|-stats=none|/filespace/d/deapen/ECE554/DE1_SOC_Linux_FB/verilog/stream_pcm.sv|
+!i113 0
+R19
+R11
