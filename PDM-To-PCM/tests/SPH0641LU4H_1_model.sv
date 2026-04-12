@@ -18,6 +18,7 @@ module SPH0641LU4H_1_model #(
     parameter bit FAST_SIM = 1'b0,
     parameter int unsigned FAST_SIM_DIV = 1,
     parameter int unsigned TONE_FREQ_HZ = 1_000,
+    parameter int unsigned TONE_AMPLITUDE = 16'd32767,
     parameter realtime MIC_DATA_ASSERT_TIME_NS = Tb_Util_pkg::MIC_TIMING_WORST_DATA_ASSERT_NS,
     parameter realtime MIC_DATA_HIGH_Z_TIME_NS = Tb_Util_pkg::MIC_TIMING_WORST_DATA_HIGH_Z_NS
 ) (
@@ -56,8 +57,9 @@ module SPH0641LU4H_1_model #(
   state_t state, nxt_state;  // Holds the current mic-model state machine state.
   mic_mode_t mode, nxt_mode;  // Holds the current settled microphone mode.
   mic_mode_t pending_mode, nxt_pending_mode;  // Holds the mode being waited on in WAIT state.
-  mic_mode_t requested_mode;  // Holds the mode decoded from the measured clock period.
-  logic request_valid;  // Indicates a full clock period has been measured.
+  mic_mode_t requested_mode;  // Holds the filtered mode decoded from measured clock periods.
+  mic_mode_t mode_sample;  // Holds the latest raw mode candidate being qualified.
+  logic request_valid;  // Indicates the decoded mode has been stable long enough to use.
   logic illegal_transition;  // Indicates a direct OFF/SLEEP -> ULT request.
   logic model_active;  // Indicates DATA may be actively driven.
   logic warning_issued;  // Prevents repeated illegal-transition warnings.
@@ -72,6 +74,7 @@ module SPH0641LU4H_1_model #(
   logic [15:0] pdm_accum;  // First-order pulse-density accumulator.
   logic [15:0] tone_phase;  // Phase accumulator for the internal triangle-wave test tone.
   int unsigned wait_cntr, wait_cycles;  // Settle counter and value to load into it.
+  int unsigned mode_sample_count;  // Counts consecutive periods with the same raw mode.
   realtime last_posedge_ns;  // Stores the timestamp of the previous clock posedge.
   realtime clock_period_ns;  // Stores the most recently measured clock period.
   event clock_stopped_sleep_ev;  // Triggered when a powered microphone has no clock for long enough to be SLEEP.
@@ -80,6 +83,7 @@ module SPH0641LU4H_1_model #(
   localparam realtime MIC_SLEEP_CLOCK_MAX_PERIOD_NS = 4_000.0;
   localparam realtime MIC_STOPPED_CLOCK_DETECT_NS = MIC_SLEEP_CLOCK_MAX_PERIOD_NS + 1.0;
   localparam realtime MIC_FREQ_CLASS_TOL_HZ = 500.0;  // Allows small PLL/period quantization near band edges.
+  localparam int unsigned MIC_MODE_STABLE_PERIODS = 4;  // Qualify mode requests across multiple clock periods.
 
   // Drive DATA from a delayed registered pin driver.
   assign data_o = data_o_drv;
@@ -117,17 +121,19 @@ module SPH0641LU4H_1_model #(
 
   // Converts the internal phase ramp into an unsigned sine-wave sample.
   // The first-order PDM accumulator expects an unsigned density target, so
-  // the sine is centered at mid-scale and spans the full 16-bit range.
+  // the sine is centered at mid-scale with a configurable test amplitude.
   function automatic logic [15:0] sine_sample(input logic [15:0] phase);
     real phase_radians;
     real sine_value;
-    int unsigned sample_value;
+    int sample_value;
     begin
       phase_radians = (6.283185307179586 * real'(phase)) / 65536.0;
       sine_value = $sin(phase_radians);
-      sample_value = int'((((sine_value + 1.0) * 65535.0) / 2.0) + 0.5);
+      sample_value = int'(32768.0 + (sine_value * real'(TONE_AMPLITUDE)) + 0.5);
 
-      if (sample_value > 65535) begin
+      if (sample_value < 0) begin
+        sine_sample = 16'h0000;
+      end else if (sample_value > 65535) begin
         sine_sample = 16'hFFFF;
       end else begin
         sine_sample = sample_value[15:0];
@@ -285,14 +291,6 @@ module SPH0641LU4H_1_model #(
     end
   endfunction : is_active_edge
 
-  // Requested mode is valid only after the model has seen two clock posedges and
-  // measured one full input clock period.
-  assign request_valid = period_valid;
-
-  // Decode the currently requested mode from the measured clock period.
-  // A zero period is interpreted as SLEEP when power is present.
-  assign requested_mode = classify_mode(vdd_i, (request_valid) ? clock_period_ns : 0.0);
-
   // Detect illegal direct entry into ultrasonic from OFF or SLEEP.
   assign illegal_transition = is_illegal_transition(mode, requested_mode);
 
@@ -354,24 +352,59 @@ module SPH0641LU4H_1_model #(
   end
 
   // Measures the applied microphone clock period. The first edge after power-up
-  // only initializes the timestamp. The second and later edges update the measured period.
+  // only initializes the timestamp. The second and later edges update the measured
+  // period, then qualify the decoded mode across consecutive periods so a single
+  // clock-mux bubble does not look like a real mode request.
   always @(posedge clock_i or clock_stopped_sleep_ev or negedge vdd_i) begin
+    realtime measured_period_ns;
+    mic_mode_t measured_mode;
+    int unsigned next_sample_count;
+
     if (!vdd_i) begin
       first_edge_seen <= 1'b0;
       period_valid <= 1'b0;
+      request_valid <= 1'b0;
+      requested_mode <= MODE_OFF;
+      mode_sample <= MODE_OFF;
+      mode_sample_count <= 0;
       last_posedge_ns <= 0.0;
       clock_period_ns <= 0.0;
     end else if (clock_stopped_sleep_ev.triggered) begin
       first_edge_seen <= 1'b0;
       period_valid <= 1'b0;
+      request_valid <= 1'b0;
+      requested_mode <= MODE_SLEEP;
+      mode_sample <= MODE_SLEEP;
+      mode_sample_count <= 0;
       last_posedge_ns <= 0.0;
       clock_period_ns <= 0.0;
     end else begin
       if (first_edge_seen) begin
-        clock_period_ns <= $realtime - last_posedge_ns;
+        measured_period_ns = $realtime - last_posedge_ns;
+        measured_mode = classify_mode(vdd_i, measured_period_ns);
+
+        clock_period_ns <= measured_period_ns;
         period_valid <= 1'b1;
+
+        if (measured_mode === mode_sample) begin
+          next_sample_count = (mode_sample_count < MIC_MODE_STABLE_PERIODS) ?
+                              (mode_sample_count + 1) : mode_sample_count;
+          mode_sample_count <= next_sample_count;
+
+          if (next_sample_count >= MIC_MODE_STABLE_PERIODS) begin
+            requested_mode <= measured_mode;
+            request_valid <= 1'b1;
+          end else begin
+            request_valid <= 1'b0;
+          end
+        end else begin
+          mode_sample <= measured_mode;
+          mode_sample_count <= 1;
+          request_valid <= 1'b0;
+        end
       end else begin
         first_edge_seen <= 1'b1;
+        request_valid <= 1'b0;
       end
 
       last_posedge_ns <= $realtime;

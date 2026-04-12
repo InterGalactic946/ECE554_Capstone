@@ -75,6 +75,7 @@ module Pdm_To_Pcm #(
   logic [1:0] cic_error_pos, cic_error_neg;
   logic [1:0] cic_error_pos_q, cic_error_neg_q;
   logic fir_pos_ready, fir_neg_ready;
+  logic [3:0] fir_bank_sel;
   logic [21:0] fir_in_pos, fir_in_neg;
   logic [40:0] comp_out_pos, comp_out_neg;
   logic output_valid_pos, output_valid_neg;
@@ -186,13 +187,19 @@ module Pdm_To_Pcm #(
       .out_error(cic_error_neg)
   );
 
+  // The generated FIR uses the two bits directly above the 18-bit data sample
+  // for bank selection. The upper two extension bits stay at 0.
+  always_comb begin
+    fir_bank_sel = {2'b00, freq_sel_i};
+  end
+
   // Package the input to the FIR filter with the frequency band selection for compensation.
   always_ff @(posedge clk_i) begin
     if (rst_i) begin
       fir_in_pos <= '0;
       cic_error_pos_q <= '0;
     end else if (cic_valid_pos) begin
-      fir_in_pos <= {2'b00, freq_sel_i, cic_out_pos};
+      fir_in_pos <= {fir_bank_sel, cic_out_pos};
       cic_error_pos_q <= cic_error_pos;
     end else begin
       fir_in_pos <= '0;
@@ -205,7 +212,7 @@ module Pdm_To_Pcm #(
       fir_in_neg <= '0;
       cic_error_neg_q <= '0;
     end else if (cic_valid_neg) begin
-      fir_in_neg <= {2'b00, freq_sel_i, cic_out_neg};
+      fir_in_neg <= {fir_bank_sel, cic_out_neg};
       cic_error_neg_q <= cic_error_neg;
     end else begin
       fir_in_neg <= '0;
@@ -285,10 +292,9 @@ module Pdm_To_Pcm #(
     end
   endfunction
 
-  // The PCM output is valid when the FIR output is valid and the capture interface is ready to accept data and
-  // we also check that there are no errors from the FIR filter before asserting valid.
-  assign pcm_valid_pos = output_valid_pos && pos_pcm_cap_rdy_i && (fir_error_pos == 2'b00);
-  assign pcm_valid_neg = output_valid_neg && neg_pcm_cap_rdy_i && (fir_error_neg == 2'b00);
+  // The PCM output is valid when the FIR output is valid and that there are no errors from the FIR filter before asserting valid.
+  assign pcm_valid_pos = output_valid_pos && (fir_error_pos == 2'b00);
+  assign pcm_valid_neg = output_valid_neg && (fir_error_neg == 2'b00);
 
   // Register the final PCM pos outputs and valid signals, applying backpressure from the capture interface.
   always_ff @(posedge clk_i) begin
