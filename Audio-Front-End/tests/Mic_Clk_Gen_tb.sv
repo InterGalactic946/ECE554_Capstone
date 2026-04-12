@@ -23,6 +23,7 @@ module Mic_Clk_Gen_tb ();
   localparam int unsigned FSM_MARGIN_CYCLES = 256;
   localparam int unsigned CLOCK_ACTIVITY_OBSERVE_CYCLES = 256;
   localparam int unsigned SAMPLE_TIMEOUT_CYCLES = 50_000;
+  localparam int unsigned TONE_FREQ_HZ = 1_000;
 
   /////////////////////////////
   // Stimulus of type logic //
@@ -175,9 +176,10 @@ module Mic_Clk_Gen_tb ();
       .FAST_SIM(FAST_SIM),
       .FAST_SIM_DIV(FAST_SIM_DIV)
   ) iMIC_MODEL_L (
-      .vdd_i(volt_on),
-      .clock_i(mic_clk),
-      .select_i(1'b0),
+      .vdd_i         (volt_on),
+      .clock_i       (mic_clk),
+      .select_i      (1'b0),
+      .tone_freq_hz_i(TONE_FREQ_HZ),
 
       .data_o(data_l)
   );
@@ -187,9 +189,10 @@ module Mic_Clk_Gen_tb ();
       .FAST_SIM(FAST_SIM),
       .FAST_SIM_DIV(FAST_SIM_DIV)
   ) iMIC_MODEL_R (
-      .vdd_i(volt_on),
-      .clock_i(mic_clk),
-      .select_i(1'b1),
+      .vdd_i         (volt_on),
+      .clock_i       (mic_clk),
+      .select_i      (1'b1),
+      .tone_freq_hz_i(TONE_FREQ_HZ),
 
       .data_o(data_r)
   );

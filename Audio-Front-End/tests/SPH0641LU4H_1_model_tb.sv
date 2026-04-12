@@ -40,10 +40,11 @@ module SPH0641LU4H_1_model_tb ();
       .MIC_DATA_ASSERT_TIME_NS(MIC_DATA_ASSERT_TIME_NS),
       .MIC_DATA_HIGH_Z_TIME_NS(MIC_DATA_HIGH_Z_TIME_NS)
   ) iDUT (
-      .vdd_i(vdd),
-      .clock_i(clk),
-      .select_i(select),
-      .data_o(data)
+      .vdd_i         (vdd),
+      .clock_i       (clk),
+      .select_i      (select),
+      .tone_freq_hz_i(TONE_FREQ_HZ),
+      .data_o        (data)
   );
 
   SPH0641LU4H_1_model #(
@@ -53,10 +54,11 @@ module SPH0641LU4H_1_model_tb ();
       .MIC_DATA_ASSERT_TIME_NS(MIC_WORST_DATA_ASSERT_TIME_NS),
       .MIC_DATA_HIGH_Z_TIME_NS(MIC_WORST_DATA_HIGH_Z_TIME_NS)
   ) iDUT_WORST (
-      .vdd_i(vdd),
-      .clock_i(clk),
-      .select_i(select),
-      .data_o(data_worst)
+      .vdd_i         (vdd),
+      .clock_i       (clk),
+      .select_i      (select),
+      .tone_freq_hz_i(TONE_FREQ_HZ),
+      .data_o        (data_worst)
   );
 
   // Capture PDM bits on whichever clock edge SELECT makes active.
