@@ -1,0 +1,22 @@
+-- begin_signature
+-- codec_fsm(P24_BIT
+-- 0)
+-- end_signature
+WIDTH=8;
+DEPTH=10;
+
+ADDRESS_RADIX=UNS;
+DATA_RADIX=BIN;
+
+CONTENT BEGIN
+	9 :	00010010;
+	8 :	00001100;
+	7 :	00010000;
+	6 :	00001110;
+	5 :	00001010;
+	4 :	00001000;
+	3 :	00000010;
+	2 :	00000000;
+	1 :	00001100;
+	0 :	00011110;
+END;
