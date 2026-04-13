@@ -1,1 +1,4 @@
 **/work/
+**.ver
+__pycache__/
+*.py[cod]
