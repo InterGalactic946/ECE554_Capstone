@@ -1,3 +1,6 @@
+**/WORK/
+**/build/
+**/tests/output
 **/work/
 **.ver
 __pycache__/

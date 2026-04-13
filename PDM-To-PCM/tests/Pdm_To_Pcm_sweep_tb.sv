@@ -7,8 +7,9 @@
 //   This bench reuses the real Audio_Front_End and mic models,
 //   then sweeps several tones across all FIR band selections.
 //   The directed Pdm_To_Pcm_tb owns strict pass/fail checks; this
-//   bench records measured tone strength so the filter behavior can
-//   be reviewed in the transcript or plotted from CSV.
+//   bench records measured tone strength across a dense tone sweep
+//   so the filter behavior can be reviewed in the transcript or
+//   plotted from CSV.
 //
 // Author: Srivibhav Jonnalagadda
 // Date: 04-12-2026
@@ -55,8 +56,21 @@ module Pdm_To_Pcm_sweep_tb ();
   // Number of FIR bands swept for each tone.
   localparam int unsigned NUM_BANDS = 4;
 
+  // First tone used by the dense characterization sweep.
+  localparam int unsigned SWEEP_START_HZ = 5_000;
+
+  // Last tone used by the dense characterization sweep.
+  localparam int unsigned SWEEP_STOP_HZ = 45_000;
+
+  // Tone spacing for the dense characterization sweep.
+  localparam int unsigned SWEEP_STEP_HZ = 1_000;
+
   // Number of tones swept across the FIR banks.
-  localparam int unsigned NUM_SWEEP_TONES = 6;
+  localparam int unsigned NUM_SWEEP_TONES =
+      ((SWEEP_STOP_HZ - SWEEP_START_HZ) / SWEEP_STEP_HZ) + 1;
+
+  // Do not hard-check strongest band near transition edges.
+  localparam int unsigned BAND_CHECK_GUARD_HZ = 1_000;
 
   // Mic-model tone amplitude used for characterization.
   localparam int unsigned TONE_AMPLITUDE = 16'd1024;
@@ -521,17 +535,10 @@ module Pdm_To_Pcm_sweep_tb ();
   // Utility function: tone list          //
   //////////////////////////////////////////
 
-  // Return the next tone used by the characterization sweep.
+  // Return the next tone used by the dense characterization sweep.
   function automatic int unsigned sweep_tone_hz(input int unsigned tone_idx);
     begin
-      unique case (tone_idx)
-        0:       sweep_tone_hz = 8_000;    // Below all selected ultrasonic bands.
-        1:       sweep_tone_hz = 14_000;   // 10-18 kHz band.
-        2:       sweep_tone_hz = 21_500;   // 18-25 kHz band.
-        3:       sweep_tone_hz = 28_500;   // 25-32 kHz band.
-        4:       sweep_tone_hz = 36_000;   // 32-40 kHz band.
-        default: sweep_tone_hz = 42_000;   // Above all selected ultrasonic bands.
-      endcase
+      sweep_tone_hz = SWEEP_START_HZ + (tone_idx * SWEEP_STEP_HZ);
     end
   endfunction
 
@@ -573,16 +580,21 @@ module Pdm_To_Pcm_sweep_tb ();
   //////////////////////////////////////////
 
   // Return the expected strongest band for clear in-band tones.
-  // Tones outside all selected bands return -1 and are logged only.
+  // Tones outside selected bands or near transition edges return -1
+  // and are logged only.
   function automatic int expected_band_idx(input int unsigned tone_hz);
     begin
-      if ((tone_hz >= 10_000) && (tone_hz < 18_000)) begin
+      if ((tone_hz >= (10_000 + BAND_CHECK_GUARD_HZ)) &&
+          (tone_hz <= (18_000 - BAND_CHECK_GUARD_HZ))) begin
         expected_band_idx = 0;
-      end else if ((tone_hz >= 18_000) && (tone_hz < 25_000)) begin
+      end else if ((tone_hz >= (18_000 + BAND_CHECK_GUARD_HZ)) &&
+                   (tone_hz <= (25_000 - BAND_CHECK_GUARD_HZ))) begin
         expected_band_idx = 1;
-      end else if ((tone_hz >= 25_000) && (tone_hz < 32_000)) begin
+      end else if ((tone_hz >= (25_000 + BAND_CHECK_GUARD_HZ)) &&
+                   (tone_hz <= (32_000 - BAND_CHECK_GUARD_HZ))) begin
         expected_band_idx = 2;
-      end else if ((tone_hz >= 32_000) && (tone_hz <= 40_000)) begin
+      end else if ((tone_hz >= (32_000 + BAND_CHECK_GUARD_HZ)) &&
+                   (tone_hz <= (40_000 - BAND_CHECK_GUARD_HZ))) begin
         expected_band_idx = 3;
       end else begin
         expected_band_idx = -1;
@@ -696,7 +708,7 @@ module Pdm_To_Pcm_sweep_tb ();
           error_count += 1;
         end
       end else begin
-        $display("%0d Hz is outside the selected bands, so strongest-band check is skipped.",
+        $display("%0d Hz is outside a clear pass band or near a transition edge, so strongest-band check is skipped.",
                  next_tone_hz);
       end
     end
@@ -738,7 +750,7 @@ module Pdm_To_Pcm_sweep_tb ();
     error_count = 0;
 
     // Open CSV output for external plotting.
-    sweep_fd = $fopen("tests/output/Pdm_To_Pcm_sweep.csv", "w");
+    sweep_fd = $fopen("./outputs/Pdm_To_Pcm_sweep.csv", "w");
     if (sweep_fd == 0) begin
       $error("ERROR: Could not open tests/output/Pdm_To_Pcm_sweep.csv.");
       error_count += 1;

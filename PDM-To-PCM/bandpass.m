@@ -13,18 +13,13 @@
 %   Therefore, use these filters instead of a separate CIC compensation FIR.
 %
 % Outputs:
-%   bPM0_coeff.txt   -> 48 kHz path filter
-%   bPM1_coeff.txt   -> 192 kHz band 1
-%   bPM2_coeff.txt   -> 192 kHz band 2
-%   bPM3_coeff.txt   -> 192 kHz band 3
-%   bPM4_coeff.txt   -> 192 kHz band 4
+%   fir_coeff_all.txt -> 192 kHz bands 1 through 4 in multibank FIR IP format
 %
 % Notes:
 %   - fir2() expects normalized frequency, where 1 corresponds to Nyquist.
 %   - Filter order n = 100 means 101 taps.
-%   - The export format is compatible with FIR II IP coefficient import:
-%       coefficients separated by whitespace/newlines
-%   - One coefficient is written per line for readability.
+%   - The export format is compatible with FIR II IP coefficient import.
+%   - bPM0 is still computed but intentionally not written to file.
 % =========================================================================
 
 clear;
@@ -114,39 +109,44 @@ end
 %
 % If you later want pre-scaled integer coefficients instead,
 % set is_fxp = true and set FIR II coefficient scaling to None.
+%
+% bPM0 is intentionally NOT written. Only bPM1 through bPM4 are exported
+% into a single multibank coefficient file.
 % -------------------------------------------------------------------------
-write_coeff_file('bPM0_coeff.txt', bPM0, is_fxp, B);
-write_coeff_file('bPM1_coeff.txt', bPM1, is_fxp, B);
-write_coeff_file('bPM2_coeff.txt', bPM2, is_fxp, B);
-write_coeff_file('bPM3_coeff.txt', bPM3, is_fxp, B);
-write_coeff_file('bPM4_coeff.txt', bPM4, is_fxp, B);
+write_multibank_coeff_file('fir_coeff_all.txt', {bPM1, bPM2, bPM3, bPM4}, is_fxp, B);
 
 fprintf('\nAll coefficient files generated successfully.\n');
 
 %% ========================================================================
-% Local helper
+% Local helpers
 % ========================================================================
-function write_coeff_file(filename, h, is_fxp, B)
+function write_multibank_coeff_file(filename, bank_coeffs, is_fxp, B)
 
     fid = fopen(filename, 'wt');
     if fid == -1
         error('Could not open %s for writing.', filename);
     end
 
-    if is_fxp
-        % Normalize before quantization so values fit signed B-bit range.
-        h_norm = h / max(abs(h));
-        h_quant = fix(h_norm * (2^(B-1) - 1));
+    for mode_idx = 1:length(bank_coeffs)
+        h = bank_coeffs{mode_idx};
 
-        % WRITE ALL COEFFICIENTS ON ONE LINE (space separated)
-        fprintf(fid, '%d ', h_quant);
+        fprintf(fid, '# mode %d\n', mode_idx - 1);
 
-    else
-        % Export floating-point coefficients on a single line
-        fprintf(fid, '%.18f ', h);
+        if is_fxp
+            % Normalize before quantization so values fit signed B-bit range.
+            h_norm = h / max(abs(h));
+            h_quant = fix(h_norm * (2^(B-1) - 1));
+
+            % Write all coefficients for this bank on one line (space separated)
+            fprintf(fid, '%d ', h_quant);
+        else
+            % Export floating-point coefficients on one line
+            fprintf(fid, '%.18f ', h);
+        end
+
+        fprintf(fid, '\n\n');
     end
 
-    fprintf(fid, '\n');
     fclose(fid);
 
     fprintf('Saved coefficient file: %s\n', filename);
