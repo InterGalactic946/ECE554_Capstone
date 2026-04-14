@@ -761,28 +761,28 @@ module Pdm_To_Pcm_tb ();
     // ----------------------------------------------------------
     // TEST 4
     // ----------------------------------------------------------
-    run_band_check(4, BAND_10_18, "8 kHz tone should be rejected by the 10-18 kHz band.");
+    run_invalid_band_check(4, 3'h5, "Invalid freq_sel 3'h5 should not produce PCM output.");
 
     // ----------------------------------------------------------
     // TEST 5
     // ----------------------------------------------------------
-    run_invalid_band_check(5, 3'h5, "Invalid freq_sel 3'h5 should not produce PCM output.");
+    run_invalid_band_check(5, 3'h6, "Invalid freq_sel 3'h6 should not produce PCM output.");
 
     // ----------------------------------------------------------
     // TEST 6
     // ----------------------------------------------------------
-    run_invalid_band_check(6, 3'h6, "Invalid freq_sel 3'h6 should not produce PCM output.");
+    run_invalid_band_check(6, 3'h7, "Invalid freq_sel 3'h7 should not produce PCM output.");
 
     // ----------------------------------------------------------
     // TEST 7
     // ----------------------------------------------------------
-    run_invalid_band_check(7, 3'h7, "Invalid freq_sel 3'h7 should not produce PCM output.");
+    set_test_tone(TONE_14_KHZ);
+    run_band_check(7, BAND_10_18, "14 kHz tone should pass the 10-18 kHz band.");
 
     // ----------------------------------------------------------
     // TEST 8
     // ----------------------------------------------------------
-    set_test_tone(TONE_14_KHZ);
-    run_band_check(8, BAND_10_18, "14 kHz tone should pass the 10-18 kHz band.");
+    run_band_check(8, BAND_0_10, "14 kHz tone should be rejected by the 0-10 kHz band.");
 
     // ----------------------------------------------------------
     // TEST 9
