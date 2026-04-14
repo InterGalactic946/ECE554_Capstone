@@ -48,12 +48,14 @@ module Pdm_To_Pcm_tb ();
   localparam logic [1:0] MODE_ULT = 2'h3;
 
   // FIR band select values expected by the DUT.
-  localparam logic [1:0] BAND_10_18 = 2'b00;
-  localparam logic [1:0] BAND_18_25 = 2'b01;
-  localparam logic [1:0] BAND_25_32 = 2'b10;
-  localparam logic [1:0] BAND_32_40 = 2'b11;
+  localparam logic [2:0] BAND_10_18 = 3'h0;
+  localparam logic [2:0] BAND_18_25 = 3'h1;
+  localparam logic [2:0] BAND_25_32 = 3'h2;
+  localparam logic [2:0] BAND_32_40 = 3'h3;
+  localparam logic [2:0] BAND_0_10  = 3'h4;
 
   // Test tones used to stress the selectable FIR bands.
+  localparam int unsigned TONE_8_KHZ = 8_000;
   localparam int unsigned TONE_14_KHZ = 14_000;
   localparam int unsigned TONE_21P5_KHZ = 21_500;
   localparam int unsigned TONE_28P5_KHZ = 28_500;
@@ -119,7 +121,7 @@ module Pdm_To_Pcm_tb ();
   logic [1:0] mode_req;
 
   // FIR band select sent into Pdm_To_Pcm DUT.
-  logic [1:0] freq_sel;
+  logic [2:0] freq_sel;
 
   // Serial ADC return data observed by the AFE.
   logic adc_data_out;
@@ -604,9 +606,11 @@ module Pdm_To_Pcm_tb ();
   // Utility function: determine band pass//
   //////////////////////////////////////////
   function automatic bit band_should_pass(input int unsigned tone_freq_hz,
-                                          input logic [1:0] band_sel);
+                                          input logic [2:0] band_sel);
     begin
       unique case (band_sel)
+        BAND_0_10: band_should_pass = (tone_freq_hz < 10_000);
+
         BAND_10_18: band_should_pass = (tone_freq_hz >= 10_000) && (tone_freq_hz < 18_000);
 
         BAND_18_25: band_should_pass = (tone_freq_hz >= 18_000) && (tone_freq_hz < 25_000);
@@ -626,7 +630,7 @@ module Pdm_To_Pcm_tb ();
 
   // Select a new FIR band, clear old samples, collect fresh samples, then
   // evaluate whether that band passes or rejects the current tone.
-  task automatic run_band_check(input int test_num, input logic [1:0] next_freq_sel,
+  task automatic run_band_check(input int test_num, input logic [2:0] next_freq_sel,
                                 input string label);
     bit expect_pass;
     begin
@@ -649,6 +653,32 @@ module Pdm_To_Pcm_tb ();
 
       // Evaluate the captured output.
       check_band(label, expect_pass);
+    end
+  endtask
+
+  //////////////////////////////////////////
+  // Utility task: run invalid band check //
+  //////////////////////////////////////////
+
+  // Invalid band selections should not produce accepted PCM samples.
+  task automatic run_invalid_band_check(input int test_num, input logic [2:0] next_freq_sel,
+                                        input string label);
+    begin
+      // Print a readable test header.
+      announce_test(test_num, label);
+
+      // Select an invalid FIR band and clear old captured samples.
+      @(negedge clk) freq_sel = next_freq_sel;
+      clear_pcm_capture(clk, clr_capture);
+
+      // Wait long enough that a valid band would have produced samples.
+      wait_n_negedges(clk, PCM_TIMEOUT_CYCLES / 8);
+
+      // No samples should have been accepted from either channel.
+      if ((pos_sample_count != 0) || (neg_sample_count != 0)) begin
+        $error("ERROR: %s produced PCM samples for invalid freq_sel %0h!", label, next_freq_sel);
+        error_count += 1;
+      end
     end
   endtask
 
@@ -725,56 +755,82 @@ module Pdm_To_Pcm_tb ();
     // ----------------------------------------------------------
     // TEST 3
     // ----------------------------------------------------------
-    set_test_tone(TONE_14_KHZ);
-    run_band_check(3, BAND_10_18, "14 kHz tone should pass the 10-18 kHz band.");
+    set_test_tone(TONE_8_KHZ);
+    run_band_check(3, BAND_0_10, "8 kHz tone should pass the 0-10 kHz band.");
 
     // ----------------------------------------------------------
     // TEST 4
     // ----------------------------------------------------------
-    run_band_check(4, BAND_18_25, "14 kHz tone should be rejected by the 18-25 kHz band.");
+    run_band_check(4, BAND_10_18, "8 kHz tone should be rejected by the 10-18 kHz band.");
 
     // ----------------------------------------------------------
     // TEST 5
     // ----------------------------------------------------------
-    set_test_tone(TONE_21P5_KHZ);
-    run_band_check(5, BAND_18_25, "21.5 kHz tone should pass the 18-25 kHz band.");
+    run_invalid_band_check(5, 3'h5, "Invalid freq_sel 3'h5 should not produce PCM output.");
 
     // ----------------------------------------------------------
     // TEST 6
     // ----------------------------------------------------------
-    run_band_check(6, BAND_10_18, "21.5 kHz tone should be rejected by the 10-18 kHz band.");
+    run_invalid_band_check(6, 3'h6, "Invalid freq_sel 3'h6 should not produce PCM output.");
 
     // ----------------------------------------------------------
     // TEST 7
     // ----------------------------------------------------------
-    run_band_check(7, BAND_25_32, "21.5 kHz tone should be rejected by the 25-32 kHz band.");
+    run_invalid_band_check(7, 3'h7, "Invalid freq_sel 3'h7 should not produce PCM output.");
 
     // ----------------------------------------------------------
     // TEST 8
     // ----------------------------------------------------------
-    set_test_tone(TONE_28P5_KHZ);
-    run_band_check(8, BAND_25_32, "28.5 kHz tone should pass the 25-32 kHz band.");
+    set_test_tone(TONE_14_KHZ);
+    run_band_check(8, BAND_10_18, "14 kHz tone should pass the 10-18 kHz band.");
 
     // ----------------------------------------------------------
     // TEST 9
     // ----------------------------------------------------------
-    run_band_check(9, BAND_18_25, "28.5 kHz tone should be rejected by the 18-25 kHz band.");
+    run_band_check(9, BAND_18_25, "14 kHz tone should be rejected by the 18-25 kHz band.");
 
     // ----------------------------------------------------------
     // TEST 10
     // ----------------------------------------------------------
-    run_band_check(10, BAND_32_40, "28.5 kHz tone should be rejected by the 32-40 kHz band.");
+    set_test_tone(TONE_21P5_KHZ);
+    run_band_check(10, BAND_18_25, "21.5 kHz tone should pass the 18-25 kHz band.");
 
     // ----------------------------------------------------------
     // TEST 11
     // ----------------------------------------------------------
-    set_test_tone(TONE_36_KHZ);
-    run_band_check(11, BAND_32_40, "36 kHz tone should pass the 32-40 kHz band.");
+    run_band_check(11, BAND_10_18, "21.5 kHz tone should be rejected by the 10-18 kHz band.");
 
     // ----------------------------------------------------------
     // TEST 12
     // ----------------------------------------------------------
-    run_band_check(12, BAND_25_32, "36 kHz tone should be rejected by the 25-32 kHz band.");
+    run_band_check(12, BAND_25_32, "21.5 kHz tone should be rejected by the 25-32 kHz band.");
+
+    // ----------------------------------------------------------
+    // TEST 13
+    // ----------------------------------------------------------
+    set_test_tone(TONE_28P5_KHZ);
+    run_band_check(13, BAND_25_32, "28.5 kHz tone should pass the 25-32 kHz band.");
+
+    // ----------------------------------------------------------
+    // TEST 14
+    // ----------------------------------------------------------
+    run_band_check(14, BAND_18_25, "28.5 kHz tone should be rejected by the 18-25 kHz band.");
+
+    // ----------------------------------------------------------
+    // TEST 15
+    // ----------------------------------------------------------
+    run_band_check(15, BAND_32_40, "28.5 kHz tone should be rejected by the 32-40 kHz band.");
+
+    // ----------------------------------------------------------
+    // TEST 16
+    // ----------------------------------------------------------
+    set_test_tone(TONE_36_KHZ);
+    run_band_check(16, BAND_32_40, "36 kHz tone should pass the 32-40 kHz band.");
+
+    // ----------------------------------------------------------
+    // TEST 17
+    // ----------------------------------------------------------
+    run_band_check(17, BAND_25_32, "36 kHz tone should be rejected by the 25-32 kHz band.");
 
     // Final summary message.
     if ((error_count + pcm_x_error_count) == 0) begin

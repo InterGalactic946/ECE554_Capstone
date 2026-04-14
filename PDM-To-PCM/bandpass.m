@@ -33,7 +33,7 @@ B = 16;               % Coefficient bit width for fixed-point export
 is_fxp = false;       % false -> export floating-point coefficients
                       % true  -> export signed integer coefficients
 
-plot_filters = true;  % true -> open Filter Analyzer windows
+plot_filters = false;  % true -> open Filter Analyzer windows
 
 %% ------------------------------------------------------------------------
 % 48 kHz path filter
@@ -103,17 +103,9 @@ end
 %% ------------------------------------------------------------------------
 % Export coefficients for FIR II IP
 %
-% Recommended flow:
-%   - Export floating-point first (is_fxp = false)
-%   - Let FIR II IP scale/quantize internally
-%
-% If you later want pre-scaled integer coefficients instead,
-% set is_fxp = true and set FIR II coefficient scaling to None.
-%
-% bPM0 is intentionally NOT written. Only bPM1 through bPM4 are exported
-% into a single multibank coefficient file.
+% bPM0 through bPM4 are exported into a single multibank coefficient file.
 % -------------------------------------------------------------------------
-write_multibank_coeff_file('fir_coeff_all.txt', {bPM1, bPM2, bPM3, bPM4}, is_fxp, B);
+write_multibank_coeff_file('./outputs/fir_coeff_all.txt', {bPM0, bPM1, bPM2, bPM3, bPM4}, is_fxp, B);
 
 fprintf('\nAll coefficient files generated successfully.\n');
 
