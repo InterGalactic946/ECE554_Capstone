@@ -1,0 +1,34 @@
+Info: Starting: Create HDL design files for synthesis
+Info: qsys-generate /mnt/hgfs/UbuntuShared/FPGA_DMA/soc_system.qsys --synthesis=VERILOG --output-directory=/mnt/hgfs/UbuntuShared/FPGA_DMA/soc_system/synthesis --family="Cyclone V" --part=5CSEMA5F31C6
+Progress: Loading FPGA_DMA/soc_system.qsys
+Progress: Reading input file
+Progress: Adding axi_conduit_merger_0 [axi_conduit_merger 1.0]
+Progress: Parameterizing module axi_conduit_merger_0
+Progress: Adding clk_0 [clock_source 25.1]
+Progress: Parameterizing module clk_0
+Progress: Adding dma_0 [altera_avalon_dma 25.1]
+Progress: Parameterizing module dma_0
+Progress: Adding fifo_0 [altera_avalon_fifo 25.1]
+Progress: Parameterizing module fifo_0
+Progress: Adding hps_0 [altera_hps 25.1]
+Progress: Parameterizing module hps_0
+Progress: Adding pio_0 [altera_avalon_pio 25.1]
+Progress: Parameterizing module pio_0
+Progress: Adding pio_1 [altera_avalon_pio 25.1]
+Progress: Parameterizing module pio_1
+Progress: Adding pll_0 [altera_pll 25.1]
+Progress: Parameterizing module pll_0
+Progress: Building connections
+Progress: Parameterizing connections
+Progress: Validating
+Progress: Done reading input file
+Info: soc_system.dma_0: DMA Controller will only be supported in Quartus Prime Standard Edition in the future release.
+Warning: soc_system.fifo_0: The Nios II HAL drivers for the Altera Avalon FIFO support only 32-bit data width.         If you connect this FIFO to a Nios II CPU, you will need to access the registers directly.
+Info: soc_system.hps_0: HPS Main PLL counter settings: n = 0  m = 73
+Info: soc_system.hps_0: HPS peripherial PLL counter settings: n = 0  m = 39
+Warning: soc_system.hps_0: "Configuration/HPS-to-FPGA user 0 clock frequency" (desired_cfg_clk_mhz) requested 100.0 MHz, but only achieved 97.368421 MHz
+Warning: soc_system.hps_0: "QSPI clock frequency" (desired_qspi_clk_mhz) requested 400.0 MHz, but only achieved 370.0 MHz
+Warning: soc_system.hps_0: 1 or more output clock frequencies cannot be achieved precisely, consider revising desired output clock frequencies.
+Warning: soc_system.hps_0: HPS model no longer supports simulation for HPS FPGA Bridges.
+Info: soc_system.pll_0: The legal reference clock frequency is 5.0 MHz..800.0 MHz
+Info: soc_system.pll_0: Able to implement PLL with user settings
