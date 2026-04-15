@@ -26,6 +26,7 @@ SIM_LIBRARY_PATH = None
 TESTS_DIR = None
 DESIGNS_DIR = None
 PACKAGES_DIR = None
+INTERFACES_DIR = None
 TEST_FILE = None
 OUTPUTS_DIR = None
 
@@ -188,6 +189,9 @@ def setup_directories(name):
 
     # Set the path for the directory containing package files.
     PACKAGES_DIR = os.path.join(TEST_DIR, "packages")
+
+    # Set the path for the directory containing interface files (optional).
+    INTERFACES_DIR = os.path.join(TEST_DIR, "interfaces")
 
     # Define the path for the synthesis directory.
     SYNTHESIS_DIR = os.path.join(TEST_DIR, "synthesis")
