@@ -429,10 +429,10 @@ module Pdm_To_Pcm #(
 
   // Select the active FIR path. Unselected FIR outputs are drained so they do not backpressure stale samples.
   always_comb begin
-    fir_48_pos_source_ready  = 1'b0;
-    fir_48_neg_source_ready  = 1'b0;
-    fir_192_pos_source_ready = 1'b0;
-    fir_192_neg_source_ready = 1'b0;
+    fir_48_pos_source_ready  = 1'b1;
+    fir_48_neg_source_ready  = 1'b1;
+    fir_192_pos_source_ready = 1'b1;
+    fir_192_neg_source_ready = 1'b1;
     comp_out_pos             = '0;
     comp_out_neg             = '0;
     output_valid_pos         = 1'b0;

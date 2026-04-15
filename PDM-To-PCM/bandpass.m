@@ -13,13 +13,15 @@
 %   Therefore, use these filters instead of a separate CIC compensation FIR.
 %
 % Outputs:
-%   fir_coeff_all.txt -> 192 kHz bands 1 through 4 in multibank FIR IP format
+%   fir_coeff_all.txt -> 48 kHz low band plus 192 kHz ultrasonic bands
+%                        in multibank FIR IP format
 %
 % Notes:
 %   - fir2() expects normalized frequency, where 1 corresponds to Nyquist.
 %   - Filter order n = 100 means 101 taps.
 %   - The export format is compatible with FIR II IP coefficient import.
-%   - bPM0 is still computed but intentionally not written to file.
+%   - bPM0 is the 48 kHz 0-10 kHz low band.
+%   - bPM1 through bPM4 are the 192 kHz ultrasonic bands.
 % =========================================================================
 
 clear;
@@ -43,10 +45,10 @@ plot_filters = false;  % true -> open Filter Analyzer windows
 %   transition: 10 to 11 kHz
 %   stopband:   above 11 kHz
 %
-% Frequencies are normalized by Nyquist = 48 kHz.
+% Frequencies are normalized by Nyquist = 24 kHz.
 % -------------------------------------------------------------------------
-f0  = [0 10000 11000 48000];
-fn0 = f0 ./ 48000;
+f0  = [0 10000 11000 24000];
+fn0 = f0 ./ 24000;
 A0  = [1 0.988 0 0];
 bPM0 = fir2(n, fn0, A0);
 
