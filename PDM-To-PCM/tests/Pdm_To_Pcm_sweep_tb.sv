@@ -48,13 +48,14 @@ module Pdm_To_Pcm_sweep_tb ();
   localparam logic [1:0] MODE_ULT = 2'h3;
 
   // FIR band select values expected by the DUT.
-  localparam logic [1:0] BAND_10_18 = 2'b00;
-  localparam logic [1:0] BAND_18_25 = 2'b01;
-  localparam logic [1:0] BAND_25_32 = 2'b10;
-  localparam logic [1:0] BAND_32_40 = 2'b11;
+  localparam logic [2:0] BAND_10_18 = 3'h0;
+  localparam logic [2:0] BAND_18_25 = 3'h1;
+  localparam logic [2:0] BAND_25_32 = 3'h2;
+  localparam logic [2:0] BAND_32_40 = 3'h3;
+  localparam logic [2:0] BAND_0_10  = 3'h4;
 
   // Number of FIR bands swept for each tone.
-  localparam int unsigned NUM_BANDS = 4;
+  localparam int unsigned NUM_BANDS = 5;
 
   // First tone used by the dense characterization sweep.
   localparam int unsigned SWEEP_START_HZ = 5_000;
@@ -123,7 +124,7 @@ module Pdm_To_Pcm_sweep_tb ();
   logic [1:0] mode_req;
 
   // FIR band select sent into Pdm_To_Pcm DUT.
-  logic [1:0] freq_sel;
+  logic [2:0] freq_sel;
 
   // Serial ADC return data observed by the AFE.
   logic adc_data_out;
@@ -547,13 +548,15 @@ module Pdm_To_Pcm_sweep_tb ();
   //////////////////////////////////////////
 
   // Convert a loop index into the DUT's band-select encoding.
-  function automatic logic [1:0] band_from_idx(input int unsigned band_idx);
+  function automatic logic [2:0] band_from_idx(input int unsigned band_idx);
     begin
       unique case (band_idx)
         0:       band_from_idx = BAND_10_18;
         1:       band_from_idx = BAND_18_25;
         2:       band_from_idx = BAND_25_32;
-        default: band_from_idx = BAND_32_40;
+        3:       band_from_idx = BAND_32_40;
+        4:       band_from_idx = BAND_0_10;
+        default: band_from_idx = BAND_0_10;
       endcase
     end
   endfunction
@@ -563,13 +566,14 @@ module Pdm_To_Pcm_sweep_tb ();
   //////////////////////////////////////////
 
   // Human-readable label for transcript and CSV output.
-  function automatic string band_name(input logic [1:0] band_sel);
+  function automatic string band_name(input logic [2:0] band_sel);
     begin
       unique case (band_sel)
         BAND_10_18: band_name = "10-18";
         BAND_18_25: band_name = "18-25";
         BAND_25_32: band_name = "25-32";
         BAND_32_40: band_name = "32-40";
+        BAND_0_10:  band_name = "0-10";
         default:    band_name = "unknown";
       endcase
     end
@@ -584,7 +588,9 @@ module Pdm_To_Pcm_sweep_tb ();
   // and are logged only.
   function automatic int expected_band_idx(input int unsigned tone_hz);
     begin
-      if ((tone_hz >= (10_000 + BAND_CHECK_GUARD_HZ)) &&
+      if (tone_hz <= (10_000 - BAND_CHECK_GUARD_HZ)) begin
+        expected_band_idx = 4;
+      end else if ((tone_hz >= (10_000 + BAND_CHECK_GUARD_HZ)) &&
           (tone_hz <= (18_000 - BAND_CHECK_GUARD_HZ))) begin
         expected_band_idx = 0;
       end else if ((tone_hz >= (18_000 + BAND_CHECK_GUARD_HZ)) &&
@@ -607,7 +613,7 @@ module Pdm_To_Pcm_sweep_tb ();
   //////////////////////////////////////////
 
   // Select one FIR band, capture fresh PCM samples, then compute tone metrics.
-  task automatic measure_band(input logic [1:0] next_freq_sel,
+  task automatic measure_band(input logic [2:0] next_freq_sel,
                               input int unsigned next_tone_hz,
                               output real pos_swing,
                               output real pos_corr,
@@ -661,7 +667,7 @@ module Pdm_To_Pcm_sweep_tb ();
     real neg_corr_by_band[0:NUM_BANDS-1];
     real pos_tone_by_band[0:NUM_BANDS-1];
     real neg_tone_by_band[0:NUM_BANDS-1];
-    logic [1:0] curr_band;
+    logic [2:0] curr_band;
     begin
       announce_test(test_num, $sformatf("Sweep %0d Hz tone across all FIR bands.", next_tone_hz));
 
