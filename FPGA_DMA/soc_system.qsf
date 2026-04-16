@@ -948,34 +948,46 @@ set_instance_assignment -name GLOBAL_SIGNAL OFF -to u0|hps_0|hps_io|border|hps_s
 set_instance_assignment -name ENABLE_BENEFICIAL_SKEW_OPTIMIZATION_FOR_NON_GLOBAL_CLOCKS ON -to u0|hps_0|hps_io|border|hps_sdram_inst -tag __hps_sdram_p0
 set_instance_assignment -name PLL_COMPENSATION_MODE DIRECT -to u0|hps_0|hps_io|border|hps_sdram_inst|pll0|fbout -tag __hps_sdram_p0
 
-set_global_assignment -name VERILOG_FILE ip/clk_gen/Mic_Clk_Pll_0002.v
-set_global_assignment -name VERILOG_FILE ip/clk_gen/Mic_Clk_Pll.v
-set_global_assignment -name VERILOG_FILE ip/clk_gen/Mic_Clk_Ctrl_altclkctrl_0_sub.v
-set_global_assignment -name VERILOG_FILE ip/clk_gen/Mic_Clk_Ctrl_altclkctrl_0.v
-set_global_assignment -name QSYS_FILE ip/clk_gen/Mic_Clk_Ctrl.qsys
-set_global_assignment -name VERILOG_FILE ip/clk_gen/ADC_Controller.v
-set_global_assignment -name QSYS_FILE ip/clk_gen/ADC_Controller.qsys
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/stream_pcm.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/Seven_Seg.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/pdm_to_pcm_no_bp.sv
-set_global_assignment -name VERILOG_FILE rtl/PCM_Top.v
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/pcm_to_mem.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/PCM_no_comp.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/mock_data.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/Mic_Time_pkg.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/Mic_Mode_Fsm.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/Mic_Clk_Gen.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/Mic_Clk_Ctrl.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/fir_comp.sv
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/fifo.sv
-set_global_assignment -name VERILOG_FILE rtl/Clock_Gen.v
-set_global_assignment -name VERILOG_FILE rtl/cic_decimator.v
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/Audio_Front_End.sv
-set_global_assignment -name QIP_FILE soc_system/synthesis/soc_system.qip
-set_global_assignment -name QIP_FILE ip/altsource_probe/hps_reset.qip
 set_global_assignment -name VERILOG_FILE ip/altsource_probe/hps_reset.v
+set_global_assignment -name QIP_FILE ip/altsource_probe/hps_reset.qip
 set_global_assignment -name VERILOG_FILE ip/debounce/debounce.v
-set_global_assignment -name VERILOG_FILE ip/edge_detect/altera_edge_detector.v
-set_global_assignment -name SDC_FILE soc_system_timing.sdc
 set_global_assignment -name VERILOG_FILE ghrd_top.v
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/pcm_to_mem.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/mock_data.sv
+set_global_assignment -name QSYS_FILE soc_system.qsys
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/latest/Seven_Seg.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/latest/Pdm_To_Pcm.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/latest/Mic_Time_pkg.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/latest/Mic_Mode_Fsm.sv
+set_global_assignment -name VERILOG_FILE rtl/latest/Mic_Clk_Pll_0002.v
+set_global_assignment -name QIP_FILE rtl/latest/Mic_Clk_Pll_0002.qip
+set_global_assignment -name VERILOG_FILE rtl/latest/Mic_Clk_Pll.v -library Mic_Clk_Pll
+set_global_assignment -name QIP_FILE rtl/latest/Mic_Clk_Pll.qip
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/latest/Mic_Clk_Gen.sv
+set_global_assignment -name QSYS_FILE rtl/latest/Mic_Clk_Ctrl.qsys
+set_global_assignment -name VHDL_FILE rtl/latest/FIR_192_0002_rtl_core.vhd
+set_global_assignment -name VHDL_FILE rtl/latest/FIR_192_0002_ast.vhd
+set_global_assignment -name VHDL_FILE rtl/latest/FIR_192_0002.vhd
+set_global_assignment -name VERILOG_FILE rtl/latest/FIR_192.v -library FIR_192
+set_global_assignment -name QIP_FILE rtl/latest/FIR_192.qip
+set_global_assignment -name VHDL_FILE rtl/latest/FIR_48_0002_rtl_core.vhd
+set_global_assignment -name VHDL_FILE rtl/latest/FIR_48_0002_ast.vhd
+set_global_assignment -name VHDL_FILE rtl/latest/FIR_48_0002.vhd
+set_global_assignment -name VERILOG_FILE rtl/latest/FIR_48.v -library FIR_48
+set_global_assignment -name QIP_FILE rtl/latest/FIR_48.qip
+set_global_assignment -name VERILOG_FILE rtl/latest/FIFO.v
+set_global_assignment -name QIP_FILE rtl/latest/FIFO.qip
+set_global_assignment -name VHDL_FILE rtl/latest/dspba_library_package.vhd
+set_global_assignment -name VHDL_FILE rtl/latest/dspba_library.vhd
+set_global_assignment -name QSYS_FILE rtl/latest/Cic_Decimator_192.qsys
+set_global_assignment -name QSYS_FILE rtl/latest/Cic_Decimator_48.qsys
+set_global_assignment -name VHDL_FILE rtl/latest/auk_dspip_roundsat_hpfir.vhd
+set_global_assignment -name VHDL_FILE rtl/latest/auk_dspip_math_pkg_hpfir.vhd
+set_global_assignment -name VHDL_FILE rtl/latest/auk_dspip_lib_pkg_hpfir.vhd
+set_global_assignment -name VHDL_FILE rtl/latest/auk_dspip_avalon_streaming_source_hpfir.vhd
+set_global_assignment -name VHDL_FILE rtl/latest/auk_dspip_avalon_streaming_sink_hpfir.vhd
+set_global_assignment -name VHDL_FILE rtl/latest/auk_dspip_avalon_streaming_controller_hpfir.vhd
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/latest/Audio_Front_End.sv
+set_global_assignment -name VERILOG_FILE rtl/latest/altera_avalon_sc_fifo.v
+set_global_assignment -name QSYS_FILE rtl/latest/ADC_Controller.qsys
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

@@ -1,5 +1,5 @@
 Flow report for soc_system
-Wed Apr 15 21:55:40 2026
+Thu Apr 16 15:53:15 2026
 Quartus Prime Version 25.1std.0 Build 1129 10/21/2025 SC Lite Edition
 
 
@@ -41,25 +41,25 @@ on the Quartus Prime software download page.
 +-----------------------------------------------------------------------------------+
 ; Flow Summary                                                                      ;
 +---------------------------------+-------------------------------------------------+
-; Flow Status                     ; Successful - Wed Apr 15 21:55:04 2026           ;
+; Flow Status                     ; Successful - Thu Apr 16 15:53:14 2026           ;
 ; Quartus Prime Version           ; 25.1std.0 Build 1129 10/21/2025 SC Lite Edition ;
 ; Revision Name                   ; soc_system                                      ;
 ; Top-level Entity Name           ; ghrd_top                                        ;
 ; Family                          ; Cyclone V                                       ;
 ; Device                          ; 5CSEMA5F31C6                                    ;
 ; Timing Models                   ; Final                                           ;
-; Logic utilization (in ALMs)     ; 2,458 / 32,070 ( 8 % )                          ;
-; Total registers                 ; 4971                                            ;
-; Total pins                      ; 368 / 457 ( 81 % )                              ;
+; Logic utilization (in ALMs)     ; N/A                                             ;
+; Total registers                 ; 7154                                            ;
+; Total pins                      ; 368                                             ;
 ; Total virtual pins              ; 0                                               ;
-; Total block memory bits         ; 24,576 / 4,065,280 ( < 1 % )                    ;
-; Total DSP Blocks                ; 0 / 87 ( 0 % )                                  ;
+; Total block memory bits         ; 212,576                                         ;
+; Total DSP Blocks                ; 8                                               ;
 ; Total HSSI RX PCSs              ; 0                                               ;
 ; Total HSSI PMA RX Deserializers ; 0                                               ;
 ; Total HSSI TX PCSs              ; 0                                               ;
 ; Total HSSI PMA TX Serializers   ; 0                                               ;
-; Total PLLs                      ; 2 / 6 ( 33 % )                                  ;
-; Total DLLs                      ; 1 / 4 ( 25 % )                                  ;
+; Total PLLs                      ; 2                                               ;
+; Total DLLs                      ; 1                                               ;
 +---------------------------------+-------------------------------------------------+
 
 
@@ -68,65 +68,37 @@ on the Quartus Prime software download page.
 +-------------------+---------------------+
 ; Option            ; Setting             ;
 +-------------------+---------------------+
-; Start date & time ; 04/15/2026 21:51:39 ;
+; Start date & time ; 04/16/2026 15:48:35 ;
 ; Main task         ; Compilation         ;
 ; Revision Name     ; soc_system          ;
 +-------------------+---------------------+
 
 
-+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-; Flow Non-Default Global Settings                                                                                                                                               ;
-+---------------------------------------+--------------------------------------------------------------------------+---------------+--------------------------------+------------+
-; Assignment Name                       ; Value                                                                    ; Default Value ; Entity Name                    ; Section Id ;
-+---------------------------------------+--------------------------------------------------------------------------+---------------+--------------------------------+------------+
-; COMPILER_SIGNATURE_ID                 ; 52233492112.177630789732775                                              ; --            ; --                             ; --         ;
-; ECO_REGENERATE_REPORT                 ; On                                                                       ; Off           ; --                             ; --         ;
-; HPS_ISW_FILE                          ; soc_system/synthesis/submodules/sequencer/sequencer_defines.pre.h        ; --            ; soc_system_hps_0_hps_io_border ; --         ;
-; HPS_ISW_FILE                          ; soc_system/synthesis/submodules/sequencer/tclrpt.pre.c                   ; --            ; soc_system_hps_0_hps_io_border ; --         ;
-; HPS_ISW_FILE                          ; soc_system/synthesis/submodules/sequencer/system.pre.h                   ; --            ; soc_system_hps_0_hps_io_border ; --         ;
-; HPS_ISW_FILE                          ; soc_system/synthesis/submodules/sequencer/sequencer_auto_ac_init.pre.c   ; --            ; soc_system_hps_0_hps_io_border ; --         ;
-; HPS_ISW_FILE                          ; soc_system/synthesis/submodules/sequencer/sequencer.pre.h                ; --            ; soc_system_hps_0_hps_io_border ; --         ;
-; HPS_ISW_FILE                          ; soc_system/synthesis/submodules/sequencer/sequencer_auto_inst_init.pre.c ; --            ; soc_system_hps_0_hps_io_border ; --         ;
-; HPS_ISW_FILE                          ; soc_system/synthesis/submodules/sequencer/sequencer_auto.pre.h           ; --            ; soc_system_hps_0_hps_io_border ; --         ;
-; HPS_ISW_FILE                          ; soc_system/synthesis/submodules/sequencer/tclrpt.pre.h                   ; --            ; soc_system_hps_0_hps_io_border ; --         ;
-; HPS_ISW_FILE                          ; soc_system/synthesis/submodules/sequencer/alt_types.pre.h                ; --            ; soc_system_hps_0_hps_io_border ; --         ;
-; HPS_ISW_FILE                          ; soc_system/synthesis/submodules/sequencer/sequencer.pre.c                ; --            ; soc_system_hps_0_hps_io_border ; --         ;
-; HPS_ISW_FILE                          ; soc_system/synthesis/submodules/sequencer/sdram_io.pre.h                 ; --            ; soc_system_hps_0_hps_io_border ; --         ;
-; HPS_ISW_FILE                          ; soc_system/synthesis/submodules/sequencer/emif.pre.xml                   ; --            ; soc_system_hps_0_hps_io_border ; --         ;
-; HPS_ISW_FILE                          ; soc_system/synthesis/submodules/hps.pre.xml                              ; --            ; soc_system_hps_0_hps_io_border ; --         ;
-; HPS_PARTITION                         ; On                                                                       ; --            ; soc_system_hps_0_hps_io_border ; --         ;
-; MAX_CORE_JUNCTION_TEMP                ; 85                                                                       ; --            ; --                             ; --         ;
-; MIN_CORE_JUNCTION_TEMP                ; 0                                                                        ; --            ; --                             ; --         ;
-; MISC_FILE                             ; soc_system/synthesis/../soc_system.cmp                                   ; --            ; --                             ; --         ;
-; MISC_FILE                             ; soc_system/synthesis/soc_system_hps_0_hps.svd                            ; --            ; --                             ; --         ;
-; MISC_FILE                             ; soc_system/synthesis/../../soc_system.qsys                               ; --            ; --                             ; --         ;
-; MISC_FILE                             ; soc_system/synthesis/submodules/sequencer/sequencer_defines.pre.h        ; --            ; --                             ; --         ;
-; MISC_FILE                             ; soc_system/synthesis/submodules/sequencer/tclrpt.pre.c                   ; --            ; --                             ; --         ;
-; MISC_FILE                             ; soc_system/synthesis/submodules/sequencer/system.pre.h                   ; --            ; --                             ; --         ;
-; MISC_FILE                             ; soc_system/synthesis/submodules/sequencer/sequencer_auto_ac_init.pre.c   ; --            ; --                             ; --         ;
-; MISC_FILE                             ; soc_system/synthesis/submodules/sequencer/sequencer.pre.h                ; --            ; --                             ; --         ;
-; MISC_FILE                             ; soc_system/synthesis/submodules/sequencer/sequencer_auto_inst_init.pre.c ; --            ; --                             ; --         ;
-; MISC_FILE                             ; soc_system/synthesis/submodules/sequencer/sequencer_auto.pre.h           ; --            ; --                             ; --         ;
-; MISC_FILE                             ; soc_system/synthesis/submodules/sequencer/tclrpt.pre.h                   ; --            ; --                             ; --         ;
-; MISC_FILE                             ; soc_system/synthesis/submodules/sequencer/alt_types.pre.h                ; --            ; --                             ; --         ;
-; MISC_FILE                             ; soc_system/synthesis/submodules/sequencer/sequencer.pre.c                ; --            ; --                             ; --         ;
-; MISC_FILE                             ; soc_system/synthesis/submodules/sequencer/sdram_io.pre.h                 ; --            ; --                             ; --         ;
-; MISC_FILE                             ; soc_system/synthesis/submodules/sequencer/emif.pre.xml                   ; --            ; --                             ; --         ;
-; MISC_FILE                             ; soc_system/synthesis/submodules/hps.pre.xml                              ; --            ; --                             ; --         ;
-; MISC_FILE                             ; ip/altsource_probe/hps_reset_bb.v                                        ; --            ; --                             ; --         ;
-; PARTITION_COLOR                       ; -- (Not supported for targeted family)                                   ; --            ; ghrd_top                       ; Top        ;
-; PARTITION_FITTER_PRESERVATION_LEVEL   ; -- (Not supported for targeted family)                                   ; --            ; ghrd_top                       ; Top        ;
-; PARTITION_NETLIST_TYPE                ; -- (Not supported for targeted family)                                   ; --            ; ghrd_top                       ; Top        ;
-; POWER_BOARD_THERMAL_MODEL             ; None (CONSERVATIVE)                                                      ; --            ; --                             ; --         ;
-; POWER_PRESET_COOLING_SOLUTION         ; 23 MM HEAT SINK WITH 200 LFPM AIRFLOW                                    ; --            ; --                             ; --         ;
-; SLD_FILE                              ; soc_system/synthesis/soc_system.regmap                                   ; --            ; --                             ; --         ;
-; SLD_FILE                              ; soc_system/synthesis/soc_system.debuginfo                                ; --            ; --                             ; --         ;
-; SLD_INFO                              ; QSYS_NAME soc_system HAS_SOPCINFO 1 GENERATION_ID 1776297678             ; --            ; --                             ; --         ;
-; SOPCINFO_FILE                         ; soc_system/synthesis/../../soc_system.sopcinfo                           ; --            ; --                             ; --         ;
-; SYNTHESIS_ONLY_QIP                    ; On                                                                       ; --            ; --                             ; --         ;
-; TOP_LEVEL_ENTITY                      ; ghrd_top                                                                 ; soc_system    ; --                             ; --         ;
-; USE_DLL_FREQUENCY_FOR_DQS_DELAY_CHAIN ; On                                                                       ; Off           ; --                             ; --         ;
-+---------------------------------------+--------------------------------------------------------------------------+---------------+--------------------------------+------------+
++---------------------------------------------------------------------------------------------------------------------------+
+; Flow Non-Default Global Settings                                                                                          ;
++---------------------------------------+----------------------------------------+---------------+-------------+------------+
+; Assignment Name                       ; Value                                  ; Default Value ; Entity Name ; Section Id ;
++---------------------------------------+----------------------------------------+---------------+-------------+------------+
+; COMPILER_SIGNATURE_ID                 ; 224382518706515.177637251516720        ; --            ; --          ; --         ;
+; ECO_REGENERATE_REPORT                 ; On                                     ; Off           ; --          ; --         ;
+; MAX_CORE_JUNCTION_TEMP                ; 85                                     ; --            ; --          ; --         ;
+; MIN_CORE_JUNCTION_TEMP                ; 0                                      ; --            ; --          ; --         ;
+; MISC_FILE                             ; ip/altsource_probe/hps_reset_bb.v      ; --            ; --          ; --         ;
+; MISC_FILE                             ; rtl/latest/Mic_Clk_Pll.cmp             ; --            ; --          ; --         ;
+; MISC_FILE                             ; rtl/latest/FIR_192.cmp                 ; --            ; --          ; --         ;
+; MISC_FILE                             ; rtl/latest/FIR_48.cmp                  ; --            ; --          ; --         ;
+; MISC_FILE                             ; rtl/latest/FIFO_bb.v                   ; --            ; --          ; --         ;
+; PARTITION_COLOR                       ; -- (Not supported for targeted family) ; --            ; ghrd_top    ; Top        ;
+; PARTITION_FITTER_PRESERVATION_LEVEL   ; -- (Not supported for targeted family) ; --            ; ghrd_top    ; Top        ;
+; PARTITION_NETLIST_TYPE                ; -- (Not supported for targeted family) ; --            ; ghrd_top    ; Top        ;
+; POWER_BOARD_THERMAL_MODEL             ; None (CONSERVATIVE)                    ; --            ; --          ; --         ;
+; POWER_PRESET_COOLING_SOLUTION         ; 23 MM HEAT SINK WITH 200 LFPM AIRFLOW  ; --            ; --          ; --         ;
+; SYNTHESIS_ONLY_QIP                    ; On                                     ; --            ; --          ; --         ;
+; SYNTHESIS_ONLY_QIP                    ; On                                     ; --            ; --          ; --         ;
+; SYNTHESIS_ONLY_QIP                    ; On                                     ; --            ; --          ; --         ;
+; TOP_LEVEL_ENTITY                      ; ghrd_top                               ; soc_system    ; --          ; --         ;
+; USE_DLL_FREQUENCY_FOR_DQS_DELAY_CHAIN ; On                                     ; Off           ; --          ; --         ;
++---------------------------------------+----------------------------------------+---------------+-------------+------------+
 
 
 +--------------------------------------------------------------------------------------------------------------------------+
@@ -134,33 +106,24 @@ on the Quartus Prime software download page.
 +----------------------+--------------+-------------------------+---------------------+------------------------------------+
 ; Module Name          ; Elapsed Time ; Average Processors Used ; Peak Virtual Memory ; Total CPU Time (on all processors) ;
 +----------------------+--------------+-------------------------+---------------------+------------------------------------+
-; Analysis & Synthesis ; 00:00:51     ; 1.0                     ; 873 MB              ; 00:01:22                           ;
-; Fitter               ; 00:02:19     ; 1.2                     ; 2916 MB             ; 00:03:58                           ;
-; Assembler            ; 00:00:10     ; 1.0                     ; 597 MB              ; 00:00:11                           ;
-; Timing Analyzer      ; 00:00:34     ; 1.5                     ; 1442 MB             ; 00:00:49                           ;
-; Total                ; 00:03:54     ; --                      ; --                  ; 00:06:20                           ;
+; Analysis & Synthesis ; 00:04:21     ; 1.6                     ; 5468 MB             ; 00:07:24                           ;
+; Total                ; 00:04:21     ; --                      ; --                  ; 00:07:24                           ;
 +----------------------+--------------+-------------------------+---------------------+------------------------------------+
 
 
-+--------------------------------------------------------------------------------------+
-; Flow OS Summary                                                                      ;
-+----------------------+-----------------------+---------+------------+----------------+
-; Module Name          ; Machine Hostname      ; OS Name ; OS Version ; Processor type ;
-+----------------------+-----------------------+---------+------------+----------------+
-; Analysis & Synthesis ; david-virtual-machine ; Ubuntu  ; 22         ; x86_64         ;
-; Fitter               ; david-virtual-machine ; Ubuntu  ; 22         ; x86_64         ;
-; Assembler            ; david-virtual-machine ; Ubuntu  ; 22         ; x86_64         ;
-; Timing Analyzer      ; david-virtual-machine ; Ubuntu  ; 22         ; x86_64         ;
-+----------------------+-----------------------+---------+------------+----------------+
++------------------------------------------------------------------------------------+
+; Flow OS Summary                                                                    ;
++----------------------+------------------+------------+------------+----------------+
+; Module Name          ; Machine Hostname ; OS Name    ; OS Version ; Processor type ;
++----------------------+------------------+------------+------------+----------------+
+; Analysis & Synthesis ; Sky              ; Windows 10 ; 10.0       ; x86_64         ;
++----------------------+------------------+------------+------------+----------------+
 
 
 ------------
 ; Flow Log ;
 ------------
 quartus_map --read_settings_files=on --write_settings_files=off soc_system -c soc_system
-quartus_fit --read_settings_files=off --write_settings_files=off soc_system -c soc_system
-quartus_asm --read_settings_files=off --write_settings_files=off soc_system -c soc_system
-quartus_sta soc_system -c soc_system
 
 
 

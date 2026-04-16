@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <EnsembleReport name="soc_system" kind="soc_system" version="1.0" fabric="QSYS">
  <!-- Format version 25.1 1129 (Future versions may contain additional information.) -->
- <!-- 2026.04.15.19:01:43 -->
+ <!-- 2026.04.16.15:49:14 -->
  <!-- A collection of modules and connections -->
  <parameter name="AUTO_GENERATION_ID">
   <type>java.lang.Integer</type>
-  <value>1776297678</value>
+  <value>1776372554</value>
   <derived>false</derived>
   <enabled>true</enabled>
   <visible>false</visible>
@@ -1934,7 +1934,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="writeMaximumSlaveSpan">
    <type>long</type>
-   <value>4294967296</value>
+   <value>0</value>
    <derived>true</derived>
    <enabled>true</enabled>
    <visible>false</visible>
