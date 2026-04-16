@@ -1,5 +1,5 @@
 Flow report for soc_system
-Wed Apr 15 21:16:01 2026
+Wed Apr 15 21:55:40 2026
 Quartus Prime Version 25.1std.0 Build 1129 10/21/2025 SC Lite Edition
 
 
@@ -38,24 +38,29 @@ on the Quartus Prime software download page.
 
 
 
-+-------------------------------------------------------------------------------+
-; Flow Summary                                                                  ;
-+-----------------------------+-------------------------------------------------+
-; Flow Status                 ; Flow Failed - Wed Apr 15 21:16:01 2026          ;
-; Quartus Prime Version       ; 25.1std.0 Build 1129 10/21/2025 SC Lite Edition ;
-; Revision Name               ; soc_system                                      ;
-; Top-level Entity Name       ; ghrd_top                                        ;
-; Family                      ; Cyclone V                                       ;
-; Device                      ; 5CSEMA5F31C6                                    ;
-; Timing Models               ; Final                                           ;
-; Logic utilization (in ALMs) ; N/A until Partition Merge                       ;
-; Total registers             ; N/A until Partition Merge                       ;
-; Total pins                  ; N/A until Partition Merge                       ;
-; Total virtual pins          ; N/A until Partition Merge                       ;
-; Total block memory bits     ; N/A until Partition Merge                       ;
-; Total PLLs                  ; N/A until Partition Merge                       ;
-; Total DLLs                  ; N/A until Partition Merge                       ;
-+-----------------------------+-------------------------------------------------+
++-----------------------------------------------------------------------------------+
+; Flow Summary                                                                      ;
++---------------------------------+-------------------------------------------------+
+; Flow Status                     ; Successful - Wed Apr 15 21:55:04 2026           ;
+; Quartus Prime Version           ; 25.1std.0 Build 1129 10/21/2025 SC Lite Edition ;
+; Revision Name                   ; soc_system                                      ;
+; Top-level Entity Name           ; ghrd_top                                        ;
+; Family                          ; Cyclone V                                       ;
+; Device                          ; 5CSEMA5F31C6                                    ;
+; Timing Models                   ; Final                                           ;
+; Logic utilization (in ALMs)     ; 2,458 / 32,070 ( 8 % )                          ;
+; Total registers                 ; 4971                                            ;
+; Total pins                      ; 368 / 457 ( 81 % )                              ;
+; Total virtual pins              ; 0                                               ;
+; Total block memory bits         ; 24,576 / 4,065,280 ( < 1 % )                    ;
+; Total DSP Blocks                ; 0 / 87 ( 0 % )                                  ;
+; Total HSSI RX PCSs              ; 0                                               ;
+; Total HSSI PMA RX Deserializers ; 0                                               ;
+; Total HSSI TX PCSs              ; 0                                               ;
+; Total HSSI PMA TX Serializers   ; 0                                               ;
+; Total PLLs                      ; 2 / 6 ( 33 % )                                  ;
+; Total DLLs                      ; 1 / 4 ( 25 % )                                  ;
++---------------------------------+-------------------------------------------------+
 
 
 +-----------------------------------------+
@@ -63,7 +68,7 @@ on the Quartus Prime software download page.
 +-------------------+---------------------+
 ; Option            ; Setting             ;
 +-------------------+---------------------+
-; Start date & time ; 04/15/2026 21:15:41 ;
+; Start date & time ; 04/15/2026 21:51:39 ;
 ; Main task         ; Compilation         ;
 ; Revision Name     ; soc_system          ;
 +-------------------+---------------------+
@@ -74,7 +79,7 @@ on the Quartus Prime software download page.
 +---------------------------------------+--------------------------------------------------------------------------+---------------+--------------------------------+------------+
 ; Assignment Name                       ; Value                                                                    ; Default Value ; Entity Name                    ; Section Id ;
 +---------------------------------------+--------------------------------------------------------------------------+---------------+--------------------------------+------------+
-; COMPILER_SIGNATURE_ID                 ; 52233492112.177630573824397                                              ; --            ; --                             ; --         ;
+; COMPILER_SIGNATURE_ID                 ; 52233492112.177630789732775                                              ; --            ; --                             ; --         ;
 ; ECO_REGENERATE_REPORT                 ; On                                                                       ; Off           ; --                             ; --         ;
 ; HPS_ISW_FILE                          ; soc_system/synthesis/submodules/sequencer/sequencer_defines.pre.h        ; --            ; soc_system_hps_0_hps_io_border ; --         ;
 ; HPS_ISW_FILE                          ; soc_system/synthesis/submodules/sequencer/tclrpt.pre.c                   ; --            ; soc_system_hps_0_hps_io_border ; --         ;
@@ -129,8 +134,11 @@ on the Quartus Prime software download page.
 +----------------------+--------------+-------------------------+---------------------+------------------------------------+
 ; Module Name          ; Elapsed Time ; Average Processors Used ; Peak Virtual Memory ; Total CPU Time (on all processors) ;
 +----------------------+--------------+-------------------------+---------------------+------------------------------------+
-; Analysis & Synthesis ; 00:00:25     ; 1.0                     ; 462 MB              ; 00:00:50                           ;
-; Total                ; 00:00:25     ; --                      ; --                  ; 00:00:50                           ;
+; Analysis & Synthesis ; 00:00:51     ; 1.0                     ; 873 MB              ; 00:01:22                           ;
+; Fitter               ; 00:02:19     ; 1.2                     ; 2916 MB             ; 00:03:58                           ;
+; Assembler            ; 00:00:10     ; 1.0                     ; 597 MB              ; 00:00:11                           ;
+; Timing Analyzer      ; 00:00:34     ; 1.5                     ; 1442 MB             ; 00:00:49                           ;
+; Total                ; 00:03:54     ; --                      ; --                  ; 00:06:20                           ;
 +----------------------+--------------+-------------------------+---------------------+------------------------------------+
 
 
@@ -140,6 +148,9 @@ on the Quartus Prime software download page.
 ; Module Name          ; Machine Hostname      ; OS Name ; OS Version ; Processor type ;
 +----------------------+-----------------------+---------+------------+----------------+
 ; Analysis & Synthesis ; david-virtual-machine ; Ubuntu  ; 22         ; x86_64         ;
+; Fitter               ; david-virtual-machine ; Ubuntu  ; 22         ; x86_64         ;
+; Assembler            ; david-virtual-machine ; Ubuntu  ; 22         ; x86_64         ;
+; Timing Analyzer      ; david-virtual-machine ; Ubuntu  ; 22         ; x86_64         ;
 +----------------------+-----------------------+---------+------------+----------------+
 
 
@@ -147,6 +158,9 @@ on the Quartus Prime software download page.
 ; Flow Log ;
 ------------
 quartus_map --read_settings_files=on --write_settings_files=off soc_system -c soc_system
+quartus_fit --read_settings_files=off --write_settings_files=off soc_system -c soc_system
+quartus_asm --read_settings_files=off --write_settings_files=off soc_system -c soc_system
+quartus_sta soc_system -c soc_system
 
 
 
