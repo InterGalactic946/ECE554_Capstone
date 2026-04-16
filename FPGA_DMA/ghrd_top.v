@@ -91,22 +91,22 @@ module ghrd_top(
  
 
       ///////// HEX0 /////////
-      output   reg   [6:0]  HEX0,
+      output      [6:0]  HEX0,
 
       ///////// HEX1 /////////
-      output   reg   [6:0]  HEX1,
+      output      [6:0]  HEX1,
 
       ///////// HEX2 /////////
-      output   reg  [6:0]  HEX2,
+      output     [6:0]  HEX2,
 
       ///////// HEX3 /////////
-      output   reg   [6:0]  HEX3,
+      output      [6:0]  HEX3,
 
       ///////// HEX4 /////////
-      output   reg   [6:0]  HEX4,
+      output      [6:0]  HEX4,
 
       ///////// HEX5 /////////
-      output   reg   [6:0]  HEX5,
+      output      [6:0]  HEX5,
 
 `ifdef ENABLE_HPS
       ///////// HPS /////////
