@@ -14,12 +14,6 @@
 module soc_system_hps_0_fpga_interfaces(
 // h2f_reset
   output wire [1 - 1 : 0 ] h2f_rst_n
-// f2h_cold_reset_req
- ,input wire [1 - 1 : 0 ] f2h_cold_rst_req_n
-// f2h_debug_reset_req
- ,input wire [1 - 1 : 0 ] f2h_dbg_rst_req_n
-// f2h_warm_reset_req
- ,input wire [1 - 1 : 0 ] f2h_warm_rst_req_n
 // h2f_user0_clock
  ,output wire [1 - 1 : 0 ] h2f_user0_clk
 // h2f_user1_clock
@@ -157,19 +151,19 @@ cyclonev_hps_interface_clocks_resets clocks_resets(
     1'b1 // 0:0
   })
 ,.f2h_warm_rst_req_n({
-    f2h_warm_rst_req_n[0:0] // 0:0
+    1'b1 // 0:0
   })
 ,.f2h_dbg_rst_req_n({
-    f2h_dbg_rst_req_n[0:0] // 0:0
-  })
-,.h2f_rst_n({
-    h2f_rst_n[0:0] // 0:0
+    1'b1 // 0:0
   })
 ,.h2f_user1_clk({
     h2f_user1_clk[0:0] // 0:0
   })
+,.h2f_rst_n({
+    h2f_rst_n[0:0] // 0:0
+  })
 ,.f2h_cold_rst_req_n({
-    f2h_cold_rst_req_n[0:0] // 0:0
+    1'b1 // 0:0
   })
 ,.h2f_user0_clk({
     h2f_user0_clk[0:0] // 0:0

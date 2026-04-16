@@ -1,5 +1,5 @@
 Info: Starting: Create HDL design files for synthesis
-Info: qsys-generate /mnt/hgfs/UbuntuShared/FPGA_DMA/soc_system.qsys --synthesis=VERILOG --output-directory=/mnt/hgfs/UbuntuShared/FPGA_DMA/soc_system/synthesis --family="Cyclone V" --part=5CSEMA5F31C6
+Info: qsys-generate /home/david/Documents/from_windows/FPGA_DMA/soc_system.qsys --synthesis=VERILOG --output-directory=/home/david/Documents/from_windows/FPGA_DMA/soc_system/synthesis --family="Cyclone V" --part=5CSEMA5F31C6
 Progress: Loading FPGA_DMA/soc_system.qsys
 Progress: Reading input file
 Progress: Adding axi_conduit_merger_0 [axi_conduit_merger 1.0]
@@ -32,3 +32,93 @@ Warning: soc_system.hps_0: 1 or more output clock frequencies cannot be achieved
 Warning: soc_system.hps_0: HPS model no longer supports simulation for HPS FPGA Bridges.
 Info: soc_system.pll_0: The legal reference clock frequency is 5.0 MHz..800.0 MHz
 Info: soc_system.pll_0: Able to implement PLL with user settings
+Info: soc_system: Generating "soc_system" for QUARTUS_SYNTH
+Info: Inserting clock-crossing logic between cmd_demux.src2 and cmd_mux_002.sink0
+Info: Inserting clock-crossing logic between cmd_demux_001.src2 and cmd_mux_002.sink1
+Info: Inserting clock-crossing logic between rsp_demux_002.src0 and rsp_mux.sink2
+Info: Inserting clock-crossing logic between rsp_demux_002.src1 and rsp_mux_001.sink2
+Info: Interconnect is inserted between master dma_0.read_master and slave fifo_0.out because the master has address signal 5 bit wide, but the slave is 0 bit wide.
+Info: Interconnect is inserted between master dma_0.read_master and slave fifo_0.out because the master has chipselect signal 1 bit wide, but the slave is 0 bit wide.
+Info: Interconnect is inserted between master dma_0.read_master and slave fifo_0.out because the master has readdatavalid signal 1 bit wide, but the slave is 0 bit wide.
+Info: Interconnect is inserted between master dma_0.write_master and slave axi_conduit_merger_0.altera_axi_slave because the master is of type avalon and the slave is of type axi.
+Warning: hps_0.f2h_irq0: Cannot connect clock for irq_mapper.sender
+Warning: hps_0.f2h_irq0: Cannot connect reset for irq_mapper.sender
+Warning: hps_0.f2h_irq1: Cannot connect clock for irq_mapper_001.sender
+Warning: hps_0.f2h_irq1: Cannot connect reset for irq_mapper_001.sender
+Info: axi_conduit_merger_0: "soc_system" instantiated axi_conduit_merger "axi_conduit_merger_0"
+Info: dma_0: softresetEnable = 1
+Info: dma_0: Starting RTL generation for module 'soc_system_dma_0'
+Info: dma_0:   Generation command is [exec /home/david/altera_lite/25.1std/quartus/linux64//perl/bin/perl -I /home/david/altera_lite/25.1std/quartus/linux64//perl/lib -I /home/david/altera_lite/25.1std/quartus/sopc_builder/bin/europa -I /home/david/altera_lite/25.1std/quartus/sopc_builder/bin -I /home/david/altera_lite/25.1std/quartus/../ip/altera/sopc_builder_ip/common -I /home/david/altera_lite/25.1std/quartus/../ip/altera/sopc_builder_ip/altera_avalon_dma -- /home/david/altera_lite/25.1std/quartus/../ip/altera/sopc_builder_ip/altera_avalon_dma/generate_rtl.pl --name=soc_system_dma_0 --dir=/tmp/alt0559_8875369678244032773.dir/0003_dma_0_gen/ --quartus_dir=/home/david/altera_lite/25.1std/quartus --verilog --config=/tmp/alt0559_8875369678244032773.dir/0003_dma_0_gen//soc_system_dma_0_component_configuration.pl  --do_build_sim=0  ]
+Info: dma_0: # 2026.04.15 19:02:20 (*)   soc_system_dma_0: allowing these transactions: quadword, doubleword, word, hw, byte_access
+Info: dma_0: Done RTL generation for module 'soc_system_dma_0'
+Info: dma_0: "soc_system" instantiated altera_avalon_dma "dma_0"
+Info: fifo_0: Starting RTL generation for module 'soc_system_fifo_0'
+Info: fifo_0:   Generation command is [exec /home/david/altera_lite/25.1std/quartus/linux64/perl/bin/perl -I /home/david/altera_lite/25.1std/quartus/linux64/perl/lib -I /home/david/altera_lite/25.1std/quartus/sopc_builder/bin/europa -I /home/david/altera_lite/25.1std/quartus/sopc_builder/bin -I /home/david/altera_lite/25.1std/quartus/../ip/altera/sopc_builder_ip/common -I /home/david/altera_lite/25.1std/quartus/../ip/altera/sopc_builder_ip/altera_avalon_fifo -- /home/david/altera_lite/25.1std/quartus/../ip/altera/sopc_builder_ip/altera_avalon_fifo/generate_rtl.pl --name=soc_system_fifo_0 --dir=/tmp/alt0559_8875369678244032773.dir/0004_fifo_0_gen/ --quartus_dir=/home/david/altera_lite/25.1std/quartus --verilog --config=/tmp/alt0559_8875369678244032773.dir/0004_fifo_0_gen//soc_system_fifo_0_component_configuration.pl  --do_build_sim=0  ]
+Info: fifo_0: Done RTL generation for module 'soc_system_fifo_0'
+Info: fifo_0: "soc_system" instantiated altera_avalon_fifo "fifo_0"
+Info: hps_0: "Running  for module: hps_0"
+Info: hps_0: HPS Main PLL counter settings: n = 0  m = 73
+Info: hps_0: HPS peripherial PLL counter settings: n = 0  m = 39
+Warning: hps_0: "Configuration/HPS-to-FPGA user 0 clock frequency" (desired_cfg_clk_mhz) requested 100.0 MHz, but only achieved 97.368421 MHz
+Warning: hps_0: "QSPI clock frequency" (desired_qspi_clk_mhz) requested 400.0 MHz, but only achieved 370.0 MHz
+Warning: hps_0: 1 or more output clock frequencies cannot be achieved precisely, consider revising desired output clock frequencies.
+Warning: hps_0: HPS model no longer supports simulation for HPS FPGA Bridges.
+Info: hps_0: "soc_system" instantiated altera_hps "hps_0"
+Info: pio_0: Starting RTL generation for module 'soc_system_pio_0'
+Info: pio_0:   Generation command is [exec /home/david/altera_lite/25.1std/quartus/linux64/perl/bin/perl -I /home/david/altera_lite/25.1std/quartus/linux64/perl/lib -I /home/david/altera_lite/25.1std/quartus/sopc_builder/bin/europa -I /home/david/altera_lite/25.1std/quartus/sopc_builder/bin -I /home/david/altera_lite/25.1std/quartus/../ip/altera/sopc_builder_ip/common -I /home/david/altera_lite/25.1std/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio -- /home/david/altera_lite/25.1std/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio/generate_rtl.pl --name=soc_system_pio_0 --dir=/tmp/alt0559_8875369678244032773.dir/0005_pio_0_gen/ --quartus_dir=/home/david/altera_lite/25.1std/quartus --verilog --config=/tmp/alt0559_8875369678244032773.dir/0005_pio_0_gen//soc_system_pio_0_component_configuration.pl  --do_build_sim=0  ]
+Info: pio_0: Done RTL generation for module 'soc_system_pio_0'
+Info: pio_0: "soc_system" instantiated altera_avalon_pio "pio_0"
+Info: pio_1: Starting RTL generation for module 'soc_system_pio_1'
+Info: pio_1:   Generation command is [exec /home/david/altera_lite/25.1std/quartus/linux64/perl/bin/perl -I /home/david/altera_lite/25.1std/quartus/linux64/perl/lib -I /home/david/altera_lite/25.1std/quartus/sopc_builder/bin/europa -I /home/david/altera_lite/25.1std/quartus/sopc_builder/bin -I /home/david/altera_lite/25.1std/quartus/../ip/altera/sopc_builder_ip/common -I /home/david/altera_lite/25.1std/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio -- /home/david/altera_lite/25.1std/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio/generate_rtl.pl --name=soc_system_pio_1 --dir=/tmp/alt0559_8875369678244032773.dir/0006_pio_1_gen/ --quartus_dir=/home/david/altera_lite/25.1std/quartus --verilog --config=/tmp/alt0559_8875369678244032773.dir/0006_pio_1_gen//soc_system_pio_1_component_configuration.pl  --do_build_sim=0  ]
+Info: pio_1: Done RTL generation for module 'soc_system_pio_1'
+Info: pio_1: "soc_system" instantiated altera_avalon_pio "pio_1"
+Info: pll_0: "soc_system" instantiated altera_pll "pll_0"
+Info: avalon_st_adapter: Inserting error_adapter: error_adapter_0
+Info: avalon_st_adapter_001: Inserting error_adapter: error_adapter_0
+Info: avalon_st_adapter_002: Inserting error_adapter: error_adapter_0
+Info: mm_interconnect_1: "soc_system" instantiated altera_mm_interconnect "mm_interconnect_1"
+Info: mm_interconnect_2: "soc_system" instantiated altera_mm_interconnect "mm_interconnect_2"
+Info: mm_interconnect_3: "soc_system" instantiated altera_mm_interconnect "mm_interconnect_3"
+Info: irq_mapper: "soc_system" instantiated altera_irq_mapper "irq_mapper"
+Info: rst_controller: "soc_system" instantiated altera_reset_controller "rst_controller"
+Info: fpga_interfaces: "hps_0" instantiated altera_interface_generator "fpga_interfaces"
+Info: hps_io: "hps_0" instantiated altera_hps_io "hps_io"
+Info: dma_0_control_port_slave_translator: "mm_interconnect_1" instantiated altera_merlin_slave_translator "dma_0_control_port_slave_translator"
+Info: hps_0_h2f_lw_axi_master_agent: "mm_interconnect_1" instantiated altera_merlin_axi_master_ni "hps_0_h2f_lw_axi_master_agent"
+Info: dma_0_control_port_slave_agent: "mm_interconnect_1" instantiated altera_merlin_slave_agent "dma_0_control_port_slave_agent"
+Info: dma_0_control_port_slave_agent_rsp_fifo: "mm_interconnect_1" instantiated altera_avalon_sc_fifo "dma_0_control_port_slave_agent_rsp_fifo"
+Info: router: "mm_interconnect_1" instantiated altera_merlin_router "router"
+Info: router_002: "mm_interconnect_1" instantiated altera_merlin_router "router_002"
+Info: hps_0_h2f_lw_axi_master_wr_limiter: "mm_interconnect_1" instantiated altera_merlin_traffic_limiter "hps_0_h2f_lw_axi_master_wr_limiter"
+Info: Reusing file /home/david/Documents/from_windows/FPGA_DMA/soc_system/synthesis/submodules/altera_avalon_sc_fifo.v
+Info: dma_0_control_port_slave_burst_adapter: "mm_interconnect_1" instantiated altera_merlin_burst_adapter "dma_0_control_port_slave_burst_adapter"
+Info: Reusing file /home/david/Documents/from_windows/FPGA_DMA/soc_system/synthesis/submodules/altera_merlin_address_alignment.sv
+Info: Reusing file /home/david/Documents/from_windows/FPGA_DMA/soc_system/synthesis/submodules/altera_avalon_st_pipeline_base.v
+Info: cmd_demux: "mm_interconnect_1" instantiated altera_merlin_demultiplexer "cmd_demux"
+Info: cmd_mux: "mm_interconnect_1" instantiated altera_merlin_multiplexer "cmd_mux"
+Info: rsp_demux: "mm_interconnect_1" instantiated altera_merlin_demultiplexer "rsp_demux"
+Info: rsp_demux_002: "mm_interconnect_1" instantiated altera_merlin_demultiplexer "rsp_demux_002"
+Info: rsp_mux: "mm_interconnect_1" instantiated altera_merlin_multiplexer "rsp_mux"
+Info: Reusing file /home/david/Documents/from_windows/FPGA_DMA/soc_system/synthesis/submodules/altera_merlin_arbitrator.sv
+Info: crosser: "mm_interconnect_1" instantiated altera_avalon_st_handshake_clock_crosser "crosser"
+Info: Reusing file /home/david/Documents/from_windows/FPGA_DMA/soc_system/synthesis/submodules/altera_avalon_st_pipeline_base.v
+Info: avalon_st_adapter: "mm_interconnect_1" instantiated altera_avalon_st_adapter "avalon_st_adapter"
+Info: dma_0_read_master_translator: "mm_interconnect_2" instantiated altera_merlin_master_translator "dma_0_read_master_translator"
+Info: dma_0_write_master_agent: "mm_interconnect_3" instantiated altera_merlin_master_agent "dma_0_write_master_agent"
+Info: axi_conduit_merger_0_altera_axi_slave_agent: "mm_interconnect_3" instantiated altera_merlin_axi_slave_ni "axi_conduit_merger_0_altera_axi_slave_agent"
+Info: Reusing file /home/david/Documents/from_windows/FPGA_DMA/soc_system/synthesis/submodules/altera_merlin_burst_uncompressor.sv
+Info: Reusing file /home/david/Documents/from_windows/FPGA_DMA/soc_system/synthesis/submodules/altera_avalon_sc_fifo.v
+Info: Reusing file /home/david/Documents/from_windows/FPGA_DMA/soc_system/synthesis/submodules/altera_merlin_address_alignment.sv
+Info: router: "mm_interconnect_3" instantiated altera_merlin_router "router"
+Info: router_001: "mm_interconnect_3" instantiated altera_merlin_router "router_001"
+Info: cmd_demux: "mm_interconnect_3" instantiated altera_merlin_demultiplexer "cmd_demux"
+Info: cmd_mux: "mm_interconnect_3" instantiated altera_merlin_multiplexer "cmd_mux"
+Info: Reusing file /home/david/Documents/from_windows/FPGA_DMA/soc_system/synthesis/submodules/altera_merlin_arbitrator.sv
+Info: rsp_demux: "mm_interconnect_3" instantiated altera_merlin_demultiplexer "rsp_demux"
+Info: rsp_mux: "mm_interconnect_3" instantiated altera_merlin_multiplexer "rsp_mux"
+Info: Reusing file /home/david/Documents/from_windows/FPGA_DMA/soc_system/synthesis/submodules/altera_merlin_arbitrator.sv
+Info: border: "hps_io" instantiated altera_interface_generator "border"
+Info: error_adapter_0: "avalon_st_adapter" instantiated error_adapter "error_adapter_0"
+Info: soc_system: Done "soc_system" with 41 modules, 104 files
+Info: qsys-generate succeeded.
+Info: Finished: Create HDL design files for synthesis

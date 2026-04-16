@@ -955,7 +955,6 @@ set_global_assignment -name VERILOG_FILE ip/clk_gen/Mic_Clk_Ctrl_altclkctrl_0.v
 set_global_assignment -name QSYS_FILE ip/clk_gen/Mic_Clk_Ctrl.qsys
 set_global_assignment -name VERILOG_FILE ip/clk_gen/ADC_Controller.v
 set_global_assignment -name QSYS_FILE ip/clk_gen/ADC_Controller.qsys
-set_global_assignment -name QSYS_FILE soc_system.qsys
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/stream_pcm.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/Seven_Seg.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/pdm_to_pcm_no_bp.sv

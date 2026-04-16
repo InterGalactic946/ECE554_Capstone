@@ -323,10 +323,7 @@ module ghrd_top(
         .clk_clk                               (CLOCK_50),
         .reset_reset_n                         (hps_fpga_reset_n),
         .hps_0_f2h_stm_hw_events_stm_hwevents  (stm_hw_events),
-        .hps_0_f2h_warm_reset_req_reset_n      (~hps_warm_reset),
-        .hps_0_f2h_debug_reset_req_reset_n     (~hps_debug_reset),
-        .hps_0_f2h_cold_reset_req_reset_n      (~hps_cold_reset),
-
+	.hps_0_h2f_reset_reset_n(hps_fpga_reset_n),
         // AXI Coherency Signals
         .mcu_axi_signals_export                (pio_controlled_axi_signals),
         .axi_signals_awcache                   (pio_controlled_axi_signals[AWCACHE_BASE+:AWCACHE_SIZE]),
@@ -344,6 +341,14 @@ module ghrd_top(
         // New Control Signal
         .data_cntrl_export                     (data_cntrl)
     );
+
+  // Debounce logic to clean out glitches within 1ms
+  debounce debounce_inst (
+    .clk                                  (CLOCK3_50),
+    .reset_n                              (hps_fpga_reset_n),  
+    .data_in                              (KEY),
+    .data_out                             (fpga_debounced_buttons)
+  );
 
   wire rst;
   wire [1:0] curr_mode;
@@ -483,36 +488,6 @@ hps_reset hps_reset_inst (
   .source_clk (CLOCK_50),
   .source     (hps_reset_req)
 );
-
-altera_edge_detector pulse_cold_reset (
-  .clk       (CLOCK_50),
-  .rst_n     (hps_fpga_reset_n),
-  .signal_in (hps_reset_req[0]),
-  .pulse_out (hps_cold_reset)
-);
-  defparam pulse_cold_reset.PULSE_EXT = 6;
-  defparam pulse_cold_reset.EDGE_TYPE = 1;
-  defparam pulse_cold_reset.IGNORE_RST_WHILE_BUSY = 1;
-
-altera_edge_detector pulse_warm_reset (
-  .clk       (CLOCK_50),
-  .rst_n     (hps_fpga_reset_n),
-  .signal_in (hps_reset_req[1]),
-  .pulse_out (hps_warm_reset)
-);
-  defparam pulse_warm_reset.PULSE_EXT = 2;
-  defparam pulse_warm_reset.EDGE_TYPE = 1;
-  defparam pulse_warm_reset.IGNORE_RST_WHILE_BUSY = 1;
-  
-altera_edge_detector pulse_debug_reset (
-  .clk       (CLOCK_50),
-  .rst_n     (hps_fpga_reset_n),
-  .signal_in (hps_reset_req[2]),
-  .pulse_out (hps_debug_reset)
-);
-  defparam pulse_debug_reset.PULSE_EXT = 32;
-  defparam pulse_debug_reset.EDGE_TYPE = 1;
-  defparam pulse_debug_reset.IGNORE_RST_WHILE_BUSY = 1;
 
 endmodule
 

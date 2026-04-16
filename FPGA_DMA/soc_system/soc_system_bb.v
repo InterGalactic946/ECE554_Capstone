@@ -11,10 +11,8 @@ module soc_system (
 	fifo_in_writedata,
 	fifo_in_write,
 	fifo_in_waitrequest,
-	hps_0_f2h_cold_reset_req_reset_n,
-	hps_0_f2h_debug_reset_req_reset_n,
 	hps_0_f2h_stm_hw_events_stm_hwevents,
-	hps_0_f2h_warm_reset_req_reset_n,
+	hps_0_h2f_reset_reset_n,
 	hps_0_hps_io_hps_io_emac1_inst_TX_CLK,
 	hps_0_hps_io_hps_io_emac1_inst_TXD0,
 	hps_0_hps_io_hps_io_emac1_inst_TXD1,
@@ -100,10 +98,8 @@ module soc_system (
 	input	[127:0]	fifo_in_writedata;
 	input		fifo_in_write;
 	output		fifo_in_waitrequest;
-	input		hps_0_f2h_cold_reset_req_reset_n;
-	input		hps_0_f2h_debug_reset_req_reset_n;
 	input	[27:0]	hps_0_f2h_stm_hw_events_stm_hwevents;
-	input		hps_0_f2h_warm_reset_req_reset_n;
+	output		hps_0_h2f_reset_reset_n;
 	output		hps_0_hps_io_hps_io_emac1_inst_TX_CLK;
 	output		hps_0_hps_io_hps_io_emac1_inst_TXD0;
 	output		hps_0_hps_io_hps_io_emac1_inst_TXD1;
