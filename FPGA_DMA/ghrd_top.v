@@ -346,7 +346,20 @@ module ghrd_top(
     assign LEDR[8] = ps_ready_for_data;
     assign LEDR[7] = mic1_valid && mic3_valid; // Both mics have valid data
     assign LEDR[6] = mic2_valid && mic4_valid; // Both mics have valid data
+    assign LEDR[5] = pos_neg_valid; // Cross-validity (should not ever happen)
     assign LEDR[0] = rst; // Show reset state on LEDR[0]
+
+    reg pos_neg_valid;
+
+    always @(posedge clk, negedge ~rst) begin
+      if (~rst) begin
+        pos_neg_valid <= 1'b0;
+      end else if ((mic1_valid && mic4_valid) || (mic2_valid && mic3_valid) || (mic1_valid && mic2_valid) || (mic3_valid && mic4_valid)) begin
+        pos_neg_valid <= 1'b1;
+      end else if (~fpga_debounced_buttons[1]) begin
+        pos_neg_valid <= 1'b0;
+      end
+    end
 
   // Debounce logic to clean out glitches within 1ms
   debounce debounce_inst (
