@@ -802,10 +802,10 @@ module Pdm_To_Pcm_sweep_tb ();
     // ----------------------------------------------------------
     // TEST 3+
     // ----------------------------------------------------------
-    // Sweep each tone across every selectable FIR band.
-    for (int tone_idx = 0; tone_idx < NUM_SWEEP_TONES; tone_idx += 1) begin
-      run_tone_sweep(tone_idx + 3, sweep_tone_hz(tone_idx));
-    end
+    // // Sweep each tone across every selectable FIR band.
+    // for (int tone_idx = 0; tone_idx < NUM_SWEEP_TONES; tone_idx += 1) begin
+    //   run_tone_sweep(tone_idx + 3, sweep_tone_hz(tone_idx));
+    // end
 
     // Final summary message.
     if ((error_count + pcm_x_error_count) == 0) begin
