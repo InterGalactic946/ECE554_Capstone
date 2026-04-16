@@ -344,8 +344,6 @@ module ghrd_top(
 
     assign LEDR[9] = fifo_waitreq;
     assign LEDR[8] = ps_ready_for_data;
-    assign LEDR[7] = mic1_valid && mic3_valid; // Both mics have valid data
-    assign LEDR[6] = mic2_valid && mic4_valid; // Both mics have valid data
     assign LEDR[0] = rst_i; // Show reset state on LEDR[0]
 
   // Debounce logic to clean out glitches within 1ms
