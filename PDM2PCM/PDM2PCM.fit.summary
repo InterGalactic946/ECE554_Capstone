@@ -1,0 +1,20 @@
+Fitter Status : Successful - Wed Apr 15 15:39:45 2026
+Quartus Prime Version : 25.1std.0 Build 1129 10/21/2025 SC Lite Edition
+Revision Name : PDM2PCM
+Top-level Entity Name : PDM2PCM
+Family : Cyclone V
+Device : 5CSEMA5F31C6
+Timing Models : Final
+Logic utilization (in ALMs) : 2,758 / 32,070 ( 9 % )
+Total registers : 4586
+Total pins : 100 / 457 ( 22 % )
+Total virtual pins : 0
+Total block memory bits : 188,000 / 4,065,280 ( 5 % )
+Total RAM Blocks : 60 / 397 ( 15 % )
+Total DSP Blocks : 8 / 87 ( 9 % )
+Total HSSI RX PCSs : 0
+Total HSSI PMA RX Deserializers : 0
+Total HSSI TX PCSs : 0
+Total HSSI PMA TX Serializers : 0
+Total PLLs : 1 / 6 ( 17 % )
+Total DLLs : 0 / 4 ( 0 % )
