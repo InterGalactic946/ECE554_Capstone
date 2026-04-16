@@ -351,8 +351,8 @@ module ghrd_top(
 
     reg pos_neg_valid;
 
-    always @(posedge CLOCK_50, negedge ~rst) begin
-      if (~rst) begin
+    always @(posedge CLOCK_50, posedge rst) begin
+      if (rst) begin
         pos_neg_valid <= 1'b0;
       end else if ((mic1_valid && mic4_valid) || (mic2_valid && mic3_valid) || (mic1_valid && mic2_valid) || (mic3_valid && mic4_valid)) begin
         pos_neg_valid <= 1'b1;
