@@ -346,20 +346,7 @@ module ghrd_top(
     assign LEDR[8] = ps_ready_for_data;
     assign LEDR[7] = mic1_valid && mic3_valid; // Both mics have valid data
     assign LEDR[6] = mic2_valid && mic4_valid; // Both mics have valid data
-    assign LEDR[5] = pos_neg_valid; // Cross-validity (should not ever happen)
-    assign LEDR[0] = rst; // Show reset state on LEDR[0]
-
-    reg pos_neg_valid;
-
-    always @(posedge CLOCK_50, posedge rst) begin
-      if (rst) begin
-        pos_neg_valid <= 1'b0;
-      end else if ((mic1_valid && mic4_valid) || (mic2_valid && mic3_valid) || (mic1_valid && mic2_valid) || (mic3_valid && mic4_valid)) begin
-        pos_neg_valid <= 1'b1;
-      end else if (~fpga_debounced_buttons[1]) begin
-        pos_neg_valid <= 1'b0;
-      end
-    end
+    assign LEDR[0] = rst_i; // Show reset state on LEDR[0]
 
   // Debounce logic to clean out glitches within 1ms
   debounce debounce_inst (
@@ -369,133 +356,52 @@ module ghrd_top(
     .data_out                             (fpga_debounced_buttons)
   );
 
-  wire rst;
-  wire [1:0] curr_mode;
-  wire pdm_in1, pdm_in2;
-  wire data_val; 
-  wire [15:0] mic1_pcm, mic2_pcm, mic3_pcm, mic4_pcm;
-  wire mic1_valid, mic2_valid, mic3_valid, mic4_valid;
-
-  assign pdm_in1 = data_val ? GPIO_0[1] : 1'b0;
-  assign pdm_in2 = data_val ? GPIO_0[2] : 1'b0;
-
-  // Active high synchronous reset.
-  assign rst = ~fpga_debounced_buttons[0];
-
-  // We don't care about the remaining GPIO pins.
-  assign GPIO_0[35:3] = 32'hzzzz;
-
-  // Instatiate the Audio Front End.
-  Audio_Front_End iAUD_FRONT (
-      .clk_i(CLOCK_50),
-      .rst_i(rst),
-      .mode_req_i(SW[1:0]),
-      .en_adc_i(~SW[2]), // Default ADC on
-      .ADC_data_out_i(ADC_DOUT),
-      .ADC_SCLK_o(ADC_SCLK),
-      .ADC_CS_o(ADC_CS_N),
-      .ADC_data_in_o(ADC_DIN),
-
-      .curr_mode_o(curr_mode),
-      .data_val_o (data_val),
-      .mic_clk_o  (GPIO_0[0])
-  );
-
-  PCM_no_comp iPDM_PCM_1 (
-    .clk(CLOCK_50),
-    .mic_clk(GPIO_0[0]),
-    .dec_mode(SW[4:3]),
-    .rst_n(~rst),
-    .mic_raw(pdm_in1),
-    .pcm_valid_pos(mic1_valid),
-    .pcm_valid_neg(mic2_valid),
-    .pcm_pos(mic1_pcm),
-    .pcm_neg(mic2_pcm)
-  );
-
-  PCM_no_comp iPDM_PCM_2 (
-    .clk(CLOCK_50),
-    .mic_clk(GPIO_0[0]),
-    .dec_mode(SW[4:3]),
-    .rst_n(~rst),
-    .mic_raw(pdm_in2),
-    .pcm_valid_pos(mic3_valid),
-    .pcm_valid_neg(mic4_valid),
-    .pcm_pos(mic3_pcm),
-    .pcm_neg(mic4_pcm)
-  );
-
-  // Drive Mode (HEX0) manually
-  always @(*) begin
-    HEX0 = 7'b1111111;
-    HEX1 = 7'b1111111;
-    HEX2 = 7'b1111111;
-    HEX3 = 7'b1111111;
-    HEX4 = 7'b1111111;
-    HEX5 = 7'b1111111;
-
-    case (curr_mode)
-      2'b00: HEX0 = 7'b1000000;  // 0
-      2'b01: HEX0 = 7'b1111001;  // 1
-      2'b10: HEX0 = 7'b0100100;  // 2
-      2'b11: HEX0 = 7'b0110000;  // 3
-      default: begin
-        HEX0 = 7'b1111111;
-        HEX1 = 7'b1111111;
-        HEX2 = 7'b1111111;
-        HEX3 = 7'b1111111;
-        HEX4 = 7'b1111111;
-        HEX5 = 7'b1111111;
-      end
-    endcase
-  end
-
   wire [15:0] mock_data_1, mock_data_2, mock_data_3, mock_data_4;
   wire data_valid_1, data_valid_2, data_valid_3, data_valid_4;
 
   mock_data mock_data_inst_1 (
     .clk(CLOCK_50),
-    .rst_n(~rst),
-    .ready_for_data(ps_ready_for_data && mic1_valid), 
+    .rst_n(~rst_i),
+    .ready_for_data(ps_ready_for_data && conv1_valid_pos), 
     .data_out(mock_data_1),
     .data_valid(data_valid_1),
   );
 
   mock_data mock_data_inst_2 (
     .clk(CLOCK_50),
-    .rst_n(~rst),
-    .ready_for_data(ps_ready_for_data && mic2_valid), 
+    .rst_n(~rst_i),
+    .ready_for_data(ps_ready_for_data && conv1_valid_neg), 
     .data_out(mock_data_2),
     .data_valid(data_valid_2),
   );
 
     mock_data mock_data_inst_3 (
     .clk(CLOCK_50),
-    .rst_n(~rst),
-    .ready_for_data(ps_ready_for_data && mic3_valid), 
+    .rst_n(~rst_i),
+    .ready_for_data(ps_ready_for_data && conv2_valid_pos), 
     .data_out(mock_data_3),
     .data_valid(data_valid_3),
   );
 
   mock_data mock_data_inst_4 (
     .clk(CLOCK_50),
-    .rst_n(~rst),
-    .ready_for_data(ps_ready_for_data && mic4_valid), 
+    .rst_n(~rst_i),
+    .ready_for_data(ps_ready_for_data && conv2_valid_neg), 
     .data_out(mock_data_4),
     .data_valid(data_valid_4),
   );
 
   pcm_to_mem pcm_to_mem_inst (
     .clk(CLOCK_50),
-    .rst_n(~rst),
-    .pcm_pos_1(SW[9] ? mock_data_1 : mic1_pcm),
-    .pcm_pos_valid_1(SW[9] ? data_valid_1 : mic1_valid),
-    .pcm_neg_1(SW[9] ? mock_data_2 : mic2_pcm),
-    .pcm_neg_valid_1(SW[9] ? data_valid_2 : mic2_valid),
-    .pcm_pos_2(SW[9] ? mock_data_3 : mic3_pcm),
-    .pcm_pos_valid_2(SW[9] ? data_valid_3 : mic3_valid),
-    .pcm_neg_2(SW[9] ? mock_data_4 : mic4_pcm),
-    .pcm_neg_valid_2(SW[9] ? data_valid_4 : mic4_valid),
+    .rst_n(~rst_i),
+    .pcm_pos_1(SW[9] ? mock_data_1 : conv1_pcm_pos),
+    .pcm_pos_valid_1(SW[9] ? data_valid_1 : conv1_pcm_valid_pos),
+    .pcm_neg_1(SW[9] ? mock_data_2 : conv1_pcm_neg),
+    .pcm_neg_valid_1(SW[9] ? data_valid_2 : conv1_pcm_valid_neg),
+    .pcm_pos_2(SW[9] ? mock_data_3 : conv2_pcm_pos),
+    .pcm_pos_valid_2(SW[9] ? data_valid_3 : conv2_pcm_valid_pos),
+    .pcm_neg_2(SW[9] ? mock_data_4 : conv2_pcm_neg),
+    .pcm_neg_valid_2(SW[9] ? data_valid_4 : conv2_pcm_valid_neg),
     .ps_ready_for_data(ps_ready_for_data),
     .write_pending(fifo_waitreq),
     .write_en(fifo_write_en),
@@ -507,6 +413,256 @@ hps_reset hps_reset_inst (
   .source_clk (CLOCK_50),
   .source     (hps_reset_req)
 );
+
+//////////////////
+  // Parameters //
+  ////////////////
+  // 50 MHz / 5,000,000 = 10 Hz refresh rate per sample.
+  localparam integer DISPLAY_UPDATE_DIV = 5000000;
+
+  /////////////////////////////////////////////////////
+  // Declare clock, reset, and mode control signals //
+  ///////////////////////////////////////////////////
+  wire clk_i;
+  wire rst_i;
+  wire mic_clk_o;
+  wire mic_data_val;
+  wire [1:0] curr_mode;
+  wire [2:0] freq_sel;
+
+  /////////////////////////////////////////////////
+  // Declare PCM converter interface signals    //
+  ///////////////////////////////////////////////
+  wire signed [15:0] conv1_pcm_pos;
+  wire signed [15:0] conv1_pcm_neg;
+  wire signed [15:0] conv2_pcm_pos;
+  wire signed [15:0] conv2_pcm_neg;
+  wire conv1_pcm_valid_pos;
+  wire conv1_pcm_valid_neg;
+  wire conv2_pcm_valid_pos;
+  wire conv2_pcm_valid_neg;
+  wire conv1_pos_pcm_cap_rdy;
+  wire conv1_neg_pcm_cap_rdy;
+  wire conv2_pos_pcm_cap_rdy;
+  wire conv2_neg_pcm_cap_rdy;
+
+  /////////////////////////////////////////////////
+  // Declare FIFO capture and display signals   //
+  ///////////////////////////////////////////////
+  wire [1:0] pcm_stream_sel;
+  reg signed [15:0] fifo_data;
+  reg fifo_pcm_valid;
+  wire fifo_wrreq;
+  wire fifo_rdreq;
+  wire fifo_empty;
+  wire fifo_full;
+  wire [15:0] fifo_q;
+  wire [12:0] fifo_usedw;
+
+  reg fifo_rdreq_q;
+  reg [15:0] latest_fifo_sample;
+  reg [15:0] display_sample;
+  reg [22:0] display_div_cnt;
+
+  /////////////////////////////
+  // Top-level assignments  //
+  ///////////////////////////
+  // Drive the internal system clock and active-high reset.
+  assign clk_i = CLOCK_50;
+  assign rst_i = ~fpga_debounced_buttons[0];
+
+
+  // Frequency selection based on SW[4:2].
+  assign freq_sel = SW[4:2];
+
+  // Select which PCM stream to capture/display.
+  // 0: GPIO[1] positive edge mic, 1: GPIO[1] negative edge mic,
+  // 2: GPIO[2] positive edge mic, 3: GPIO[2] negative edge mic.
+  assign pcm_stream_sel = SW[6:5];
+
+  // Output the mic clock on the GPIO.
+  assign GPIO_0[0] = mic_clk_o;
+
+  // We don't care about the remaining GPIO pins.
+  assign GPIO_0[35:3] = {33{1'bz}};
+
+  //////////////////////////
+  // Submodule instances //
+  ////////////////////////
+  // Instantiate the Audio Front End.
+  Audio_Front_End iAUD_FRONT (
+      .clk_i(clk_i),
+      .rst_i(rst_i),
+      .mode_req_i(SW[1:0]),
+
+      .ADC_data_out_i(ADC_DOUT),
+      .ADC_SCLK_o(ADC_SCLK),
+      .ADC_CS_o(ADC_CONVST),
+      .ADC_data_in_o(ADC_DIN),
+
+      .curr_mode_o(curr_mode),
+      .data_val_o (mic_data_val),
+      .mic_clk_o  (mic_clk_o)
+  );
+
+  // Instantiate the PDM2PCM module for the first microphone data input.
+  Pdm_To_Pcm iCONV_1 (
+      .clk_i            (clk_i),
+      .rst_i            (rst_i),
+      .mic_clk_i        (mic_clk_o),
+      .mic_clk_val_i    (mic_data_val),
+      .freq_sel_i       (freq_sel),
+      .mic_data_i       (GPIO_0[1]),                // Input the mic's PDM signal.
+      .pos_pcm_cap_rdy_i(conv1_pos_pcm_cap_rdy),
+      .neg_pcm_cap_rdy_i(conv1_neg_pcm_cap_rdy),
+
+      .pcm_pos_o      (conv1_pcm_pos),
+      .pcm_valid_pos_o(conv1_pcm_valid_pos),
+      .pcm_neg_o      (conv1_pcm_neg),
+      .pcm_valid_neg_o(conv1_pcm_valid_neg)
+  );
+
+  // Instantiate the PDM2PCM module for the second microphone data input.
+  Pdm_To_Pcm iCONV_2 (
+      .clk_i            (clk_i),
+      .rst_i            (rst_i),
+      .mic_clk_i        (mic_clk_o),
+      .mic_clk_val_i    (mic_data_val),
+      .freq_sel_i       (freq_sel),
+      .mic_data_i       (GPIO_0[2]),                // Input the mic's PDM signal.
+      .pos_pcm_cap_rdy_i(conv2_pos_pcm_cap_rdy),
+      .neg_pcm_cap_rdy_i(conv2_neg_pcm_cap_rdy),
+
+      .pcm_pos_o      (conv2_pcm_pos),
+      .pcm_valid_pos_o(conv2_pcm_valid_pos),
+      .pcm_neg_o      (conv2_pcm_neg),
+      .pcm_valid_neg_o(conv2_pcm_valid_neg)
+  );
+
+  /////////////////////////////////
+  // PCM stream selection logic //
+  ///////////////////////////////
+  // Select one of the four PCM streams to push into the display FIFO.
+  always @(*) begin
+    fifo_data = 16'h0000;
+    fifo_pcm_valid = 1'b0;
+
+    case (pcm_stream_sel)
+      2'b00: begin
+        fifo_data = conv1_pcm_pos;
+        fifo_pcm_valid = conv1_pcm_valid_pos;
+      end
+      2'b01: begin
+        fifo_data = conv1_pcm_neg;
+        fifo_pcm_valid = conv1_pcm_valid_neg;
+      end
+      2'b10: begin
+        fifo_data = conv2_pcm_pos;
+        fifo_pcm_valid = conv2_pcm_valid_pos;
+      end
+      2'b11: begin
+        fifo_data = conv2_pcm_neg;
+        fifo_pcm_valid = conv2_pcm_valid_neg;
+      end
+      default: begin
+        fifo_data = 16'h0000;
+        fifo_pcm_valid = 1'b0;
+      end
+    endcase
+  end
+
+  ////////////////////////
+  // FIFO control logic //
+  //////////////////////
+  // Write selected PCM samples when the FIFO can accept data.
+  assign fifo_wrreq = fifo_pcm_valid & ~fifo_full;
+
+  // Read continuously so the most recent captured sample reaches the display.
+  assign fifo_rdreq = ~fifo_empty;
+
+  // Backpressure only the selected stream when the display FIFO is full.
+  assign conv1_pos_pcm_cap_rdy = (pcm_stream_sel == 2'b00) ? ~fifo_full : 1'b1;
+  assign conv1_neg_pcm_cap_rdy = (pcm_stream_sel == 2'b01) ? ~fifo_full : 1'b1;
+  assign conv2_pos_pcm_cap_rdy = (pcm_stream_sel == 2'b10) ? ~fifo_full : 1'b1;
+  assign conv2_neg_pcm_cap_rdy = (pcm_stream_sel == 2'b11) ? ~fifo_full : 1'b1;
+
+  // Instantiate the PCM display FIFO.
+  FIFO iPCM_DISPLAY_FIFO (
+      .clock(clk_i),
+      .data (fifo_data),
+      .rdreq(fifo_rdreq),
+      .sclr (rst_i),
+      .wrreq(fifo_wrreq),
+
+      .empty(fifo_empty),
+      .full (fifo_full),
+      .q    (fifo_q),
+      .usedw(fifo_usedw)
+  );
+
+  // Register the FIFO output one cycle after each read request.
+  always @(posedge clk_i) begin
+    if (rst_i) begin
+      fifo_rdreq_q <= 1'b0;
+      latest_fifo_sample <= 16'h0000;
+    end else begin
+      fifo_rdreq_q <= fifo_rdreq;
+
+      if (fifo_rdreq_q) begin
+        latest_fifo_sample <= fifo_q;
+      end
+    end
+  end
+
+  //////////////////////////
+  // HEX display logic   //
+  ////////////////////////
+  // Slow the visible update rate so the HEX display can be read by eye.
+  always @(posedge clk_i) begin
+    if (rst_i) begin
+      display_div_cnt <= 23'd0;
+      display_sample  <= 16'h0000;
+    end else if (display_div_cnt == DISPLAY_UPDATE_DIV - 1) begin
+      display_div_cnt <= 23'd0;
+      display_sample  <= latest_fifo_sample;
+    end else begin
+      display_div_cnt <= display_div_cnt + 1'b1;
+    end
+  end
+
+  // Display the selected PCM sample as four hexadecimal digits.
+  Seven_Seg iHEX0 (
+      .bin_i(display_sample[3:0]),
+      .hex_o(HEX0)
+  );
+
+  Seven_Seg iHEX1 (
+      .bin_i(display_sample[7:4]),
+      .hex_o(HEX1)
+  );
+
+  Seven_Seg iHEX2 (
+      .bin_i(display_sample[11:8]),
+      .hex_o(HEX2)
+  );
+
+  Seven_Seg iHEX3 (
+      .bin_i(display_sample[15:12]),
+      .hex_o(HEX3)
+  );
+
+  // Display the selected PCM stream number on HEX4.
+  Seven_Seg iHEX4 (
+      .bin_i({2'b00, pcm_stream_sel}),
+      .hex_o(HEX4)
+  );
+
+  // Display the current microphone mode on HEX5.
+  Seven_Seg iHEX5 (
+      .bin_i({2'b00, curr_mode}),
+      .hex_o(HEX5)
+  );
+
 
 endmodule
 
