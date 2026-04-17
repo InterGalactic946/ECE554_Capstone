@@ -1,0 +1,1032 @@
+m255
+K4
+z2
+!s11f MIXED_VERSIONS
+!s11e vcom 2024.3_2 2024.11, Nov 25 2024
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+Z0 d/filespace/s/sjonnalagad2/Tests/SIM_LIBS
+vSd0TEAk6BT51dnaitzFIBg==
+Z1 DXx6 sv_std 3 std 0 22 9oUSJO;AeEaW`l:M@^WG92
+Z2 DXx4 work 22 alt_dsp_cic_common_pkg 0 22 =eX_4WOm[Ji3;CZ4e32`11
+Z3 !s110 1775787613
+!i10b 0
+!s100 ]OmUWJiBgO7^CTJal5XVC2
+I];kP;0NagoXS166MQ]gCJ0
+!i119 1
+!i8a 147787664
+S1
+R0
+Z4 w1775787613
+8./../Cic_Decimator/simulation/submodules/mentor/alt_cic_core.sv
+F./../Cic_Decimator/simulation/submodules/mentor/alt_cic_core.sv
+!i122 26
+Z5 L0 12 1
+Z6 VDg1SIo80bB@j0V0VzS_@n1
+Z7 OE;L;2024.3_2;79
+r1
+!s85 0
+31
+Z8 !s108 1775787613.000000
+!s107 ./../Cic_Decimator/simulation/submodules/mentor/alt_cic_core.sv|
+!s90 -sv|./../Cic_Decimator/simulation/submodules/mentor/alt_cic_core.sv|-work|cic_ii_0|
+!i113 0
+Z9 o-sv -work cic_ii_0 -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+Z10 tCvgOpt 0
+n9164315
+vJ4e79hawE6D/GdQGluUfyQx61PkP2rmFRLYONrhhtUM=
+R1
+R2
+R3
+!i10b 0
+!s100 ^RzSh68:TzC8gf]:z[UGn2
+IPg6mH3@gPjj[d:7@@<HN73
+!i119 1
+!i8a 1342466928
+S1
+R0
+R4
+8./../Cic_Decimator/simulation/submodules/mentor/alt_cic_dec_miso.sv
+F./../Cic_Decimator/simulation/submodules/mentor/alt_cic_dec_miso.sv
+!i122 25
+R5
+R6
+R7
+r1
+!s85 0
+31
+R8
+!s107 ./../Cic_Decimator/simulation/submodules/mentor/alt_cic_dec_miso.sv|
+!s90 -sv|./../Cic_Decimator/simulation/submodules/mentor/alt_cic_dec_miso.sv|-work|cic_ii_0|
+!i113 0
+R9
+R10
+ne2d369f
+vtOYHeXf5CUi4VAEl0dFtjiem/rU3aimxz+8d/0HeTXM=
+R1
+R2
+R3
+!i10b 0
+!s100 3<9A^obDRcB@]<1Z[UUL71
+IVHPN<KZ@ejYQVU:l;=Z^@3
+!i119 1
+!i8a 265874000
+S1
+R0
+R4
+8./../Cic_Decimator/simulation/submodules/mentor/alt_cic_dec_siso.sv
+F./../Cic_Decimator/simulation/submodules/mentor/alt_cic_dec_siso.sv
+!i122 23
+R5
+R6
+R7
+r1
+!s85 0
+31
+R8
+!s107 ./../Cic_Decimator/simulation/submodules/mentor/alt_cic_dec_siso.sv|
+!s90 -sv|./../Cic_Decimator/simulation/submodules/mentor/alt_cic_dec_siso.sv|-work|cic_ii_0|
+!i113 0
+R9
+R10
+ne2f969f
+vG4UBOaUOCWmzLGjDOq9JjsA48oTCQ/CRFllQNcPigKo=
+R1
+R2
+R3
+!i10b 0
+!s100 FY1_oN0CK<cUc0khBLM@G2
+Ii3@`>hCZLX<`KeYz`Cb;W0
+!i119 1
+!i8a 680271584
+S1
+R0
+R4
+8./../Cic_Decimator/simulation/submodules/mentor/alt_cic_int_simo.sv
+F./../Cic_Decimator/simulation/submodules/mentor/alt_cic_int_simo.sv
+!i122 24
+R5
+R6
+R7
+r1
+!s85 0
+31
+R8
+!s107 ./../Cic_Decimator/simulation/submodules/mentor/alt_cic_int_simo.sv|
+!s90 -sv|./../Cic_Decimator/simulation/submodules/mentor/alt_cic_int_simo.sv|-work|cic_ii_0|
+!i113 0
+R9
+R10
+n1f8a5f
+vezp9+CoyHDPe39Blw5cBWyMZ4kKz8i0Ne4URu05IQaU=
+R1
+R2
+R3
+!i10b 0
+!s100 1j4hhfJBoLbSCOI_h;QHQ0
+ICMNYaPC5cIS1OOB4Sm@]U0
+!i119 1
+!i8a 890930448
+S1
+R0
+R4
+8./../Cic_Decimator/simulation/submodules/mentor/alt_cic_int_siso.sv
+F./../Cic_Decimator/simulation/submodules/mentor/alt_cic_int_siso.sv
+!i122 22
+R5
+R6
+R7
+r1
+!s85 0
+31
+R8
+!s107 ./../Cic_Decimator/simulation/submodules/mentor/alt_cic_int_siso.sv|
+!s90 -sv|./../Cic_Decimator/simulation/submodules/mentor/alt_cic_int_siso.sv|-work|cic_ii_0|
+!i113 0
+R9
+R10
+n1f96ff
+X7cwp6P1wnMS5syi+CTVG1BtWHq37yo3GRaZbucYv1ds=
+R1
+Z11 !s110 1775787612
+!i10b 0
+!s100 L2V`Mjc`R_;gLhC=DXDL92
+I=eX_4WOm[Ji3;CZ4e32`11
+!i119 1
+!i8a 1718587568
+S1
+R0
+Z12 w1775787612
+8./../Cic_Decimator/simulation/submodules/mentor/alt_dsp_cic_common_pkg.sv
+F./../Cic_Decimator/simulation/submodules/mentor/alt_dsp_cic_common_pkg.sv
+!i122 12
+L0 12 0
+V=eX_4WOm[Ji3;CZ4e32`11
+R7
+r1
+!s85 0
+31
+Z13 !s108 1775787612.000000
+!s107 ./../Cic_Decimator/simulation/submodules/mentor/alt_dsp_cic_common_pkg.sv|
+!s90 -sv|./../Cic_Decimator/simulation/submodules/mentor/alt_dsp_cic_common_pkg.sv|-work|cic_ii_0|
+!i113 0
+R9
+R10
+na2be307
+Eauk_dspip_avalon_streaming_controller
+Z14 w1775770835
+Z15 DPx9 altera_mf 20 altera_mf_components 0 22 ^:alB2MJEEXl;OOBQIDHY2
+Z16 DPx4 work 18 auk_dspip_math_pkg 0 22 RDB4f:l`0TdYH^?e_g1FD1
+Z17 DPx4 work 17 auk_dspip_lib_pkg 0 22 CEQBjQ4PnJMA_aU`O60HY3
+Z18 DPx4 ieee 11 numeric_std 0 22 aU^R8eGcicLcUFIaBQSL>3
+Z19 DPx3 std 6 textio 0 22 zE1`LPoLg^DX3Oz^4Fj1K3
+Z20 DPx4 ieee 14 std_logic_1164 0 22 cVAk:aDinOX8^VGI1ekP<3
+!i122 4
+R0
+Z21 8./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_avalon_streaming_controller.vhd
+Z22 F./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_avalon_streaming_controller.vhd
+l0
+Z23 L26 1
+VjYI5L1M2N]fZ0RJEE4`Tm0
+!s100 0T0Qj^6>_7BhhV;1JFTHg3
+Z24 OE;C;2024.3_2;79
+32
+Z25 !s110 1775787611
+!i10b 1
+Z26 !s108 1775787611.000000
+Z27 !s90 ./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_avalon_streaming_controller.vhd|-work|cic_ii_0|
+Z28 !s107 ./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_avalon_streaming_controller.vhd|
+!i113 0
+Z29 o-work cic_ii_0
+Z30 tExplicit 1 CvgOpt 0
+Astruct
+R15
+R16
+R17
+R18
+R19
+R20
+DEx4 work 37 auk_dspip_avalon_streaming_controller 0 22 jYI5L1M2N]fZ0RJEE4`Tm0
+!i122 4
+l108
+L53 179
+V=HT`LAU`<MLCCN49UWLmT0
+!s100 T58e>OIiPnDLg[Li4Xci01
+R24
+32
+R25
+!i10b 1
+R26
+R27
+R28
+!i113 0
+R29
+R30
+Eauk_dspip_avalon_streaming_sink
+R14
+R15
+R16
+R17
+R18
+R19
+R20
+!i122 5
+R0
+Z31 8./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_avalon_streaming_sink.vhd
+Z32 F./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_avalon_streaming_sink.vhd
+l0
+R23
+VXD]M1:3WKM9cMO:0j?0SE3
+!s100 `H:3LBSa]c4TVKnf`aDg62
+R24
+32
+R25
+!i10b 1
+R26
+Z33 !s90 ./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_avalon_streaming_sink.vhd|-work|cic_ii_0|
+Z34 !s107 ./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_avalon_streaming_sink.vhd|
+!i113 0
+R29
+R30
+Artl
+R15
+R16
+R17
+R18
+R19
+R20
+DEx4 work 31 auk_dspip_avalon_streaming_sink 0 22 XD]M1:3WKM9cMO:0j?0SE3
+!i122 5
+l114
+L64 112
+VgfG2hHRA8Jd^?]W@f7hD30
+!s100 140gKRBEN1YNFB=BVY_=72
+R24
+32
+R25
+!i10b 1
+R26
+R33
+R34
+!i113 0
+R29
+R30
+Eauk_dspip_avalon_streaming_small_fifo
+R14
+R16
+R17
+R18
+R19
+R20
+!i122 3
+R0
+Z35 8./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_avalon_streaming_small_fifo.vhd
+Z36 F./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_avalon_streaming_small_fifo.vhd
+l0
+L27 1
+VbRf5g>KL]fCe?4_BKHkOf2
+!s100 KS5@d]>8V[6A3hNJR0dZe0
+R24
+32
+R25
+!i10b 1
+R26
+Z37 !s90 ./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_avalon_streaming_small_fifo.vhd|-work|cic_ii_0|
+Z38 !s107 ./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_avalon_streaming_small_fifo.vhd|
+!i113 0
+R29
+R30
+Aarch
+R16
+R17
+R18
+R19
+R20
+DEx4 work 37 auk_dspip_avalon_streaming_small_fifo 0 22 bRf5g>KL]fCe?4_BKHkOf2
+!i122 3
+l64
+L50 118
+VFok3a;3TaU5[_R<B_=<Nd2
+!s100 L?7]Tn;omT<2Xe8T:XF0<3
+R24
+32
+R25
+!i10b 1
+R26
+R37
+R38
+!i113 0
+R29
+R30
+Eauk_dspip_avalon_streaming_source
+R14
+R15
+R16
+R17
+R18
+R19
+R20
+!i122 6
+R0
+Z39 8./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_avalon_streaming_source.vhd
+Z40 F./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_avalon_streaming_source.vhd
+l0
+R23
+VNG9Jl]ocUInGDD5^ozD]H1
+!s100 ?lNFOZ9MQ<o7d38mUCY@d1
+R24
+32
+R25
+!i10b 1
+R26
+Z41 !s90 ./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_avalon_streaming_source.vhd|-work|cic_ii_0|
+Z42 !s107 ./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_avalon_streaming_source.vhd|
+!i113 0
+R29
+R30
+Artl
+R15
+R16
+R17
+R18
+R19
+R20
+DEx4 work 33 auk_dspip_avalon_streaming_source 0 22 NG9Jl]ocUInGDD5^ozD]H1
+!i122 6
+l108
+L57 145
+VbV7dPKEJ[WceN>=b^Zg8d3
+!s100 dWH45L_egEOceY;iC<?C?2
+R24
+32
+R25
+!i10b 1
+R26
+R41
+R42
+!i113 0
+R29
+R30
+Eauk_dspip_channel_buffer
+R14
+R15
+R16
+R17
+R18
+R19
+R20
+!i122 18
+R0
+Z43 8./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_channel_buffer.vhd
+Z44 F./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_channel_buffer.vhd
+l0
+R23
+V[R4LeZK;jb4SPW1D6H4aP3
+!s100 5zocDP_8eGn98]b2CzGF83
+R24
+32
+R11
+!i10b 1
+R13
+Z45 !s90 ./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_channel_buffer.vhd|-work|cic_ii_0|
+Z46 !s107 ./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_channel_buffer.vhd|
+!i113 0
+R29
+R30
+Asyn
+R15
+R16
+R17
+R18
+R19
+R20
+DEx4 work 24 auk_dspip_channel_buffer 0 22 [R4LeZK;jb4SPW1D6H4aP3
+!i122 18
+l86
+L47 65
+VT0ZMZmBlSb;`4^bzH6gQR0
+!s100 dH4@mo5KXm=mHoVjKPUb_3
+R24
+32
+R11
+!i10b 1
+R13
+R45
+R46
+!i113 0
+R29
+R30
+Pauk_dspip_cic_lib_pkg
+R16
+R18
+R19
+R20
+!i122 13
+R14
+R0
+8./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_cic_lib_pkg.vhd
+F./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_cic_lib_pkg.vhd
+l0
+L23 116
+VZzH<2^lE5@gAbIUWm1zQE2
+!s100 7K6W=c9b_Ek^fXBaZmmeY2
+R24
+32
+R11
+!i10b 1
+R13
+!s90 ./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_cic_lib_pkg.vhd|-work|cic_ii_0|
+!s107 ./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_cic_lib_pkg.vhd|
+!i113 0
+R29
+R30
+Eauk_dspip_delay
+Z47 w1775770833
+R16
+R15
+R18
+R19
+R20
+!i122 7
+R0
+Z48 8./../Cic_Decimator/simulation/submodules/auk_dspip_delay.vhd
+Z49 F./../Cic_Decimator/simulation/submodules/auk_dspip_delay.vhd
+l0
+L52 1
+VLzTfH<4`zS[4cXUicMcCI1
+!s100 i[<AM6C@E322<ZKjCn^<]2
+R24
+32
+R25
+!i10b 1
+R26
+Z50 !s90 ./../Cic_Decimator/simulation/submodules/auk_dspip_delay.vhd|-work|cic_ii_0|
+Z51 !s107 ./../Cic_Decimator/simulation/submodules/auk_dspip_delay.vhd|
+!i113 0
+R29
+R30
+Artl
+R16
+R15
+R18
+R19
+R20
+DEx4 work 15 auk_dspip_delay 0 22 LzTfH<4`zS[4cXUicMcCI1
+!i122 7
+l80
+L79 230
+V8[gPiJPZ<:2EQ6CJ7CS3F3
+!s100 _Mmb<VY5AVaSh8[c8>S6X2
+R24
+32
+R25
+!i10b 1
+R26
+R50
+R51
+!i113 0
+R29
+R30
+Eauk_dspip_differentiator
+R14
+R16
+R17
+Z52 DPx3 lpm 14 lpm_components 0 22 MQaJVKl6c9@C2XO9DaM[F2
+R15
+R18
+R19
+R20
+!i122 14
+R0
+Z53 8./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_differentiator.vhd
+Z54 F./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_differentiator.vhd
+l0
+Z55 L57 1
+VdG7:dahZ6J=F15_o4KVR03
+!s100 GLd]F@2MORzMDc>Zk4=NZ1
+R24
+32
+R11
+!i10b 1
+R13
+Z56 !s90 ./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_differentiator.vhd|-work|cic_ii_0|
+Z57 !s107 ./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_differentiator.vhd|
+!i113 0
+R29
+R30
+Asyn
+R16
+R17
+R52
+R15
+R18
+R19
+R20
+DEx4 work 24 auk_dspip_differentiator 0 22 dG7:dahZ6J=F15_o4KVR03
+!i122 14
+l110
+L82 139
+VYh6bWfl@HWTjLB9JGOP2H3
+!s100 YE@2>>5QE^l><?LF;5Nef3
+R24
+32
+R11
+!i10b 1
+R13
+R56
+R57
+!i113 0
+R29
+R30
+vRfjtAPIvDDn8RwO6F3Q4LEdSc/ab9BGV7mFjQMFvfWY=
+R1
+R2
+R11
+!i10b 0
+!s100 dXKeDWeZF^djb9?6EiKJP2
+IbZEgB3ozgmDP3?W<kz;M23
+!i119 1
+!i8a 361073808
+S1
+R0
+R12
+8./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_downsample.sv
+F./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_downsample.sv
+!i122 15
+R5
+R6
+R7
+r1
+!s85 0
+31
+R13
+!s107 ./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_downsample.sv|
+!s90 -sv|./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_downsample.sv|-work|cic_ii_0|
+!i113 0
+R9
+R10
+n9c86d15
+Eauk_dspip_fastadd
+R47
+R18
+R19
+R20
+!i122 9
+R0
+Z58 8./../Cic_Decimator/simulation/submodules/auk_dspip_fastadd.vhd
+Z59 F./../Cic_Decimator/simulation/submodules/auk_dspip_fastadd.vhd
+l0
+L19 1
+VZmoi1_;NJV=jb?mzUV?zC3
+!s100 [5]E9T0Cj1m>dM=d:lbV_1
+R24
+32
+R11
+!i10b 1
+R26
+Z60 !s90 ./../Cic_Decimator/simulation/submodules/auk_dspip_fastadd.vhd|-work|cic_ii_0|
+Z61 !s107 ./../Cic_Decimator/simulation/submodules/auk_dspip_fastadd.vhd|
+!i113 0
+R29
+R30
+Abeh
+R18
+R19
+R20
+DEx4 work 17 auk_dspip_fastadd 0 22 Zmoi1_;NJV=jb?mzUV?zC3
+!i122 9
+l58
+L36 53
+V:Lj=F[K9NOiA6ii2S@TI01
+!s100 4L6d6?NT5RVcA3okPLH_h0
+R24
+32
+R11
+!i10b 1
+R26
+R60
+R61
+!i113 0
+R29
+R30
+Eauk_dspip_fastaddsub
+R47
+R18
+R19
+R20
+!i122 8
+R0
+Z62 8./../Cic_Decimator/simulation/submodules/auk_dspip_fastaddsub.vhd
+Z63 F./../Cic_Decimator/simulation/submodules/auk_dspip_fastaddsub.vhd
+l0
+L69 1
+VQIgiDDGe]Ja1S6G6fF?nE2
+!s100 DR3L<TF4H7h;URRDTdRDK3
+R24
+32
+R25
+!i10b 1
+R26
+Z64 !s90 ./../Cic_Decimator/simulation/submodules/auk_dspip_fastaddsub.vhd|-work|cic_ii_0|
+Z65 !s107 ./../Cic_Decimator/simulation/submodules/auk_dspip_fastaddsub.vhd|
+!i113 0
+R29
+R30
+Abeh
+R18
+R19
+R20
+DEx4 work 20 auk_dspip_fastaddsub 0 22 QIgiDDGe]Ja1S6G6fF?nE2
+!i122 8
+l114
+L87 74
+Vi4WamS0RF<@]6m^0g0IHD0
+!s100 kg60zaEKIWXliChKPD02@3
+R24
+32
+R25
+!i10b 1
+R26
+R64
+R65
+!i113 0
+R29
+R30
+Eauk_dspip_integrator
+R14
+R16
+R17
+R52
+R15
+R18
+R19
+R20
+!i122 16
+R0
+Z66 8./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_integrator.vhd
+Z67 F./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_integrator.vhd
+l0
+L53 1
+VZa^QFUlN9FUoU9XojJWGO2
+!s100 ^TBRez:n9MZ][^DVlOP9G3
+R24
+32
+R11
+!i10b 1
+R13
+Z68 !s90 ./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_integrator.vhd|-work|cic_ii_0|
+Z69 !s107 ./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_integrator.vhd|
+!i113 0
+R29
+R30
+Asyn
+R16
+R17
+R52
+R15
+R18
+R19
+R20
+DEx4 work 20 auk_dspip_integrator 0 22 Za^QFUlN9FUoU9XojJWGO2
+!i122 16
+l85
+L74 166
+V6NCM7PlQQKb8AKG_2A8=R1
+!s100 99QY@`8_e0jgaSWnGNHEO3
+R24
+32
+R11
+!i10b 1
+R13
+R68
+R69
+!i113 0
+R29
+R30
+Pauk_dspip_lib_pkg
+R16
+R18
+R19
+R20
+!i122 2
+R47
+R0
+8./../Cic_Decimator/simulation/submodules/auk_dspip_lib_pkg.vhd
+F./../Cic_Decimator/simulation/submodules/auk_dspip_lib_pkg.vhd
+l0
+L28 603
+VCEQBjQ4PnJMA_aU`O60HY3
+!s100 KcRlL:CTnlUz=1CF=kC_S0
+R24
+32
+R25
+!i10b 1
+R26
+!s90 ./../Cic_Decimator/simulation/submodules/auk_dspip_lib_pkg.vhd|-work|cic_ii_0|
+!s107 ./../Cic_Decimator/simulation/submodules/auk_dspip_lib_pkg.vhd|
+!i113 0
+R29
+R30
+Pauk_dspip_math_pkg
+R18
+R19
+R20
+!i122 0
+R47
+R0
+Z70 8./../Cic_Decimator/simulation/submodules/auk_dspip_math_pkg.vhd
+Z71 F./../Cic_Decimator/simulation/submodules/auk_dspip_math_pkg.vhd
+l0
+L51 76
+VRDB4f:l`0TdYH^?e_g1FD1
+!s100 [z_3ODE8b:W7XDJ[_]HTW0
+R24
+32
+b1
+R25
+!i10b 1
+R26
+Z72 !s90 ./../Cic_Decimator/simulation/submodules/auk_dspip_math_pkg.vhd|-work|cic_ii_0|
+Z73 !s107 ./../Cic_Decimator/simulation/submodules/auk_dspip_math_pkg.vhd|
+!i113 0
+R29
+R30
+Bbody
+R16
+R18
+R19
+R20
+!i122 0
+l0
+L128 240
+VizK32k3^M>dFCCSnc7QUD1
+!s100 `941_Ff6o7=GBNnXYB1eU3
+R24
+32
+R25
+!i10b 1
+R26
+R72
+R73
+!i113 0
+R29
+R30
+Eauk_dspip_pipelined_adder
+R47
+R16
+R18
+R19
+R20
+!i122 10
+R0
+Z74 8./../Cic_Decimator/simulation/submodules/auk_dspip_pipelined_adder.vhd
+Z75 F./../Cic_Decimator/simulation/submodules/auk_dspip_pipelined_adder.vhd
+l0
+R55
+VOjEbS0Zdd^8::=KL[fRNM1
+!s100 A3m<hV;FoAKjU@IanjQQe0
+R24
+32
+R11
+!i10b 1
+R13
+Z76 !s90 ./../Cic_Decimator/simulation/submodules/auk_dspip_pipelined_adder.vhd|-work|cic_ii_0|
+Z77 !s107 ./../Cic_Decimator/simulation/submodules/auk_dspip_pipelined_adder.vhd|
+!i113 0
+R29
+R30
+Artl
+R16
+R18
+R19
+R20
+DEx4 work 25 auk_dspip_pipelined_adder 0 22 OjEbS0Zdd^8::=KL[fRNM1
+!i122 10
+l145
+L80 229
+V3HehF@bg`ih=bNb4hdiG=0
+!s100 J6Q0=]bdNoikj1bKf4=@i1
+R24
+32
+R11
+!i10b 1
+R13
+R76
+R77
+!i113 0
+R29
+R30
+Eauk_dspip_roundsat
+R47
+R18
+R19
+R20
+!i122 11
+R0
+Z78 8./../Cic_Decimator/simulation/submodules/auk_dspip_roundsat.vhd
+Z79 F./../Cic_Decimator/simulation/submodules/auk_dspip_roundsat.vhd
+l0
+L45 1
+V6P;ZGT9F`S63P17[:3CkM0
+!s100 :Ro[aE[BH^N6eIGEG[O?N3
+R24
+32
+R11
+!i10b 1
+R13
+Z80 !s90 ./../Cic_Decimator/simulation/submodules/auk_dspip_roundsat.vhd|-work|cic_ii_0|
+Z81 !s107 ./../Cic_Decimator/simulation/submodules/auk_dspip_roundsat.vhd|
+!i113 0
+R29
+R30
+Abeh
+R18
+R19
+R20
+DEx4 work 18 auk_dspip_roundsat 0 22 6P;ZGT9F`S63P17[:3CkM0
+!i122 11
+l63
+L61 378
+V3LhQBi?:817GM<VXGF]l52
+!s100 ]_3I0;m7RDoiJeFA6M^`A1
+R24
+32
+R11
+!i10b 1
+R13
+R80
+R81
+!i113 0
+R29
+R30
+Pauk_dspip_text_pkg
+R18
+R19
+R20
+!i122 1
+R47
+R0
+Z82 8./../Cic_Decimator/simulation/submodules/auk_dspip_text_pkg.vhd
+Z83 F./../Cic_Decimator/simulation/submodules/auk_dspip_text_pkg.vhd
+l0
+L60 15
+V:3OQ:K16SII3W`Z78RZ1B1
+!s100 D132L>H75ieXQdW840k7O0
+R24
+32
+b1
+R25
+!i10b 1
+R26
+Z84 !s90 ./../Cic_Decimator/simulation/submodules/auk_dspip_text_pkg.vhd|-work|cic_ii_0|
+Z85 !s107 ./../Cic_Decimator/simulation/submodules/auk_dspip_text_pkg.vhd|
+!i113 0
+R29
+R30
+Bbody
+DPx4 work 18 auk_dspip_text_pkg 0 22 :3OQ:K16SII3W`Z78RZ1B1
+R18
+R19
+R20
+!i122 1
+l0
+L76 46
+VBS0HY`>AC=ai_Z8WUj[Yo0
+!s100 8<?]li33IkB>fMMF[SR`S2
+R24
+32
+R25
+!i10b 1
+R26
+R84
+R85
+!i113 0
+R29
+R30
+Eauk_dspip_upsample
+R14
+R18
+R19
+R20
+!i122 17
+R0
+Z86 8./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_upsample.vhd
+Z87 F./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_upsample.vhd
+l0
+L44 1
+VJ0Q6`G<8azj>S5R0Td2LW1
+!s100 6LVhkI6HfUaPYaO[NDQcM3
+R24
+32
+R11
+!i10b 1
+R13
+Z88 !s90 ./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_upsample.vhd|-work|cic_ii_0|
+Z89 !s107 ./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_upsample.vhd|
+!i113 0
+R29
+R30
+Asyn
+R18
+R19
+R20
+DEx4 work 18 auk_dspip_upsample 0 22 J0Q6`G<8azj>S5R0Td2LW1
+!i122 17
+l61
+L59 12
+VOFIWV=`Oca6>F@lhbM6[i3
+!s100 =njJ342K>=6fX5lK<e:fb3
+R24
+32
+R11
+!i10b 1
+R13
+R88
+R89
+!i113 0
+R29
+R30
+vc5l5lxGNzKeNn5I+qOwBmwtzSGgUuuLghRF+jyPNN94=
+R1
+R2
+R3
+!i10b 0
+!s100 gA0fU9o7Z6@JO1jVPX:Wh0
+ImJb;@mh=RYhkR:XcSLdfT2
+!i119 1
+!i8a 698279728
+S1
+R0
+R4
+8./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_variable_downsample.sv
+F./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_variable_downsample.sv
+!i122 19
+R5
+R6
+R7
+r1
+!s85 0
+31
+R13
+!s107 ./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_variable_downsample.sv|
+!s90 -sv|./../Cic_Decimator/simulation/submodules/mentor/auk_dspip_variable_downsample.sv|-work|cic_ii_0|
+!i113 0
+R9
+R10
+n66e305
+v/XndIcOORV1lBWnJsGWcWA==
+R1
+R3
+!i10b 0
+!s100 0Tn0ikMQThY:TGo;?FHl]1
+I:Z><6@X[n`cX^kjN_UK@T2
+!i119 1
+!i8a 2959408
+S1
+R0
+R4
+8./../Cic_Decimator/simulation/submodules/mentor/counter_module.sv
+F./../Cic_Decimator/simulation/submodules/mentor/counter_module.sv
+!i122 21
+R5
+R6
+R7
+r1
+!s85 0
+31
+R8
+!s107 ./../Cic_Decimator/simulation/submodules/mentor/counter_module.sv|
+!s90 -sv|./../Cic_Decimator/simulation/submodules/mentor/counter_module.sv|-work|cic_ii_0|
+!i113 0
+R9
+R10
+n50012c5
+vMphe8Km73PKgkFdBtgJV1aYMjqvj4S5u2MtkWCM/ZHg=
+R3
+!i10b 0
+!s100 ZLTfFbFKf9aSFKg^IoT2W2
+IHYmLIoZ>E:G9>^SPAHmgM3
+!i119 1
+!i8a 980208992
+R0
+R4
+8./../Cic_Decimator/simulation/submodules/mentor/hyper_pipeline_interface.v
+F./../Cic_Decimator/simulation/submodules/mentor/hyper_pipeline_interface.v
+!i122 20
+R5
+R6
+R7
+r1
+!s85 0
+31
+R8
+!s107 ./../Cic_Decimator/simulation/submodules/mentor/hyper_pipeline_interface.v|
+!s90 ./../Cic_Decimator/simulation/submodules/mentor/hyper_pipeline_interface.v|-work|cic_ii_0|
+!i113 0
+o-work cic_ii_0 -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+R10
+n5f39f65

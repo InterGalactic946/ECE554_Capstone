@@ -1,0 +1,7 @@
+**/WORK/
+**/build/
+**/tests/output
+**/work/
+**.ver
+__pycache__/
+*.py[cod]
