@@ -31,7 +31,7 @@
 //Date:  Mon Jun 17 20:35:29 2013
 // ============================================================================
 
-`define ENABLE_HPS 
+`define ENABLE_HPS
 
 
 // ------------------------------------------------------------
@@ -214,23 +214,59 @@ module ghrd_top (
     output       VGA_VS
 );
 
+  // Maps GPIO_0 correctly.
+  function automatic int gpio0_map(input int hw_pin);
+    begin
+      case (hw_pin)
 
+        1:  gpio0_map = 0;
+        2:  gpio0_map = 1;
+        3:  gpio0_map = 2;
+        4:  gpio0_map = 3;
+        5:  gpio0_map = 4;
+        6:  gpio0_map = 5;
+        7:  gpio0_map = 6;
+        8:  gpio0_map = 7;
+        9:  gpio0_map = 8;
+        10: gpio0_map = 9;
 
-  // internal wires and registers declaration
-  wire [ 3:0] fpga_debounced_buttons;
-  wire [ 9:0] fpga_led_internal;
-  wire        hps_fpga_reset_n;
-  wire [ 2:0] hps_reset_req;
-  wire        hps_cold_reset;
-  wire        hps_warm_reset;
-  wire        hps_debug_reset;
-  wire [27:0] stm_hw_events;
+        13: gpio0_map = 10;
+        14: gpio0_map = 11;
+        15: gpio0_map = 12;
+        16: gpio0_map = 13;
+        17: gpio0_map = 14;
+        18: gpio0_map = 15;
 
-  wire [31:0] pio_controlled_axi_signals;
+        19: gpio0_map = 16;
+        20: gpio0_map = 17;
+        21: gpio0_map = 18;
+        22: gpio0_map = 19;
+        23: gpio0_map = 20;
+        24: gpio0_map = 21;
+        25: gpio0_map = 22;
+        26: gpio0_map = 23;
+        27: gpio0_map = 24;
+        28: gpio0_map = 25;
 
-  /////////////////////////////////////////
-  // Declare local parameters used here //
-  ///////////////////////////////////////
+        31: gpio0_map = 26;
+        32: gpio0_map = 27;
+        33: gpio0_map = 28;
+        34: gpio0_map = 29;
+        35: gpio0_map = 30;
+        36: gpio0_map = 31;
+        37: gpio0_map = 32;
+        38: gpio0_map = 33;
+        39: gpio0_map = 34;
+        40: gpio0_map = 35;
+
+        default: gpio0_map = -1;  // invalid
+      endcase
+    end
+  endfunction
+
+  /////////////////////////////////////////////////
+  // Declare local parameters used in this module //
+  /////////////////////////////////////////////////
   localparam AWCACHE_BASE = 0;
   localparam AWCACHE_SIZE = 4;
   localparam AWPROT_BASE = 4;
@@ -246,27 +282,96 @@ module ghrd_top (
   localparam integer NUM_PDM_LANES = 8;
   localparam integer NUM_MIC_STREAMS = NUM_PDM_LANES * 2;
   localparam integer PCM_SAMPLE_WIDTH = 16;
-  localparam integer MIC_CLK_GPIO_INDEX = 16;
+  localparam integer MIC_CLK_GPIO_INDEX = gpio0_map(19);
+  localparam integer MIC_DATA_GPIO_INDEX[NUM_PDM_LANES] = '{4, 2, 8, 6, 36, 38, 34, 40};
+  // 50 MHz / 5,000,000 = 10 Hz display update rate.
+  localparam integer DISPLAY_UPDATE_DIV = 5000000;
 
-  /////////////////////////////////////////
-  // Connect always-on internal signals //
-  ///////////////////////////////////////
-  assign stm_hw_events = {{3{1'b0}}, SW, fpga_led_internal, fpga_debounced_buttons};
+  ////////////////////////////////////////////////////
+  // Declare system-control and status LED signals  //
+  //////////////////////////////////////////////////
+  wire [                 3:0] fpga_debounced_buttons;
+  wire [                 9:0] fpga_led_internal;
+  wire                        hps_fpga_reset_n;
+  wire [                 2:0] hps_reset_req;
+  wire                        hps_cold_reset;
+  wire                        hps_warm_reset;
+  wire                        hps_debug_reset;
+  wire [                27:0] stm_hw_events;
+  wire [                31:0] pio_controlled_axi_signals;
 
   /////////////////////////////////////////////////
   // Declare DMA and acquisition control signals //
   ///////////////////////////////////////////////
-  wire [127:0] fifo_write_data;
-  wire         fifo_write_en;
-  wire         fifo_waitreq;
+  wire [               127:0] fifo_write_data;
+  wire                        fifo_write_en;
+  wire                        fifo_waitreq;
+  wire [                 7:0] data_cntrl;
+  reg                         ps_data_rdy_int;
+  reg                         ps_data_rdy_stable;
+  wire                        ps_ready_for_data;
 
-  wire [  7:0] data_cntrl;
-  reg          ps_data_rdy_int, ps_data_rdy_stable;
-  wire ps_ready_for_data;
+  /////////////////////////////////////////////////
+  // Declare audio-front-end control signals     //
+  ///////////////////////////////////////////////
+  wire                        clk_i;
+  wire                        rst_i;
+  wire                        mic_clk_o;
+  wire                        mic_data_val;
+  wire [                 1:0] curr_mode;
+  wire [                 2:0] freq_sel;
+
+  ///////////////////////////////////////////////////
+  // Declare PDM-to-PCM and mock-test-path signals //
+  /////////////////////////////////////////////////
+  wire [PCM_SAMPLE_WIDTH-1:0] conv_pcm_pos               [  NUM_PDM_LANES];
+  wire [PCM_SAMPLE_WIDTH-1:0] conv_pcm_neg               [  NUM_PDM_LANES];
+  wire [   NUM_PDM_LANES-1:0] conv_pcm_valid_pos;
+  wire [   NUM_PDM_LANES-1:0] conv_pcm_valid_neg;
+  wire [   NUM_PDM_LANES-1:0] conv_pos_pcm_cap_rdy;
+  wire [   NUM_PDM_LANES-1:0] conv_neg_pcm_cap_rdy;
+  wire [   NUM_PDM_LANES-1:0] mic_data_gpio;
+  wire [PCM_SAMPLE_WIDTH-1:0] conv_pcm                   [NUM_MIC_STREAMS];
+  wire [ NUM_MIC_STREAMS-1:0] conv_pcm_valid;
+  wire [PCM_SAMPLE_WIDTH-1:0] mock_pcm                   [NUM_MIC_STREAMS];
+  wire [ NUM_MIC_STREAMS-1:0] mock_pcm_valid;
+  wire [PCM_SAMPLE_WIDTH-1:0] active_pcm                 [NUM_MIC_STREAMS];
+  wire [ NUM_MIC_STREAMS-1:0] active_pcm_valid;
+
+  /////////////////////////////////////////////////
+  // Declare display FIFO and HEX output signals //
+  ///////////////////////////////////////////////
+  wire [                 3:0] pcm_stream_sel;
+  reg  [PCM_SAMPLE_WIDTH-1:0] fifo_data;
+  reg                         fifo_pcm_valid;
+  wire                        fifo_wrreq;
+  wire                        fifo_rdreq;
+  wire                        fifo_empty;
+  wire                        fifo_full;
+  wire                        clr_fifo;
+  wire [                15:0] fifo_q;
+  wire [                12:0] fifo_usedw;
+  reg                         fifo_rdreq_q;
+  reg  [                15:0] latest_fifo_sample;
+  reg  [                15:0] display_sample;
+  reg  [                22:0] display_div_cnt;
+
+  //////////////////////////////////////
+  // System-control top-level assigns //
+  ////////////////////////////////////
+  assign stm_hw_events = {{3{1'b0}}, SW, fpga_led_internal, fpga_debounced_buttons};
 
   // Bit 0 of data_cntrl gates whether the FPGA is allowed to acquire and emit frames.
   assign ps_ready_for_data = ps_data_rdy_stable;
 
+  // Status LEDs for reset and DMA backpressure visibility.
+  assign LEDR[9] = fifo_waitreq;
+  assign LEDR[8] = ps_ready_for_data;
+  assign LEDR[0] = rst_i;
+
+  //////////////////////////////
+  // System-control instances //
+  ////////////////////////////
   soc_system u0 (
       // Memory Interface
       .memory_mem_a      (HPS_DDR3_ADDR),
@@ -348,14 +453,15 @@ module ghrd_top (
       .reset_reset_n                       (hps_fpga_reset_n),
       .hps_0_f2h_stm_hw_events_stm_hwevents(stm_hw_events),
       .hps_0_h2f_reset_reset_n             (hps_fpga_reset_n),
+
       // AXI Coherency Signals
-      .mcu_axi_signals_export              (pio_controlled_axi_signals),
-      .axi_signals_awcache                 (pio_controlled_axi_signals[AWCACHE_BASE+:AWCACHE_SIZE]),
-      .axi_signals_awprot                  (pio_controlled_axi_signals[AWPROT_BASE+:AWPROT_SIZE]),
-      .axi_signals_awuser                  (pio_controlled_axi_signals[AWUSER_BASE+:AWUSER_SIZE]),
-      .axi_signals_arcache                 (pio_controlled_axi_signals[ARCACHE_BASE+:ARCACHE_SIZE]),
-      .axi_signals_aruser                  (pio_controlled_axi_signals[ARUSER_BASE+:ARUSER_SIZE]),
-      .axi_signals_arprot                  (pio_controlled_axi_signals[ARPROT_BASE+:ARPROT_SIZE]),
+      .mcu_axi_signals_export(pio_controlled_axi_signals),
+      .axi_signals_awcache   (pio_controlled_axi_signals[AWCACHE_BASE+:AWCACHE_SIZE]),
+      .axi_signals_awprot    (pio_controlled_axi_signals[AWPROT_BASE+:AWPROT_SIZE]),
+      .axi_signals_awuser    (pio_controlled_axi_signals[AWUSER_BASE+:AWUSER_SIZE]),
+      .axi_signals_arcache   (pio_controlled_axi_signals[ARCACHE_BASE+:ARCACHE_SIZE]),
+      .axi_signals_aruser    (pio_controlled_axi_signals[ARUSER_BASE+:ARUSER_SIZE]),
+      .axi_signals_arprot    (pio_controlled_axi_signals[ARPROT_BASE+:ARPROT_SIZE]),
 
       // DMA input FIFO interface
       .fifo_in_writedata  (fifo_write_data),
@@ -366,15 +472,9 @@ module ghrd_top (
       .data_cntrl_export(data_cntrl)
   );
 
-  //////////////////////////////////////
-  // Top-level status LED indicators  //
-  ////////////////////////////////////
-  assign LEDR[9] = fifo_waitreq;
-  assign LEDR[8] = ps_ready_for_data;
-
-  // Debounce logic to clean out glitches within 1 ms.
+  // Debounce the push buttons before using KEY[0] as the board reset input.
   debounce debounce_inst (
-      .clk     (CLOCK3_50),
+      .clk     (CLOCK_50),
       .reset_n (hps_fpga_reset_n),
       .data_in (KEY),
       .data_out(fpga_debounced_buttons)
@@ -386,26 +486,8 @@ module ghrd_top (
       .source    (hps_reset_req)
   );
 
-  //////////////////
-  // Parameters //
-  ////////////////
-  // 50 MHz / 5,000,000 = 10 Hz refresh rate per sample.
-  localparam integer DISPLAY_UPDATE_DIV = 5000000;
-
-  /////////////////////////////////////////////////////
-  // Declare clock, reset, and mode control signals //
-  ///////////////////////////////////////////////////
-  wire clk_i;
-  wire rst_i;
-  wire mic_clk_o;
-  wire mic_data_val;
-  wire [1:0] curr_mode;
-  wire [2:0] freq_sel;
-
-  assign LEDR[0] = rst_i;  // Show reset state on LEDR[0]
-
   // Synchronize the software acquisition request into the 50 MHz clock domain.
-  always @(posedge CLOCK_50) begin
+  always @(posedge clk_i) begin
     if (rst_i) begin
       ps_data_rdy_int <= 1'b0;
       ps_data_rdy_stable <= 1'b0;
@@ -415,81 +497,19 @@ module ghrd_top (
     end
   end
 
-  /////////////////////////////////////////////////
-  // Declare PCM converter interface signals    //
-  ///////////////////////////////////////////////
-  wire [NUM_PDM_LANES*PCM_SAMPLE_WIDTH-1:0] conv_pcm_pos_flat;
-  wire [NUM_PDM_LANES*PCM_SAMPLE_WIDTH-1:0] conv_pcm_neg_flat;
-  wire [NUM_PDM_LANES-1:0] conv_pcm_valid_pos;
-  wire [NUM_PDM_LANES-1:0] conv_pcm_valid_neg;
-  wire [NUM_PDM_LANES-1:0] conv_pos_pcm_cap_rdy;
-  wire [NUM_PDM_LANES-1:0] conv_neg_pcm_cap_rdy;
-  wire [NUM_PDM_LANES-1:0] mic_data_gpio;
-  wire [NUM_MIC_STREAMS*PCM_SAMPLE_WIDTH-1:0] conv_pcm_flat;
-  wire [NUM_MIC_STREAMS-1:0] conv_pcm_valid;
-  wire [NUM_MIC_STREAMS*PCM_SAMPLE_WIDTH-1:0] mock_pcm_flat;
-  wire [NUM_MIC_STREAMS-1:0] mock_pcm_valid;
-  wire [NUM_MIC_STREAMS*PCM_SAMPLE_WIDTH-1:0] active_pcm_flat;
-  wire [NUM_MIC_STREAMS-1:0] active_pcm_valid;
-  reg [NUM_MIC_STREAMS-1:0] display_pcm_cap_rdy;
-
-  /////////////////////////////////////////////////
-  // Declare FIFO capture and display signals   //
-  ///////////////////////////////////////////////
-  wire [3:0] pcm_stream_sel;
-  reg [PCM_SAMPLE_WIDTH-1:0] fifo_data;
-  reg fifo_pcm_valid;
-  wire fifo_wrreq;
-  wire fifo_rdreq;
-  wire fifo_empty;
-  wire fifo_full;
-  wire [15:0] fifo_q;
-  wire [12:0] fifo_usedw;
-
-  reg fifo_rdreq_q;
-  reg [15:0] latest_fifo_sample;
-  reg [15:0] display_sample;
-  reg [22:0] display_div_cnt;
-
-  /////////////////////////////
-  // Top-level assignments  //
-  ///////////////////////////
-  // Drive the internal system clock and active-high reset.
+  ///////////////////////////////////
+  // Audio-front-end local assigns //
+  /////////////////////////////////
   assign clk_i = CLOCK_50;
   assign rst_i = ~fpga_debounced_buttons[0];
-
-  // Frequency selection based on SW[4:2].
   assign freq_sel = SW[4:2];
 
-  // Select which PCM stream to capture/display using SW[8:5].
-  // Stream order is M1, M2, M3, M4, ... , M15, M16.
-  assign pcm_stream_sel = SW[8:5];
-
-  // Route the shared microphone clock to GPIO_0 header pin 19.
+  // Route the shared microphone clock onto GPIO_0.
   assign GPIO_0[MIC_CLK_GPIO_INDEX] = mic_clk_o;
 
-  // Map the microphone data lanes to the physical GPIO_0 header pins:
-  // M1-M2: header pin 4  -> GPIO_0[3]
-  // M3-M4: header pin 2  -> GPIO_0[1]
-  // M5-M6: header pin 8  -> GPIO_0[7]
-  // M7-M8: header pin 6  -> GPIO_0[5]
-  // M9-M10: header pin 36 -> GPIO_0[31]
-  // M11-M12: header pin 38 -> GPIO_0[33]
-  // M13-M14: header pin 34 -> GPIO_0[29]
-  // M15-M16: header pin 40 -> GPIO_0[35]
-  assign mic_data_gpio[0] = GPIO_0[3];
-  assign mic_data_gpio[1] = GPIO_0[1];
-  assign mic_data_gpio[2] = GPIO_0[7];
-  assign mic_data_gpio[3] = GPIO_0[5];
-  assign mic_data_gpio[4] = GPIO_0[31];
-  assign mic_data_gpio[5] = GPIO_0[33];
-  assign mic_data_gpio[6] = GPIO_0[29];
-  assign mic_data_gpio[7] = GPIO_0[35];
-
-  //////////////////////////
-  // Submodule instances //
-  ////////////////////////
-  // Instantiate the Audio Front End.
+  ///////////////////////////////
+  // Audio-front-end instance //
+  /////////////////////////////
   Audio_Front_End iAUD_FRONT (
       .clk_i(clk_i),
       .rst_i(rst_i),
@@ -505,14 +525,20 @@ module ghrd_top (
       .mic_clk_o  (mic_clk_o)
   );
 
+  ////////////////////////////////////////////
+  // PDM-to-PCM conversion and mock-data mux //
+  ////////////////////////////////////////////
   genvar lane_idx;
   genvar stream_idx;
 
   generate
-    // Each PDM lane produces two PCM streams by decoding the positive
-    // and negative microphone-clock edges independently. The lane order
-    // above is chosen so the packed stream order matches M1 through M16.
+    // Each PDM lane produces two PCM streams by decoding the positive and
+    // negative microphone-clock edges independently. The lane order above is
+    // chosen so the stream indices map to M1 through M16.
     for (lane_idx = 0; lane_idx < NUM_PDM_LANES; lane_idx = lane_idx + 1) begin : gen_pdm_lanes
+      // Map each logical PDM lane onto the GPIO pin used by the board wiring.
+      assign mic_data_gpio[lane_idx] = GPIO_0[gpio0_map(MIC_DATA_GPIO_INDEX[lane_idx])];
+
       Pdm_To_Pcm iCONV (
           .clk_i            (clk_i),
           .rst_i            (rst_i),
@@ -523,50 +549,53 @@ module ghrd_top (
           .pos_pcm_cap_rdy_i(conv_pos_pcm_cap_rdy[lane_idx]),
           .neg_pcm_cap_rdy_i(conv_neg_pcm_cap_rdy[lane_idx]),
 
-          .pcm_pos_o      (conv_pcm_pos_flat[lane_idx*PCM_SAMPLE_WIDTH+:PCM_SAMPLE_WIDTH]),
+          .pcm_pos_o      (conv_pcm_pos[lane_idx]),
           .pcm_valid_pos_o(conv_pcm_valid_pos[lane_idx]),
-          .pcm_neg_o      (conv_pcm_neg_flat[lane_idx*PCM_SAMPLE_WIDTH+:PCM_SAMPLE_WIDTH]),
+          .pcm_neg_o      (conv_pcm_neg[lane_idx]),
           .pcm_valid_neg_o(conv_pcm_valid_neg[lane_idx])
       );
 
-      assign conv_pcm_flat[(2*lane_idx)*PCM_SAMPLE_WIDTH+:PCM_SAMPLE_WIDTH] =
-          conv_pcm_pos_flat[lane_idx*PCM_SAMPLE_WIDTH+:PCM_SAMPLE_WIDTH];
-      assign conv_pcm_flat[(2*lane_idx+1)*PCM_SAMPLE_WIDTH+:PCM_SAMPLE_WIDTH] =
-          conv_pcm_neg_flat[lane_idx*PCM_SAMPLE_WIDTH+:PCM_SAMPLE_WIDTH];
+      assign conv_pcm[2*lane_idx] = conv_pcm_pos[lane_idx];
+      assign conv_pcm[2*lane_idx+1] = conv_pcm_neg[lane_idx];
       assign conv_pcm_valid[2*lane_idx] = conv_pcm_valid_pos[lane_idx];
       assign conv_pcm_valid[2*lane_idx+1] = conv_pcm_valid_neg[lane_idx];
-      assign conv_pos_pcm_cap_rdy[lane_idx] = display_pcm_cap_rdy[2*lane_idx];
-      assign conv_neg_pcm_cap_rdy[lane_idx] = display_pcm_cap_rdy[2*lane_idx+1];
+      assign conv_pos_pcm_cap_rdy[lane_idx] = 1'b1;
+      assign conv_neg_pcm_cap_rdy[lane_idx] = 1'b1;
     end
 
-    // Generate mock samples for DMA/display-path testing. The mock streams
-    // advance only when the corresponding real stream produces a valid pulse,
-    // so the test traffic stays aligned to the real sample cadence.
-    for (stream_idx = 0; stream_idx < NUM_MIC_STREAMS; stream_idx = stream_idx + 1) begin : gen_mock_data
+    // Generate mock samples for DMA and display-path testing. The mock streams
+    // step only when the corresponding real stream produces a valid pulse so
+    // the synthetic traffic stays aligned to the real sample cadence.
+    for (
+        stream_idx = 0; stream_idx < NUM_MIC_STREAMS; stream_idx = stream_idx + 1
+    ) begin : gen_mock_data
       mock_data iMOCK_DATA (
           .clk_i(clk_i),
           .rst_n_i(~rst_i),
           .step_i(ps_ready_for_data && conv_pcm_valid[stream_idx]),
-          .data_o(mock_pcm_flat[stream_idx*PCM_SAMPLE_WIDTH+:PCM_SAMPLE_WIDTH]),
+          .data_o(mock_pcm[stream_idx]),
           .data_valid_o(mock_pcm_valid[stream_idx])
       );
+
+      assign active_pcm[stream_idx] = SW[9] ? mock_pcm[stream_idx] : conv_pcm[stream_idx];
+      assign active_pcm_valid[stream_idx] = SW[9] ? mock_pcm_valid[stream_idx] :
+          conv_pcm_valid[stream_idx];
     end
   endgenerate
 
-  // SW[9] selects the mock-data test path.
-  assign active_pcm_flat = SW[9] ? mock_pcm_flat : conv_pcm_flat;
-  assign active_pcm_valid = SW[9] ? mock_pcm_valid : conv_pcm_valid;
-
+  ///////////////////////////
+  // DMA packetizer block  //
+  /////////////////////////
   // Capture one sample from all sixteen streams, then packetize the
   // completed frame into consecutive 128-bit DMA beats.
-  pcm_to_mem #(
-      .NUM_STREAMS(NUM_MIC_STREAMS),
+  Pcm_To_Mem #(
+      .NUM_STREAMS (NUM_MIC_STREAMS),
       .SAMPLE_WIDTH(PCM_SAMPLE_WIDTH),
-      .BEAT_WIDTH(128)
+      .BEAT_WIDTH  (128)
   ) pcm_to_mem_inst (
-      .clk_i(CLOCK_50),
-      .rst_n_i(~rst_i),
-      .pcm_data_i(active_pcm_flat),
+      .clk_i(clk_i),
+      .rst_i(rst_i),
+      .pcm_data_i(active_pcm),
       .pcm_valid_i(active_pcm_valid),
       .ps_ready_for_data_i(ps_ready_for_data),
       .write_pending_i(fifo_waitreq),
@@ -574,29 +603,23 @@ module ghrd_top (
       .write_data_o(fifo_write_data)
   );
 
-  /////////////////////////////////
-  // PCM stream selection logic //
-  ///////////////////////////////
-  // Select one of the sixteen PCM streams from the active source path
-  // to push into the display FIFO.
-  always @(*) begin
-    fifo_data = active_pcm_flat[pcm_stream_sel*PCM_SAMPLE_WIDTH+:PCM_SAMPLE_WIDTH];
-    fifo_pcm_valid = active_pcm_valid[pcm_stream_sel];
-  end
+  /////////////////////////////////////
+  // Display FIFO selection and flow //
+  ///////////////////////////////////
+  // Select which PCM stream to show on the HEX display path.
+  // Stream order is M1, M2, M3, M4, ... , M15, M16.
+  assign pcm_stream_sel = SW[8:5];
 
-  ////////////////////////
-  // FIFO control logic //
-  //////////////////////
-  // Write selected PCM samples when the FIFO can accept data.
+  // Write selected PCM samples when the display FIFO can accept data.
   assign fifo_wrreq = fifo_pcm_valid & ~fifo_full;
 
   // Read continuously so the most recent captured sample reaches the display.
   assign fifo_rdreq = ~fifo_empty;
 
-  // Backpressure only the selected stream when the display FIFO is full.
+  // Select one of the sixteen active PCM streams to feed the display FIFO.
   always @(*) begin
-    display_pcm_cap_rdy = {NUM_MIC_STREAMS{1'b1}};
-    display_pcm_cap_rdy[pcm_stream_sel] = ~fifo_full;
+    fifo_data = active_pcm[pcm_stream_sel];
+    fifo_pcm_valid = active_pcm_valid[pcm_stream_sel];
   end
 
   // Instantiate the PCM display FIFO.
@@ -604,7 +627,7 @@ module ghrd_top (
       .clock(clk_i),
       .data (fifo_data),
       .rdreq(fifo_rdreq),
-      .sclr (rst_i),
+      .sclr (clr_fifo),
       .wrreq(fifo_wrreq),
 
       .empty(fifo_empty),
@@ -612,6 +635,9 @@ module ghrd_top (
       .q    (fifo_q),
       .usedw(fifo_usedw)
   );
+
+  // clear the FIFO periodically.
+  assign clr_fifo = rst_i | fifo_full;
 
   // Register the FIFO output one cycle after each read request.
   always @(posedge clk_i) begin

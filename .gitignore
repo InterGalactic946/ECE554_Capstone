@@ -14,9 +14,7 @@
 **/*.sopcinfo
 **/*.sld
 **/*.qws
-**/*.sof
 **/*.rbf
-**/*.cdf
 **/*.stp
 **/*.cof
 **/*.bak

@@ -46,7 +46,7 @@ module Pdm_To_Pcm #(
   localparam int unsigned MIC_TDZ_MAX_NS = 16;
 
   // Add a buffer to ensure we sample after the data is stable.
-  localparam int unsigned MIC_DATA_SAMPLE_GUARD_NS = 10;
+  localparam int unsigned MIC_DATA_SAMPLE_GUARD_NS = 110;
 
   // Total time for data to settle.
   localparam int unsigned MIC_DATA_SETTLE_NS = MIC_TDD_MAX_NS + MIC_DATA_SAMPLE_GUARD_NS;
@@ -76,8 +76,8 @@ module Pdm_To_Pcm #(
   ////////////////////////////// PDM Sample Logic /////////////////////////////////////////
   logic pdm_pos_valid;  // Valid pulse for positive-channel PDM sample.
   logic pdm_neg_valid;  // Valid pulse for negative-channel PDM sample.
-  logic [1:0] data_in_pos;  // Signed 2-bit PDM sample sent to positive CIC inputs.
-  logic [1:0] data_in_neg;  // Signed 2-bit PDM sample sent to negative CIC inputs.
+  logic signed [1:0] data_in_pos;  // Signed 2-bit PDM sample sent to positive CIC inputs.
+  logic signed [1:0] data_in_neg;  // Signed 2-bit PDM sample sent to negative CIC inputs.
   ////////////////////////////// 48 kHz CIC/FIR Path //////////////////////////////////////
   logic [19:0] cic_48_out_pos;  // Positive-channel output from the 48 kHz CIC.
   logic [19:0] cic_48_out_neg;  // Negative-channel output from the 48 kHz CIC.
