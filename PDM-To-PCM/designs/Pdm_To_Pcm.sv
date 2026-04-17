@@ -76,8 +76,8 @@ module Pdm_To_Pcm #(
   ////////////////////////////// PDM Sample Logic /////////////////////////////////////////
   logic pdm_pos_valid;  // Valid pulse for positive-channel PDM sample.
   logic pdm_neg_valid;  // Valid pulse for negative-channel PDM sample.
-  logic [1:0] data_in_pos;  // Signed 2-bit PDM sample sent to positive CIC inputs.
-  logic [1:0] data_in_neg;  // Signed 2-bit PDM sample sent to negative CIC inputs.
+  logic signed [1:0] data_in_pos;  // Signed 2-bit PDM sample sent to positive CIC inputs.
+  logic signed [1:0] data_in_neg;  // Signed 2-bit PDM sample sent to negative CIC inputs.
   ////////////////////////////// 48 kHz CIC/FIR Path //////////////////////////////////////
   logic [19:0] cic_48_out_pos;  // Positive-channel output from the 48 kHz CIC.
   logic [19:0] cic_48_out_neg;  // Negative-channel output from the 48 kHz CIC.
