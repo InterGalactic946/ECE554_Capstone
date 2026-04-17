@@ -34,6 +34,8 @@
 `define ENABLE_HPS 
 
 
+
+
 // ------------------------------------------------------------
 // Module: ghrd_top
 // Description: Top-level integration for the DE1-SoC audio and
@@ -246,7 +248,7 @@ module ghrd_top (
   localparam integer NUM_PDM_LANES = 8;
   localparam integer NUM_MIC_STREAMS = NUM_PDM_LANES * 2;
   localparam integer PCM_SAMPLE_WIDTH = 16;
-  localparam integer MIC_CLK_GPIO_INDEX = 16;
+  localparam integer MIC_CLK_GPIO_INDEX = 19;
 
   /////////////////////////////////////////
   // Connect always-on internal signals //
@@ -261,7 +263,7 @@ module ghrd_top (
   wire         fifo_waitreq;
 
   wire [  7:0] data_cntrl;
-  reg          ps_data_rdy_int, ps_data_rdy_stable;
+  reg ps_data_rdy_int, ps_data_rdy_stable;
   wire ps_ready_for_data;
 
   // Bit 0 of data_cntrl gates whether the FPGA is allowed to acquire and emit frames.
@@ -469,22 +471,22 @@ module ghrd_top (
   assign GPIO_0[MIC_CLK_GPIO_INDEX] = mic_clk_o;
 
   // Map the microphone data lanes to the physical GPIO_0 header pins:
-  // M1-M2: header pin 4  -> GPIO_0[3]
-  // M3-M4: header pin 2  -> GPIO_0[1]
-  // M5-M6: header pin 8  -> GPIO_0[7]
-  // M7-M8: header pin 6  -> GPIO_0[5]
-  // M9-M10: header pin 36 -> GPIO_0[31]
-  // M11-M12: header pin 38 -> GPIO_0[33]
-  // M13-M14: header pin 34 -> GPIO_0[29]
-  // M15-M16: header pin 40 -> GPIO_0[35]
+  // M1-M2: header pin 3  -> GPIO_0[3]
+  // M3-M4: header pin 1  -> GPIO_0[1]
+  // M5-M6: header pin 7  -> GPIO_0[7]
+  // M7-M8: header pin 5  -> GPIO_0[5]
+  // M9-M10: header pin 35 -> GPIO_0[35]
+  // M11-M12: header pin 37 -> GPIO_0[37]
+  // M13-M14: header pin 33 -> GPIO_0[33]
+  // M15-M16: header pin 39 -> GPIO_0[39]
   assign mic_data_gpio[0] = GPIO_0[3];
   assign mic_data_gpio[1] = GPIO_0[1];
   assign mic_data_gpio[2] = GPIO_0[7];
   assign mic_data_gpio[3] = GPIO_0[5];
-  assign mic_data_gpio[4] = GPIO_0[31];
-  assign mic_data_gpio[5] = GPIO_0[33];
-  assign mic_data_gpio[6] = GPIO_0[29];
-  assign mic_data_gpio[7] = GPIO_0[35];
+  assign mic_data_gpio[4] = GPIO_0[35];
+  assign mic_data_gpio[5] = GPIO_0[37];
+  assign mic_data_gpio[6] = GPIO_0[33];
+  assign mic_data_gpio[7] = GPIO_0[39];
 
   //////////////////////////
   // Submodule instances //
@@ -542,7 +544,9 @@ module ghrd_top (
     // Generate mock samples for DMA/display-path testing. The mock streams
     // advance only when the corresponding real stream produces a valid pulse,
     // so the test traffic stays aligned to the real sample cadence.
-    for (stream_idx = 0; stream_idx < NUM_MIC_STREAMS; stream_idx = stream_idx + 1) begin : gen_mock_data
+    for (
+        stream_idx = 0; stream_idx < NUM_MIC_STREAMS; stream_idx = stream_idx + 1
+    ) begin : gen_mock_data
       mock_data iMOCK_DATA (
           .clk_i(clk_i),
           .rst_n_i(~rst_i),
@@ -554,15 +558,15 @@ module ghrd_top (
   endgenerate
 
   // SW[9] selects the mock-data test path.
-  assign active_pcm_flat = SW[9] ? mock_pcm_flat : conv_pcm_flat;
+  assign active_pcm_flat  = SW[9] ? mock_pcm_flat : conv_pcm_flat;
   assign active_pcm_valid = SW[9] ? mock_pcm_valid : conv_pcm_valid;
 
   // Capture one sample from all sixteen streams, then packetize the
   // completed frame into consecutive 128-bit DMA beats.
   pcm_to_mem #(
-      .NUM_STREAMS(NUM_MIC_STREAMS),
+      .NUM_STREAMS (NUM_MIC_STREAMS),
       .SAMPLE_WIDTH(PCM_SAMPLE_WIDTH),
-      .BEAT_WIDTH(128)
+      .BEAT_WIDTH  (128)
   ) pcm_to_mem_inst (
       .clk_i(CLOCK_50),
       .rst_n_i(~rst_i),
