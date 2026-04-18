@@ -279,11 +279,14 @@ module ghrd_top (
   localparam ARPROT_SIZE = 3;
   localparam ARUSER_BASE = 23;
   localparam ARUSER_SIZE = 5;
-  localparam integer NUM_PDM_LANES = 8;
+  localparam integer NUM_PDM_LANES = 2;
   localparam integer NUM_MIC_STREAMS = NUM_PDM_LANES * 2;
   localparam integer PCM_SAMPLE_WIDTH = 16;
-  localparam integer MIC_CLK_GPIO_INDEX = gpio0_map(19);
-  localparam integer MIC_DATA_GPIO_INDEX[NUM_PDM_LANES] = '{4, 2, 8, 6, 36, 38, 34, 40};
+  localparam integer FRAME_WIDTH = NUM_MIC_STREAMS * PCM_SAMPLE_WIDTH;
+  localparam integer MIC_CLK_GPIO_INDEX = (NUM_PDM_LANES == 8) ? gpio0_map(19) : gpio0_map(1);
+  localparam integer MIC_DATA_GPIO_INDEX[NUM_PDM_LANES] = '{2, 3};
+  // (NUM_PDM_LANES == 8) ? '{4, 2, 8, 6, 36, 38, 34, 40}
+  localparam integer STREAM_SEL_WIDTH = $clog2(NUM_MIC_STREAMS);
   // 50 MHz / 5,000,000 = 10 Hz display update rate.
   localparam integer DISPLAY_UPDATE_DIV = 5000000;
 
@@ -303,7 +306,7 @@ module ghrd_top (
   /////////////////////////////////////////////////
   // Declare DMA and acquisition control signals //
   ///////////////////////////////////////////////
-  wire [               127:0] fifo_write_data;
+  wire [     FRAME_WIDTH-1:0] fifo_write_data;
   wire                        fifo_write_en;
   wire                        fifo_waitreq;
   wire [                 7:0] data_cntrl;
@@ -341,7 +344,7 @@ module ghrd_top (
   /////////////////////////////////////////////////
   // Declare display FIFO and HEX output signals //
   ///////////////////////////////////////////////
-  wire [                 3:0] pcm_stream_sel;
+  wire [STREAM_SEL_WIDTH-1:0] pcm_stream_sel;
   reg  [PCM_SAMPLE_WIDTH-1:0] fifo_data;
   reg                         fifo_pcm_valid;
   wire                        fifo_wrreq;
@@ -586,12 +589,12 @@ module ghrd_top (
   ///////////////////////////
   // DMA packetizer block  //
   /////////////////////////
-  // Capture one sample from all sixteen streams, then packetize the
-  // completed frame into consecutive 128-bit DMA beats.
+  // Capture one sample from all streams, then packetize the
+  // completed frame.
   Pcm_To_Mem #(
       .NUM_STREAMS (NUM_MIC_STREAMS),
       .SAMPLE_WIDTH(PCM_SAMPLE_WIDTH),
-      .BEAT_WIDTH  (128)
+      .BEAT_WIDTH  (FRAME_WIDTH)
   ) pcm_to_mem_inst (
       .clk_i(clk_i),
       .rst_i(rst_i),
@@ -608,7 +611,7 @@ module ghrd_top (
   ///////////////////////////////////
   // Select which PCM stream to show on the HEX display path.
   // Stream order is M1, M2, M3, M4, ... , M15, M16.
-  assign pcm_stream_sel = SW[8:5];
+  assign pcm_stream_sel = SW[STREAM_SEL_WIDTH+4:5];
 
   // Write selected PCM samples when the display FIFO can accept data.
   assign fifo_wrreq = fifo_pcm_valid & ~fifo_full;

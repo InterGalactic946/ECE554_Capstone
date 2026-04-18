@@ -46,7 +46,7 @@ module Pdm_To_Pcm #(
   localparam int unsigned MIC_TDZ_MAX_NS = 16;
 
   // Add a buffer to ensure we sample after the data is stable.
-  localparam int unsigned MIC_DATA_SAMPLE_GUARD_NS = 110;
+  localparam int unsigned MIC_DATA_SAMPLE_GUARD_NS = 90;
 
   // Total time for data to settle.
   localparam int unsigned MIC_DATA_SETTLE_NS = MIC_TDD_MAX_NS + MIC_DATA_SAMPLE_GUARD_NS;
