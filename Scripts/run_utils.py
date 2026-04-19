@@ -138,6 +138,56 @@ def get_wave_command(test_name, args):
     return add_wave_command
 
 
+def form_sim_libs():
+    """
+    Form the simulation libraries argument for the vsim command by checking the SIM_LIBRARY_PATH directory.
+        
+    Returns:
+        str: A string containing the -L arguments for each valid library found in the SIM_LIBRARY_PATH directory.
+    """
+    # Prefer Verilog Intel libraries before same-family VHDL libraries.
+    # Generated Verilog IP uses defparams that must bind to the *_ver models.
+    preferred_order = [
+        "altera_ver",
+        "lpm_ver",
+        "sgate_ver",
+        "altera_mf_ver",
+        "altera_lnsim_ver",
+        "cyclonev_ver",
+        "cyclonev_hssi_ver",
+        "cyclonev_pcie_hip_ver",
+    ]
+
+    sim_lib_paths = []
+    if os.path.exists(config.SIM_LIBRARY_PATH):
+        sim_lib_dirs = [
+            item for item in os.listdir(config.SIM_LIBRARY_PATH)
+            if os.path.isdir(os.path.join(config.SIM_LIBRARY_PATH, item))
+        ]
+
+        ordered_libs = []
+        # First add libraries in the preferred order if they exist.
+        for lib_name in preferred_order:
+            if lib_name in sim_lib_dirs:
+                ordered_libs.append(lib_name)
+                
+        # Then add any remaining libraries that were not in the preferred order.
+        for lib_name in sorted(sim_lib_dirs):
+            if lib_name not in ordered_libs:
+                ordered_libs.append(lib_name)
+
+        # Add the libraries to the sim_lib_paths list with the -L flag.
+        for item in ordered_libs:
+            # Get the library path.
+            item_path = os.path.join(config.SIM_LIBRARY_PATH, item)
+
+            # If it's a directory, assume it's a compiled library and add it to the sim libs argument.
+            sim_lib_paths.append(f"-L {item_path}")
+        
+    # Return the formatted argument string for the simulation command.
+    return " ".join(sim_lib_paths)
+
+
 def get_gui_command(test_name, log_file, args):
     """
     Generate the simulation command for GUI-based waveform viewing.
@@ -173,6 +223,13 @@ def get_gui_command(test_name, log_file, args):
         sim_command = (
             f"vsim -wlf {wave_file} ./tests/WORK/{test_name}.{test_name} -logfile {log_file} -t ns "
             f"-Lf {config.CELL_LIBRARY_PATH} -voptargs='+acc' -do '{add_wave_command} run -all; "
+            f"write format wave -window .main_pane.wave.interior.cs.body.pw.wf {wave_format_file}; "
+            f"log -flush /*;'"
+        )
+    elif args.ip:
+        sim_command = (
+            f"vsim -wlf {wave_file} ./tests/WORK/{test_name}.{test_name} -logfile {log_file} -t ps "
+            f"{form_sim_libs()} -voptargs='+acc' -do '{add_wave_command} run -all; "
             f"write format wave -window .main_pane.wave.interior.cs.body.pw.wf {wave_format_file}; "
             f"log -flush /*;'"
         )
@@ -319,7 +376,7 @@ def run_simulation(test_name, log_file, args):
         - Mode 2: Full GUI mode for debugging.
         - Constructs the appropriate simulation command and executes it.
         - Logs simulation output and returns the status based on log file checks.
-    """
+    """    
     # Define paths for the wave file.
     wave_file = os.path.join(config.WAVES_DIR, f"{test_name}.wlf")
         
@@ -331,7 +388,10 @@ def run_simulation(test_name, log_file, args):
         # Modify the command for post synthesis.
         if args.post_synth or test_name.endswith("ps_tb"):
             sim_command = f"vsim -c ./tests/WORK/{test_name}.{test_name} -wlf {wave_file} -logfile {log_file} -t ns " \
-                    f"-Lf {config.CELL_LIBRARY_PATH} -do 'run -all; log -flush /*; quit -f;'"        
+                    f"-Lf {config.CELL_LIBRARY_PATH} -do 'run -all; log -flush /*; quit -f;'"         
+        elif args.ip:
+            sim_command = f"vsim -c ./tests/WORK/{test_name}.{test_name} -wlf {wave_file} -logfile {log_file} -t ps "\
+                    f"{form_sim_libs()} -do 'run -all; log  -flush /*; quit -f;'"       
     else:
         if args.mode == 1:
             if not args.all:
