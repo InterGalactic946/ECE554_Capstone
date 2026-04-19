@@ -1004,3 +1004,4 @@ set_global_assignment -name QIP_FILE FIFO_256.qip
 set_global_assignment -name QIP_FILE FIFO_512.qip
 set_global_assignment -name QIP_FILE FIFO_1024.qip
 set_global_assignment -name QIP_FILE FIFO_2048.qip
+set_global_assignment -name QIP_FILE ip/fifos/FIFO_8.qip

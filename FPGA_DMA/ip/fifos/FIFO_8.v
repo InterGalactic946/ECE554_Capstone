@@ -42,7 +42,6 @@ module FIFO_8 (
 	data,
 	rdreq,
 	wrreq,
-	empty,
 	full,
 	q);
 
@@ -50,29 +49,26 @@ module FIFO_8 (
 	input	[15:0]  data;
 	input	  rdreq;
 	input	  wrreq;
-	output	  empty;
 	output	  full;
 	output	[15:0]  q;
 
 	wire  sub_wire0;
-	wire  sub_wire1;
-	wire [15:0] sub_wire2;
-	wire  empty = sub_wire0;
-	wire  full = sub_wire1;
-	wire [15:0] q = sub_wire2[15:0];
+	wire [15:0] sub_wire1;
+	wire  full = sub_wire0;
+	wire [15:0] q = sub_wire1[15:0];
 
 	scfifo	scfifo_component (
 				.clock (clock),
 				.data (data),
 				.rdreq (rdreq),
 				.wrreq (wrreq),
-				.empty (sub_wire0),
-				.full (sub_wire1),
-				.q (sub_wire2),
+				.full (sub_wire0),
+				.q (sub_wire1),
 				.aclr (),
 				.almost_empty (),
 				.almost_full (),
 				.eccstatus (),
+				.empty (),
 				.sclr (),
 				.usedw ());
 	defparam
@@ -100,7 +96,7 @@ endmodule
 // Retrieval info: PRIVATE: CLOCKS_ARE_SYNCHRONIZED NUMERIC "0"
 // Retrieval info: PRIVATE: Clock NUMERIC "0"
 // Retrieval info: PRIVATE: Depth NUMERIC "8"
-// Retrieval info: PRIVATE: Empty NUMERIC "1"
+// Retrieval info: PRIVATE: Empty NUMERIC "0"
 // Retrieval info: PRIVATE: Full NUMERIC "1"
 // Retrieval info: PRIVATE: INTENDED_DEVICE_FAMILY STRING "Cyclone V"
 // Retrieval info: PRIVATE: LE_BasedFIFO NUMERIC "0"
@@ -138,7 +134,6 @@ endmodule
 // Retrieval info: CONSTANT: USE_EAB STRING "ON"
 // Retrieval info: USED_PORT: clock 0 0 0 0 INPUT NODEFVAL "clock"
 // Retrieval info: USED_PORT: data 0 0 16 0 INPUT NODEFVAL "data[15..0]"
-// Retrieval info: USED_PORT: empty 0 0 0 0 OUTPUT NODEFVAL "empty"
 // Retrieval info: USED_PORT: full 0 0 0 0 OUTPUT NODEFVAL "full"
 // Retrieval info: USED_PORT: q 0 0 16 0 OUTPUT NODEFVAL "q[15..0]"
 // Retrieval info: USED_PORT: rdreq 0 0 0 0 INPUT NODEFVAL "rdreq"
@@ -147,7 +142,6 @@ endmodule
 // Retrieval info: CONNECT: @data 0 0 16 0 data 0 0 16 0
 // Retrieval info: CONNECT: @rdreq 0 0 0 0 rdreq 0 0 0 0
 // Retrieval info: CONNECT: @wrreq 0 0 0 0 wrreq 0 0 0 0
-// Retrieval info: CONNECT: empty 0 0 0 0 @empty 0 0 0 0
 // Retrieval info: CONNECT: full 0 0 0 0 @full 0 0 0 0
 // Retrieval info: CONNECT: q 0 0 16 0 @q 0 0 16 0
 // Retrieval info: GEN_FILE: TYPE_NORMAL FIFO_8.v TRUE
