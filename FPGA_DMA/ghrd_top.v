@@ -625,6 +625,22 @@ module ghrd_top (
     .pulse(pulse)
 );
 
+  wire [2:0] quadrant_code;
+  wire quadrant_valid, collect_sample;
+
+  tdoa tdoa_inst (
+    .clk(clk_i),
+    .rst_n(~rst_i),
+    .mic_valid({conv_pcm_valid_pos[0], conv_pcm_valid_neg[0], conv_pcm_valid_pos[1], conv_pcm_valid_neg[1]}),
+    .mic_pcm_0(conv_pcm_pos[0]),
+    .mic_pcm_1(conv_pcm_neg[0]),
+    .mic_pcm_2(conv_pcm_pos[1]),
+    .mic_pcm_3(conv_pcm_neg[1]),
+    .quadrant_valid(quadrant_valid),
+    .quadrant_code(quadrant_code),
+    .collect_sample(collect_sample)
+  );
+
   /////////////////////////////////////
   // Display FIFO selection and flow //
   ///////////////////////////////////
@@ -691,36 +707,67 @@ module ghrd_top (
     end
   end
 
+  reg [3:0] hex0_data, hex1_data, hex2_data, hex3_data, hex4_data, hex5_data;
+  reg page_sel;
+
+  always @(posedge clk_i) begin
+    if (rst_i) begin
+      page_sel <= '0;
+    end else if (fpga_debounced_buttons[3]) begin
+      page_sel <= page_sel + 1;
+    end
+  end
+
+  always @(*) begin
+    if (page_sel == 0) begin
+      // Show PCM sample and stream/mode info.
+      hex0_data = display_sample[3:0];
+      hex1_data = display_sample[7:4];
+      hex2_data = display_sample[11:8];
+      hex3_data = display_sample[15:12];
+      hex4_data = {2'b00, pcm_stream_sel};
+      hex5_data = {2'b00, curr_mode};
+    end else if (page_sel == 1) begin
+      // Show TDOA quadrant code and validity.
+      hex0_data = {1'b0, quadrant_code};
+      hex1_data = {3'b0, quadrant_valid};
+      hex2_data = {3'b0, collect_sample};
+      hex3_data = 0;
+      hex4_data = 0;
+      hex5_data = 0;
+    end
+  end
+
   // Display the selected PCM sample as four hexadecimal digits.
   Seven_Seg iHEX0 (
-      .bin_i(display_sample[3:0]),
+      .bin_i(hex0_data),
       .hex_o(HEX0)
   );
 
   Seven_Seg iHEX1 (
-      .bin_i(display_sample[7:4]),
+      .bin_i(hex1_data),
       .hex_o(HEX1)
   );
 
   Seven_Seg iHEX2 (
-      .bin_i(display_sample[11:8]),
+      .bin_i(hex2_data),
       .hex_o(HEX2)
   );
 
   Seven_Seg iHEX3 (
-      .bin_i(display_sample[15:12]),
+      .bin_i(hex3_data),
       .hex_o(HEX3)
   );
 
   // Display the selected PCM stream number on HEX4.
   Seven_Seg iHEX4 (
-      .bin_i({2'b00, pcm_stream_sel}),
+      .bin_i(hex4_data),
       .hex_o(HEX4)
   );
 
   // Display the current microphone mode on HEX5.
   Seven_Seg iHEX5 (
-      .bin_i({2'b00, curr_mode}),
+      .bin_i(hex5_data),
       .hex_o(HEX5)
   );
 
