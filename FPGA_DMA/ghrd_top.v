@@ -284,6 +284,7 @@ module ghrd_top (
   localparam integer PCM_SAMPLE_WIDTH = 16;
   localparam integer FRAME_WIDTH = NUM_MIC_STREAMS * PCM_SAMPLE_WIDTH;
   localparam integer MIC_CLK_GPIO_INDEX = (NUM_PDM_LANES == 8) ? gpio0_map(19) : gpio0_map(1);
+  localparam integer PULSE_GEN_GPIO_INDEX = gpio0_map(6);
   localparam integer MIC_DATA_GPIO_INDEX[NUM_PDM_LANES] = '{2, 3};
   // (NUM_PDM_LANES == 8) ? '{4, 2, 8, 6, 36, 38, 34, 40}
   localparam integer STREAM_SEL_WIDTH = $clog2(NUM_MIC_STREAMS);
@@ -358,6 +359,11 @@ module ghrd_top (
   reg  [                15:0] latest_fifo_sample;
   reg  [                15:0] display_sample;
   reg  [                22:0] display_div_cnt;
+
+  /////////////////////////////////////////////////
+  // Declare pulse generation signals signals   //
+  ///////////////////////////////////////////////
+  wire                        pulse;
 
   //////////////////////////////////////
   // System-control top-level assigns //
@@ -510,6 +516,9 @@ module ghrd_top (
   // Route the shared microphone clock onto GPIO_0.
   assign GPIO_0[MIC_CLK_GPIO_INDEX] = mic_clk_o;
 
+  // Route pulse generation onto GPIO_0
+  assign GPIO_0[PULSE_GEN_GPIO_INDEX] = pulse;
+
   ///////////////////////////////
   // Audio-front-end instance //
   /////////////////////////////
@@ -605,6 +614,16 @@ module ghrd_top (
       .write_en_o(fifo_write_en),
       .write_data_o(fifo_write_data)
   );
+
+  ///////////////////////////
+  // DMA packetizer block  //
+  ///////////////////////////
+  pulse_gen #(.PULSE_LENGTH_MS(100), .PULSE_GAP_MS(500)) pulse_gen_inst (
+    .clk(clk_i),
+    .rst_n(~rst_i),
+    .freq_sel(2'b10),
+    .pulse(pulse)
+);
 
   /////////////////////////////////////
   // Display FIFO selection and flow //
