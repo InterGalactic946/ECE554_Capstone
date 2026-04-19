@@ -1,4 +1,4 @@
-module wave_front_detection 
+module wavefront_detection 
 # (
     parameter int unsigned STA_LEN = 16,    // Short term average length (power of 2 between 8 and 2048)
     parameter int unsigned LTA_LEN = 512,   // Long term average length (power of 2 between 8 and 2048)
