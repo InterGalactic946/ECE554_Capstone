@@ -538,7 +538,6 @@ module ghrd_top (
       .data_val_o (mic_data_val),
       .mic_clk_o  (mic_clk_o)
   );
-  
 
   ////////////////////////////////////////////
   // PDM-to-PCM conversion and mock-data mux //
