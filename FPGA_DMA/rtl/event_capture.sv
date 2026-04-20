@@ -92,16 +92,17 @@ module event_capture #(
     logic capture_done;
     logic [CAPW-1:0] capture_cnt;
 
-    always_ff @(posedge clk, negedge rst_n) begin
-        if (!rst_n)
-            capture_cnt <= '0;
-        else if (begin_capture)
-            capture_cnt <= '0;
-        else if (capturing)
-            capture_cnt <= capture_cnt + 1;
-    end
+    // always_ff @(posedge clk, negedge rst_n) begin
+    //     if (!rst_n)
+    //         capture_cnt <= '0;
+    //     else if (begin_capture)
+    //         capture_cnt <= '0;
+    //     else if (capturing)
+    //         capture_cnt <= capture_cnt + 1;
+    // end
 
-    assign capture_done = (capture_cnt == CAPTURE_WINDOW - 1);
+    // assign capture_done = (capture_cnt == CAPTURE_WINDOW - 1);
+    assign capture_done = &sample_time; 
 
     // One cycle delay to event valid to synchronize with capturing of data
     always_ff @(posedge clk, negedge rst_n) begin
