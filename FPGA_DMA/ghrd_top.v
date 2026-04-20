@@ -355,52 +355,52 @@ module ghrd_top (
       .data_out(fpga_debounced_buttons)
   );
 
-  wire [15:0] mock_data_1, mock_data_2, mock_data_3, mock_data_4;
-  wire data_valid_1, data_valid_2, data_valid_3, data_valid_4;
+  // wire [15:0] mock_data_1, mock_data_2, mock_data_3, mock_data_4;
+  // wire data_valid_1, data_valid_2, data_valid_3, data_valid_4;
 
-  mock_data mock_data_inst_1 (
-      .clk(CLOCK_50),
-      .rst_n(~rst_i),
-      .ready_for_data(ps_ready_for_data && conv1_valid_pos),
-      .data_out(mock_data_1),
-      .data_valid(data_valid_1)
-  );
+  // mock_data mock_data_inst_1 (
+  //     .clk(CLOCK_50),
+  //     .rst_n(~rst_i),
+  //     .ready_for_data(ps_ready_for_data && conv1_valid_pos),
+  //     .data_out(mock_data_1),
+  //     .data_valid(data_valid_1)
+  // );
 
-  mock_data mock_data_inst_2 (
-      .clk(CLOCK_50),
-      .rst_n(~rst_i),
-      .ready_for_data(ps_ready_for_data && conv1_valid_neg),
-      .data_out(mock_data_2),
-      .data_valid(data_valid_2)
-  );
+  // mock_data mock_data_inst_2 (
+  //     .clk(CLOCK_50),
+  //     .rst_n(~rst_i),
+  //     .ready_for_data(ps_ready_for_data && conv1_valid_neg),
+  //     .data_out(mock_data_2),
+  //     .data_valid(data_valid_2)
+  // );
 
-  mock_data mock_data_inst_3 (
-      .clk(CLOCK_50),
-      .rst_n(~rst_i),
-      .ready_for_data(ps_ready_for_data && conv2_valid_pos),
-      .data_out(mock_data_3),
-      .data_valid(data_valid_3)
-  );
+  // mock_data mock_data_inst_3 (
+  //     .clk(CLOCK_50),
+  //     .rst_n(~rst_i),
+  //     .ready_for_data(ps_ready_for_data && conv2_valid_pos),
+  //     .data_out(mock_data_3),
+  //     .data_valid(data_valid_3)
+  // );
 
-  mock_data mock_data_inst_4 (
-      .clk(CLOCK_50),
-      .rst_n(~rst_i),
-      .ready_for_data(ps_ready_for_data && conv2_valid_neg),
-      .data_out(mock_data_4),
-      .data_valid(data_valid_4)
-  );
+  // mock_data mock_data_inst_4 (
+  //     .clk(CLOCK_50),
+  //     .rst_n(~rst_i),
+  //     .ready_for_data(ps_ready_for_data && conv2_valid_neg),
+  //     .data_out(mock_data_4),
+  //     .data_valid(data_valid_4)
+  // );
 
   pcm_to_mem pcm_to_mem_inst (
       .clk(CLOCK_50),
       .rst_n(~rst_i),
-      .pcm_pos_1(SW[9] ? mock_data_1 : conv1_pcm_pos),
-      .pcm_pos_valid_1(SW[9] ? data_valid_1 : conv1_pcm_valid_pos),
-      .pcm_neg_1(SW[9] ? mock_data_2 : conv1_pcm_neg),
-      .pcm_neg_valid_1(SW[9] ? data_valid_2 : conv1_pcm_valid_neg),
-      .pcm_pos_2(SW[9] ? mock_data_3 : conv2_pcm_pos),
-      .pcm_pos_valid_2(SW[9] ? data_valid_3 : conv2_pcm_valid_pos),
-      .pcm_neg_2(SW[9] ? mock_data_4 : conv2_pcm_neg),
-      .pcm_neg_valid_2(SW[9] ? data_valid_4 : conv2_pcm_valid_neg),
+      .pcm_pos_1(SW[9] ? hit_time[0] : conv1_pcm_pos),
+      .pcm_pos_valid_1(SW[9] ? threshold_valid[0] : conv1_pcm_valid_pos),
+      .pcm_neg_1(SW[9] ? hit_time[1] : conv1_pcm_neg),
+      .pcm_neg_valid_1(SW[9] ? threshold_valid[1] : conv1_pcm_valid_neg),
+      .pcm_pos_2(SW[9] ? hit_time[2] : conv2_pcm_pos),
+      .pcm_pos_valid_2(SW[9] ? threshold_valid[2] : conv2_pcm_valid_pos),
+      .pcm_neg_2(SW[9] ? hit_time[3] : conv2_pcm_neg),
+      .pcm_neg_valid_2(SW[9] ? threshold_valid[3] : conv2_pcm_valid_neg),
       .ps_ready_for_data(ps_ready_for_data),
       .write_pending(fifo_waitreq),
       .write_en(fifo_write_en),
@@ -551,7 +551,7 @@ module ghrd_top (
   );
 
   wire pulse;
-  
+
   pulse_gen #(.PULSE_LENGTH_MS(100), .PULSE_GAP_MS(500)) pulse_gen_inst (
     .clk(clk_i),
     .rst_n(~rst_i),
@@ -563,6 +563,9 @@ module ghrd_top (
 
   wire [2:0] quadrant_code;
   wire quadrant_valid;
+  wire [3:0]  threshold_valid,
+  wire [15:0] hit_time [0:3],
+
 
   tdoa tdoa_inst (
     .clk(clk_i),
@@ -574,7 +577,9 @@ module ghrd_top (
     .mic_pcm_3(conv2_pcm_neg),
     .quadrant_valid(quadrant_valid),
     .quadrant_code(quadrant_code),
-    .collect_sample(collect_sample)
+    .collect_sample(collect_sample),
+    .hit_time(hit_time),
+    .threshold_valid(threshold_valid)
   );
 
   /////////////////////////////////
