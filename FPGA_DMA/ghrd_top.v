@@ -341,6 +341,7 @@ module ghrd_top (
   wire [ NUM_MIC_STREAMS-1:0] mock_pcm_valid;
   wire [PCM_SAMPLE_WIDTH-1:0] active_pcm                 [NUM_MIC_STREAMS];
   wire [ NUM_MIC_STREAMS-1:0] active_pcm_valid;
+  reg  [                 5:0] band_visual;
 
   /////////////////////////////////////////////////
   // Declare display FIFO and HEX output signals //
@@ -374,8 +375,9 @@ module ghrd_top (
   assign ps_ready_for_data = ps_data_rdy_stable;
 
   // Status LEDs for reset and DMA backpressure visibility.
-  assign LEDR[9] = fifo_waitreq;
-  assign LEDR[8] = ps_ready_for_data;
+  assign LEDR[9:4] = band_visual;
+  assign LEDR[2] = fifo_waitreq;
+  assign LEDR[1] = ps_ready_for_data;
   assign LEDR[0] = rst_i;
 
   //////////////////////////////
@@ -736,6 +738,17 @@ module ghrd_top (
       hex4_data = 0;
       hex5_data = 0;
     end
+  end
+
+  always @(*) begin
+    case(freq_sel)
+      3'b100: band_visual = 6'b110000;
+      3'b000: band_visual = 6'b011000;
+      3'b001: band_visual = 6'b001100;
+      3'b010: band_visual = 6'b000110;
+      3'b011: band_visual = 6'b000011;
+      default: band_visual = 6'b000000;
+    endcase
   end
 
   // Display the selected PCM sample as four hexadecimal digits.
