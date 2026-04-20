@@ -563,8 +563,8 @@ module ghrd_top (
 
   wire [2:0] quadrant_code;
   wire quadrant_valid;
-  wire [3:0]  threshold_valid,
-  wire [15:0] hit_time [0:3],
+  wire [3:0]  threshold_valid;
+  wire [15:0] hit_time [0:3];
 
 
   tdoa tdoa_inst (
