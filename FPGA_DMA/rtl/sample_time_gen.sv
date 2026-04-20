@@ -13,7 +13,7 @@ module sample_time_gen #(
             sample_time <= '0;
         else if (clr_time)
             sample_time <= '0;
-        else if (sample_tick)
+        else
             sample_time <= sample_time + 1'b1;
     end
 

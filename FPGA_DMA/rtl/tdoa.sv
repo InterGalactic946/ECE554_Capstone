@@ -12,6 +12,7 @@ module tdoa(
     output logic collect_sample
 );
 
+    localparam TSW = 16;
     logic frame_sample_valid;
     logic event_done;
     logic signed [15:0] frame_sample [4];
@@ -26,7 +27,11 @@ module tdoa(
     assign mic_pcm[2] = mic_pcm_2;
     assign mic_pcm[3] = mic_pcm_3;
 
-    mic_frame_sync u_sync (
+    mic_frame_sync
+    #(
+        .M(4),
+        .DW(16)
+    ) u_sync (
         .clk(clk),
         .rst_n(rst_n),
         .mic_valid(mic_valid),
@@ -36,7 +41,11 @@ module tdoa(
         .collect_sample(collect_sample)
     );
 
-    sample_time_gen u_time (
+    sample_time_gen
+    #(
+        .TSW(TSW)
+    )
+     u_time (
         .clk(clk),
         .rst_n(rst_n),
         .sample_tick(frame_sample_valid), // Increment time on each valid sample from frame sync
@@ -44,7 +53,15 @@ module tdoa(
         .sample_time(sample_time)
     );
 
-    event_capture u_event (
+    event_capture 
+    # (
+        .DW(16),
+        .TSW(TSW),
+        .STA_LEN(16),
+        .LTA_LEN(1024),
+        .THRESHOLD(4)
+    )
+    u_event (
         .clk(clk),
         .rst_n(rst_n),
         .sample_valid(frame_sample_valid),
@@ -56,7 +73,9 @@ module tdoa(
         .begin_capture(first_threshold_crossed)
     );
 
-    quadrant_classifier u_quadrant (
+    quadrant_classifier #(
+        .TSW(TSW)
+    ) u_quadrant (
         .clk(clk),
         .rst_n(rst_n),
         .event_done(event_done),
