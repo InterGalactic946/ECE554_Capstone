@@ -687,9 +687,9 @@ module ghrd_top (
 
   always @(posedge clk_i) begin
     if (rst_i) begin
-      page_sel <= '0;
+      page_sel <= 1'b0;
     end else if (~fpga_debounced_buttons[3] && prev_button_3) begin
-      page_sel <= page_sel + 1;
+      page_sel <= page_sel + 1'b1;
     end
   end
 
