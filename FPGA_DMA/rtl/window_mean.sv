@@ -11,7 +11,6 @@ module window_mean
     output logic mean_valid
 );
 
-
     localparam DATA_WIDTH = 16;
     logic fifo_rden;
     logic fifo_wren;

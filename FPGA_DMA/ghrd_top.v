@@ -562,9 +562,11 @@ module ghrd_top (
   assign GPIO_0[5] = pulse;
 
   wire [2:0] quadrant_code;
-  wire quadrant_valid;
+  wire quadrant_valid, event_done;
   wire [3:0]  threshold_valid;
+  reg [3:0]  prev_threshold_valid;
   wire [15:0] hit_time1, hit_time2, hit_time3, hit_time4;
+  reg [15:0] prev_hit_time1, prev_hit_time2, prev_hit_time3, prev_hit_time4;
 
 
   tdoa tdoa_inst (
@@ -582,7 +584,8 @@ module ghrd_top (
     .hit_time2(hit_time2),
     .hit_time3(hit_time3),
     .hit_time4(hit_time4),
-    .threshold_valid(threshold_valid)
+    .threshold_valid(threshold_valid),
+    .event_done(event_done)
   );
 
   /////////////////////////////////
@@ -660,6 +663,22 @@ module ghrd_top (
     end
   end
 
+  always @(posedge clk_i) begin
+    if (rst_i) begin
+      prev_hit_time1 <= 16'h0;
+      prev_hit_time2 <= 16'h0;
+      prev_hit_time3 <= 16'h0;
+      prev_hit_time4 <= 16'h0;
+      prev_threshold_valid <= 4'h0;
+    end else if (event_done && ~SW[8]) begin
+      prev_hit_time1 <= hit_time1;
+      prev_hit_time2 <= hit_time2;
+      prev_hit_time3 <= hit_time3;
+      prev_hit_time4 <= hit_time4;
+      prev_threshold_valid <= threshold_valid;
+    end
+  end
+
   //////////////////////////
   // HEX display logic   //
   ////////////////////////
@@ -677,7 +696,8 @@ module ghrd_top (
   end
 
   reg [3:0] hex0_data, hex1_data, hex2_data, hex3_data, hex4_data, hex5_data;
-  reg page_sel;
+  reg [2:0] page_sel;
+  reg next_page;
   reg prev_button_3;
 
   always @(posedge clk_i) begin
@@ -690,13 +710,14 @@ module ghrd_top (
 
   always @(posedge clk_i) begin
     if (rst_i) begin
-      page_sel <= 1'b0;
-    end else if (~fpga_debounced_buttons[3] && prev_button_3) begin
+      page_sel <= 3'b000;
+    end else if ((~fpga_debounced_buttons[3] && prev_button_3) || next_page) begin
       page_sel <= page_sel + 1'b1;
     end
   end
 
   always @(*) begin
+    next_page = 1'b0;
     if (page_sel == 0) begin
       // Show PCM sample and stream/mode info.
       hex0_data = display_sample[3:0];
@@ -710,9 +731,44 @@ module ghrd_top (
       hex0_data = {1'b0, quadrant_code};
       hex1_data = {3'b0, quadrant_valid};
       hex2_data = {3'b0, collect_sample};
-      hex3_data = 0;
+      hex3_data = {3'b0, event_done};
       hex4_data = 0;
       hex5_data = 0;
+    end else if (page_sel == 2) begin
+      // Show hit times and their validity.
+      hex0_data = prev_hit_time1[3:0];
+      hex1_data = prev_hit_time1[7:4];
+      hex2_data = prev_hit_time1[11:8];
+      hex3_data = prev_hit_time1[15:12];
+      hex4_data = {3'b0, threshold_valid[0]};
+      hex5_data = 4'd1;
+    end else if (page_sel == 3) begin
+      // Show hit times and their validity.
+      hex0_data = prev_hit_time2[3:0];
+      hex1_data = prev_hit_time2[7:4];
+      hex2_data = prev_hit_time2[11:8];
+      hex3_data = prev_hit_time2[15:12];
+      hex4_data = {3'b0, threshold_valid[1]};
+      hex5_data = 4'd2;
+    end else if (page_sel == 4) begin
+      // Show hit times and their validity.
+      hex0_data = prev_hit_time3[3:0];
+      hex1_data = prev_hit_time3[7:4];
+      hex2_data = prev_hit_time3[11:8];
+      hex3_data = prev_hit_time3[15:12];
+      hex4_data = {3'b0, threshold_valid[2]};
+      hex5_data = 4'd3;
+    end else if (page_sel == 5) begin
+      // Show hit times and their validity.
+      hex0_data = prev_hit_time4[3:0];
+      hex1_data = prev_hit_time4[7:4];
+      hex2_data = prev_hit_time4[11:8];
+      hex3_data = prev_hit_time4[15:12];
+      hex4_data = {3'b0, threshold_valid[3]};
+      hex5_data = 4'd3;
+    end else begin
+      // Default to showing PCM sample and stream/mode info.
+      next_page = 1'b1;
     end
   end
 

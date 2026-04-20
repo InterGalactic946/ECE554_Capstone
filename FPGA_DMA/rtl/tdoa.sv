@@ -14,7 +14,8 @@ module tdoa(
     output logic [TSW-1:0] hit_time2,
     output logic [TSW-1:0] hit_time3,
     output logic [TSW-1:0] hit_time4,
-    output logic [3:0]                   threshold_valid
+    output logic [3:0]    threshold_valid,
+    output logic event_done
 );
 
     localparam TSW = 16;
@@ -22,9 +23,8 @@ module tdoa(
     
     logic [TSW-1:0] hit_time [4];
     logic frame_sample_valid;
-    logic event_done;
-    logic signed [15:0] frame_sample [4];
-    logic [31:0] sample_time;
+    logic signed [TSW-1:0] frame_sample [4];
+    logic [TSW-1:0] sample_time;
     logic first_threshold_crossed;
 
     logic signed [15:0] mic_pcm [4];
