@@ -13,6 +13,8 @@ module tdoa(
 );
 
     localparam TSW = 16;
+    localparam DW = 16;
+    
     logic frame_sample_valid;
     logic event_done;
     logic signed [15:0] frame_sample [4];
@@ -30,7 +32,7 @@ module tdoa(
     mic_frame_sync
     #(
         .M(4),
-        .DW(16)
+        .DW(DW)
     ) u_sync (
         .clk(clk),
         .rst_n(rst_n),
@@ -55,7 +57,7 @@ module tdoa(
 
     event_capture 
     # (
-        .DW(16),
+        .DW(DW),
         .TSW(TSW),
         .STA_LEN(16),
         .LTA_LEN(1024),

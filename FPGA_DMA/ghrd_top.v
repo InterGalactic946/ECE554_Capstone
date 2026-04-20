@@ -712,10 +712,11 @@ module ghrd_top (
   reg [3:0] hex0_data, hex1_data, hex2_data, hex3_data, hex4_data, hex5_data;
   reg page_sel;
 
+  
   always @(posedge clk_i) begin
     if (rst_i) begin
       page_sel <= '0;
-    end else if (fpga_debounced_buttons[3]) begin
+    end else if ( fpga_debounced_buttons[3]) begin
       page_sel <= page_sel + 1;
     end
   end
