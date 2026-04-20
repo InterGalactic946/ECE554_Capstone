@@ -1,11 +1,11 @@
 module event_capture #(
     parameter int DW             = 16,
-    parameter int TSW            = 32,
-    parameter int THRESHOLD      = 16'd5000,
-    parameter int CAPTURE_WINDOW = 200,
+    parameter int TSW            = 16,
+    parameter int THRESHOLD      = 4,
+    // parameter int CAPTURE_WINDOW = 200,
     parameter int NUM_MICS       = 4,
     parameter int unsigned STA_LEN = 16,
-    parameter int unsigned LTA_LEN = 512
+    parameter int unsigned LTA_LEN = 1024
 ) (
     input  logic                         clk,
     input  logic                         rst_n,
@@ -40,7 +40,7 @@ module event_capture #(
 
     state_t state, nxt_state;
 
-    localparam int CAPW = (CAPTURE_WINDOW > 1) ? $clog2(CAPTURE_WINDOW) : 1;
+    // localparam int CAPW = (CAPTURE_WINDOW > 1) ? $clog2(CAPTURE_WINDOW) : 1;
 
     logic capturing;
     logic pulse_event_done;
@@ -56,10 +56,10 @@ module event_capture #(
     logic          any_above;
     logic          begin_capture_ff;
 
-    // assign abs_sample[0] = abs_s(frame_sample[0]);
-    // assign abs_sample[1] = abs_s(frame_sample[1]);
-    // assign abs_sample[2] = abs_s(frame_sample[2]);
-    // assign abs_sample[3] = abs_s(frame_sample[3]);
+    assign abs_sample[0] = abs_s(frame_sample[0]);
+    assign abs_sample[1] = abs_s(frame_sample[1]);
+    assign abs_sample[2] = abs_s(frame_sample[2]);
+    assign abs_sample[3] = abs_s(frame_sample[3]);
 
     wavefront_detection 
     # (
@@ -70,7 +70,7 @@ module event_capture #(
     wavefront_det [1:NUM_MICS] (
         .clk(clk),
         .rst_n(rst_n),
-        .data_in(frame_sample),
+        .data_in(abs_sample),
         .data_valid(frame_sample_valid),
         .detection_out(above_threshold)
     );
@@ -90,7 +90,7 @@ module event_capture #(
 
     // Logic for the "capture window" after the first threshold crossing
     logic capture_done;
-    logic [CAPW-1:0] capture_cnt;
+    // logic [CAPW-1:0] capture_cnt;
 
     // always_ff @(posedge clk, negedge rst_n) begin
     //     if (!rst_n)
