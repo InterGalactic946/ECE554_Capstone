@@ -765,7 +765,7 @@ module ghrd_top (
       hex2_data = prev_hit_time4[11:8];
       hex3_data = prev_hit_time4[15:12];
       hex4_data = {3'b0, threshold_valid[3]};
-      hex5_data = 4'd3;
+      hex5_data = 4'd4;
     end else begin
       // Default to showing PCM sample and stream/mode info.
       next_page = 1'b1;
