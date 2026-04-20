@@ -10,7 +10,7 @@ module tdoa(
     output logic quadrant_valid,
     output logic [2:0] quadrant_code,
     output logic collect_sample,
-    output logic [TSW-1:0]               hit_time [4],
+    output logic [TSW-1:0] hit_time [0:3],
     output logic [3:0]                   threshold_valid
 );
 
