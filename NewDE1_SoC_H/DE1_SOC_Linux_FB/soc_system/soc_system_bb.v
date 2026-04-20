@@ -1,7 +1,17 @@
 
 module soc_system (
+	alt_vip_cl_cvo_0_clocked_video_vid_clk,
+	alt_vip_cl_cvo_0_clocked_video_vid_data,
+	alt_vip_cl_cvo_0_clocked_video_underflow,
+	alt_vip_cl_cvo_0_clocked_video_vid_datavalid,
+	alt_vip_cl_cvo_0_clocked_video_vid_v_sync,
+	alt_vip_cl_cvo_0_clocked_video_vid_h_sync,
+	alt_vip_cl_cvo_0_clocked_video_vid_f,
+	alt_vip_cl_cvo_0_clocked_video_vid_h,
+	alt_vip_cl_cvo_0_clocked_video_vid_v,
 	button_pio_external_connection_export,
 	clk_clk,
+	clock_bridge_0_in_clk_clk,
 	dipsw_pio_external_connection_export,
 	hps_0_h2f_reset_reset_n,
 	hps_0_hps_io_hps_io_emac1_inst_TX_CLK,
@@ -76,20 +86,20 @@ module soc_system (
 	memory_mem_odt,
 	memory_mem_dm,
 	memory_oct_rzqin,
-	reset_reset_n,
-	alt_vip_cl_cvo_0_clocked_video_vid_clk,
-	alt_vip_cl_cvo_0_clocked_video_vid_data,
-	alt_vip_cl_cvo_0_clocked_video_underflow,
-	alt_vip_cl_cvo_0_clocked_video_vid_datavalid,
-	alt_vip_cl_cvo_0_clocked_video_vid_v_sync,
-	alt_vip_cl_cvo_0_clocked_video_vid_h_sync,
-	alt_vip_cl_cvo_0_clocked_video_vid_f,
-	alt_vip_cl_cvo_0_clocked_video_vid_h,
-	alt_vip_cl_cvo_0_clocked_video_vid_v,
-	clock_bridge_0_in_clk_clk);	
+	reset_reset_n);	
 
+	input		alt_vip_cl_cvo_0_clocked_video_vid_clk;
+	output	[31:0]	alt_vip_cl_cvo_0_clocked_video_vid_data;
+	output		alt_vip_cl_cvo_0_clocked_video_underflow;
+	output		alt_vip_cl_cvo_0_clocked_video_vid_datavalid;
+	output		alt_vip_cl_cvo_0_clocked_video_vid_v_sync;
+	output		alt_vip_cl_cvo_0_clocked_video_vid_h_sync;
+	output		alt_vip_cl_cvo_0_clocked_video_vid_f;
+	output		alt_vip_cl_cvo_0_clocked_video_vid_h;
+	output		alt_vip_cl_cvo_0_clocked_video_vid_v;
 	input	[3:0]	button_pio_external_connection_export;
 	input		clk_clk;
+	input		clock_bridge_0_in_clk_clk;
 	input	[9:0]	dipsw_pio_external_connection_export;
 	output		hps_0_h2f_reset_reset_n;
 	output		hps_0_hps_io_hps_io_emac1_inst_TX_CLK;
@@ -165,14 +175,4 @@ module soc_system (
 	output	[3:0]	memory_mem_dm;
 	input		memory_oct_rzqin;
 	input		reset_reset_n;
-	input		alt_vip_cl_cvo_0_clocked_video_vid_clk;
-	output	[31:0]	alt_vip_cl_cvo_0_clocked_video_vid_data;
-	output		alt_vip_cl_cvo_0_clocked_video_underflow;
-	output		alt_vip_cl_cvo_0_clocked_video_vid_datavalid;
-	output		alt_vip_cl_cvo_0_clocked_video_vid_v_sync;
-	output		alt_vip_cl_cvo_0_clocked_video_vid_h_sync;
-	output		alt_vip_cl_cvo_0_clocked_video_vid_f;
-	output		alt_vip_cl_cvo_0_clocked_video_vid_h;
-	output		alt_vip_cl_cvo_0_clocked_video_vid_v;
-	input		clock_bridge_0_in_clk_clk;
 endmodule

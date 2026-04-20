@@ -1,13 +1,13 @@
-// (C) 2001-2020 Intel Corporation. All rights reserved.
-// Your use of Intel Corporation's design tools, logic functions and other 
+// (C) 2001-2025 Altera Corporation. All rights reserved.
+// Your use of Altera Corporation's design tools, logic functions and other 
 // software and tools, and its AMPP partner logic functions, and any output 
 // files from any of the foregoing (including device programming or simulation 
 // files), and any associated documentation or information are expressly subject 
-// to the terms and conditions of the Intel Program License Subscription 
-// Agreement, Intel FPGA IP License Agreement, or other applicable 
+// to the terms and conditions of the Altera Program License Subscription 
+// Agreement, Altera IP License Agreement, or other applicable 
 // license agreement, including, without limitation, that your use is for the 
-// sole purpose of programming logic devices manufactured by Intel and sold by 
-// Intel or its authorized distributors.  Please refer to the applicable 
+// sole purpose of programming logic devices manufactured by Altera and sold by 
+// Altera or its authorized distributors.  Please refer to the applicable 
 // agreement for further details.
 
 
@@ -24,9 +24,9 @@
 // agreement for further details.
 
 
-// $Id: //acds/rel/20.1std/ip/merlin/altera_merlin_router/altera_merlin_router.sv.terp#1 $
+// $Id: //acds/rel/25.1std/ip/merlin/altera_merlin_router/altera_merlin_router.sv.terp#1 $
 // $Revision: #1 $
-// $Date: 2019/10/06 $
+// $Date: 2025/03/10 $
 // $Author: psgswbuild $
 
 // -------------------------------------------------------
@@ -134,7 +134,7 @@ module soc_system_mm_interconnect_0_router
     // Figure out the number of bits to mask off for each slave span
     // during address decoding
     // -------------------------------------------------------
-    localparam PAD0 = log2ceil(64'h40 - 64'h0); 
+    localparam PAD0 = log2ceil(64'h140 - 64'h100); 
     localparam PAD1 = log2ceil(64'h10008 - 64'h10000); 
     localparam PAD2 = log2ceil(64'h10050 - 64'h10040); 
     localparam PAD3 = log2ceil(64'h10090 - 64'h10080); 
@@ -198,8 +198,8 @@ module soc_system_mm_interconnect_0_router
         // Sets the channel and destination ID based on the address
         // --------------------------------------------------
 
-    // ( 0x0 .. 0x40 )
-    if ( {address[RG:PAD0],{PAD0{1'b0}}} == 18'h0   ) begin
+    // ( 0x100 .. 0x140 )
+    if ( {address[RG:PAD0],{PAD0{1'b0}}} == 18'h100   ) begin
             src_channel = 7'b000010;
             src_data[PKT_DEST_ID_H:PKT_DEST_ID_L] = 0;
     end

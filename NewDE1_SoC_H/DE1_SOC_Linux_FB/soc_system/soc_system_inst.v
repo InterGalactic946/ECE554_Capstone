@@ -1,6 +1,16 @@
 	soc_system u0 (
+		.alt_vip_cl_cvo_0_clocked_video_vid_clk       (<connected-to-alt_vip_cl_cvo_0_clocked_video_vid_clk>),       // alt_vip_cl_cvo_0_clocked_video.vid_clk
+		.alt_vip_cl_cvo_0_clocked_video_vid_data      (<connected-to-alt_vip_cl_cvo_0_clocked_video_vid_data>),      //                               .vid_data
+		.alt_vip_cl_cvo_0_clocked_video_underflow     (<connected-to-alt_vip_cl_cvo_0_clocked_video_underflow>),     //                               .underflow
+		.alt_vip_cl_cvo_0_clocked_video_vid_datavalid (<connected-to-alt_vip_cl_cvo_0_clocked_video_vid_datavalid>), //                               .vid_datavalid
+		.alt_vip_cl_cvo_0_clocked_video_vid_v_sync    (<connected-to-alt_vip_cl_cvo_0_clocked_video_vid_v_sync>),    //                               .vid_v_sync
+		.alt_vip_cl_cvo_0_clocked_video_vid_h_sync    (<connected-to-alt_vip_cl_cvo_0_clocked_video_vid_h_sync>),    //                               .vid_h_sync
+		.alt_vip_cl_cvo_0_clocked_video_vid_f         (<connected-to-alt_vip_cl_cvo_0_clocked_video_vid_f>),         //                               .vid_f
+		.alt_vip_cl_cvo_0_clocked_video_vid_h         (<connected-to-alt_vip_cl_cvo_0_clocked_video_vid_h>),         //                               .vid_h
+		.alt_vip_cl_cvo_0_clocked_video_vid_v         (<connected-to-alt_vip_cl_cvo_0_clocked_video_vid_v>),         //                               .vid_v
 		.button_pio_external_connection_export        (<connected-to-button_pio_external_connection_export>),        // button_pio_external_connection.export
 		.clk_clk                                      (<connected-to-clk_clk>),                                      //                            clk.clk
+		.clock_bridge_0_in_clk_clk                    (<connected-to-clock_bridge_0_in_clk_clk>),                    //          clock_bridge_0_in_clk.clk
 		.dipsw_pio_external_connection_export         (<connected-to-dipsw_pio_external_connection_export>),         //  dipsw_pio_external_connection.export
 		.hps_0_h2f_reset_reset_n                      (<connected-to-hps_0_h2f_reset_reset_n>),                      //                hps_0_h2f_reset.reset_n
 		.hps_0_hps_io_hps_io_emac1_inst_TX_CLK        (<connected-to-hps_0_hps_io_hps_io_emac1_inst_TX_CLK>),        //                   hps_0_hps_io.hps_io_emac1_inst_TX_CLK
@@ -75,16 +85,6 @@
 		.memory_mem_odt                               (<connected-to-memory_mem_odt>),                               //                               .mem_odt
 		.memory_mem_dm                                (<connected-to-memory_mem_dm>),                                //                               .mem_dm
 		.memory_oct_rzqin                             (<connected-to-memory_oct_rzqin>),                             //                               .oct_rzqin
-		.reset_reset_n                                (<connected-to-reset_reset_n>),                                //                          reset.reset_n
-		.alt_vip_cl_cvo_0_clocked_video_vid_clk       (<connected-to-alt_vip_cl_cvo_0_clocked_video_vid_clk>),       // alt_vip_cl_cvo_0_clocked_video.vid_clk
-		.alt_vip_cl_cvo_0_clocked_video_vid_data      (<connected-to-alt_vip_cl_cvo_0_clocked_video_vid_data>),      //                               .vid_data
-		.alt_vip_cl_cvo_0_clocked_video_underflow     (<connected-to-alt_vip_cl_cvo_0_clocked_video_underflow>),     //                               .underflow
-		.alt_vip_cl_cvo_0_clocked_video_vid_datavalid (<connected-to-alt_vip_cl_cvo_0_clocked_video_vid_datavalid>), //                               .vid_datavalid
-		.alt_vip_cl_cvo_0_clocked_video_vid_v_sync    (<connected-to-alt_vip_cl_cvo_0_clocked_video_vid_v_sync>),    //                               .vid_v_sync
-		.alt_vip_cl_cvo_0_clocked_video_vid_h_sync    (<connected-to-alt_vip_cl_cvo_0_clocked_video_vid_h_sync>),    //                               .vid_h_sync
-		.alt_vip_cl_cvo_0_clocked_video_vid_f         (<connected-to-alt_vip_cl_cvo_0_clocked_video_vid_f>),         //                               .vid_f
-		.alt_vip_cl_cvo_0_clocked_video_vid_h         (<connected-to-alt_vip_cl_cvo_0_clocked_video_vid_h>),         //                               .vid_h
-		.alt_vip_cl_cvo_0_clocked_video_vid_v         (<connected-to-alt_vip_cl_cvo_0_clocked_video_vid_v>),         //                               .vid_v
-		.clock_bridge_0_in_clk_clk                    (<connected-to-clock_bridge_0_in_clk_clk>)                     //          clock_bridge_0_in_clk.clk
+		.reset_reset_n                                (<connected-to-reset_reset_n>)                                 //                          reset.reset_n
 	);
 
