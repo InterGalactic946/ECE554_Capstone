@@ -49,7 +49,7 @@ module event_capture #(
     //////////////////////////////////////////////////
     // Per-channel threshold checks
     //////////////////////////////////////////////////
-    // logic [DW-1:0] abs_sample [4];
+    logic [DW-1:0] abs_sample [4];
     logic [3:0]    above_threshold;
     logic [3:0]    already_hit;
     logic [3:0]    new_hits;
