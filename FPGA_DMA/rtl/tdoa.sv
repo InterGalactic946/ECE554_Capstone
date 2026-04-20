@@ -10,13 +10,17 @@ module tdoa(
     output logic quadrant_valid,
     output logic [2:0] quadrant_code,
     output logic collect_sample,
-    output logic [TSW-1:0] hit_time [0:3],
+    output logic [TSW-1:0] hit_time1,
+    output logic [TSW-1:0] hit_time2,
+    output logic [TSW-1:0] hit_time3,
+    output logic [TSW-1:0] hit_time4,
     output logic [3:0]                   threshold_valid
 );
 
     localparam TSW = 16;
     localparam DW = 16;
     
+    logic [TSW-1:0] hit_time [4];
     logic frame_sample_valid;
     logic event_done;
     logic signed [15:0] frame_sample [4];
@@ -28,6 +32,11 @@ module tdoa(
     assign mic_pcm[1] = mic_pcm_1;
     assign mic_pcm[2] = mic_pcm_2;
     assign mic_pcm[3] = mic_pcm_3;
+
+    assign hit_time1 = hit_time[0];
+    assign hit_time2 = hit_time[1];
+    assign hit_time3 = hit_time[2];
+    assign hit_time4 = hit_time[3];
 
     mic_frame_sync
     #(

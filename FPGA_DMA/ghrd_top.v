@@ -393,13 +393,13 @@ module ghrd_top (
   pcm_to_mem pcm_to_mem_inst (
       .clk(CLOCK_50),
       .rst_n(~rst_i),
-      .pcm_pos_1(SW[9] ? hit_time[0] : conv1_pcm_pos),
+      .pcm_pos_1(SW[9] ? hit_time1 : conv1_pcm_pos),
       .pcm_pos_valid_1(SW[9] ? threshold_valid[0] : conv1_pcm_valid_pos),
-      .pcm_neg_1(SW[9] ? hit_time[1] : conv1_pcm_neg),
+      .pcm_neg_1(SW[9] ? hit_time2 : conv1_pcm_neg),
       .pcm_neg_valid_1(SW[9] ? threshold_valid[1] : conv1_pcm_valid_neg),
-      .pcm_pos_2(SW[9] ? hit_time[2] : conv2_pcm_pos),
+      .pcm_pos_2(SW[9] ? hit_time3 : conv2_pcm_pos),
       .pcm_pos_valid_2(SW[9] ? threshold_valid[2] : conv2_pcm_valid_pos),
-      .pcm_neg_2(SW[9] ? hit_time[3] : conv2_pcm_neg),
+      .pcm_neg_2(SW[9] ? hit_time4 : conv2_pcm_neg),
       .pcm_neg_valid_2(SW[9] ? threshold_valid[3] : conv2_pcm_valid_neg),
       .ps_ready_for_data(ps_ready_for_data),
       .write_pending(fifo_waitreq),
@@ -564,7 +564,7 @@ module ghrd_top (
   wire [2:0] quadrant_code;
   wire quadrant_valid;
   wire [3:0]  threshold_valid;
-  wire [15:0] hit_time [0:3];
+  wire [15:0] hit_time1, hit_time2, hit_time3, hit_time4;
 
 
   tdoa tdoa_inst (
@@ -578,7 +578,10 @@ module ghrd_top (
     .quadrant_valid(quadrant_valid),
     .quadrant_code(quadrant_code),
     .collect_sample(collect_sample),
-    .hit_time(hit_time),
+    .hit_time1(hit_time1),
+    .hit_time2(hit_time2),
+    .hit_time3(hit_time3),
+    .hit_time4(hit_time4),
     .threshold_valid(threshold_valid)
   );
 
