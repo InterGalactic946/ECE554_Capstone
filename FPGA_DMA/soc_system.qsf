@@ -950,6 +950,13 @@ set_instance_assignment -name PLL_COMPENSATION_MODE DIRECT -to u0|hps_0|hps_io|b
 
 
 
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/window_mean.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/sample_time_gen.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/wavefront_detection.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/quadrant_classifier.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/mic_frame_sync.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/event_capture.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/tdoa.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/pulse_gen.sv
 set_global_assignment -name VERILOG_FILE ip/fifos/FIFO_2048.v
 set_global_assignment -name QIP_FILE ip/fifos/FIFO_2048.qip

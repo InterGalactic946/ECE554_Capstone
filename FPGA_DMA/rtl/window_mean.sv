@@ -87,7 +87,7 @@ module window_mean
                 .q(fifo_out),
                 .full(fifo_full)
             );
-            else if (WINDOW_SIZE == 1024) begin
+        end else if (WINDOW_SIZE == 1024) begin
                 FIFO_1024 fifo_1024 (
                     .clock(clk),
                     .data(data_in),
