@@ -4,7 +4,7 @@
 // This module implements a simple FIFO memory with        //
 // parameterized depth and data width.                     //
 /////////////////////////////////////////////////////////////
-module FIFO
+module My_FIFO
 #(
   parameter DEPTH=8,
   parameter DATA_WIDTH=8

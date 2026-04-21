@@ -20,7 +20,7 @@ module pl_to_ps (
     assign data_to_ps[9:2] = (rd_upper_byte) ? data_out[15:8] : lower_buf;
 
     assign ready_for_data = ~fifo_full;
-    FIFO #(
+    My_FIFO #(
         .DEPTH(512),
         .DATA_WIDTH(16)
     ) fifo_inst (
