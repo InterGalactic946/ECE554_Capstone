@@ -1,7 +1,6 @@
 **/.qsys_edit/**
 **/db/**
 **/incremental_db/**
-**/soc_system/**
 **/hps_isw_handoff/**
 **/*.txt
 **/*.rpt
