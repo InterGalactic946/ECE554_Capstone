@@ -77,7 +77,7 @@ module dma_fifo_write (
     if (!rst_n) begin
       write_data <= '0;
     end else if (aq_done) begin
-      write_data <= buffer;
+      write_data <= {buffer[7], buffer[6], buffer[5], buffer[4], buffer[3], buffer[2], buffer[1], buffer[0]};
     end
   end
 endmodule
