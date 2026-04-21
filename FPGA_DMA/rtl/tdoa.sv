@@ -15,7 +15,23 @@ module tdoa(
     output logic [TSW-1:0] hit_time3,
     output logic [TSW-1:0] hit_time4,
     output logic [3:0]    threshold_valid,
-    output logic event_done
+    output logic event_done,
+    output logic [15:0] sta_mean_1,
+    output logic [15:0] sta_mean_2,
+    output logic [15:0] sta_mean_3,
+    output logic [15:0] sta_mean_4,
+    output logic [15:0] lta_mean_1,
+    output logic [15:0] lta_mean_2,
+    output logic [15:0] lta_mean_3,
+    output logic [15:0] lta_mean_4,
+    output logic sta_valid_1,
+    output logic sta_valid_2,
+    output logic sta_valid_3,
+    output logic sta_valid_4,
+    output logic lta_valid_1,
+    output logic lta_valid_2,
+    output logic lta_valid_3,
+    output logic lta_valid_4
 );
 
     localparam TSW = 16;
@@ -26,6 +42,10 @@ module tdoa(
     logic signed [TSW-1:0] frame_sample [4];
     logic [TSW-1:0] sample_time;
     logic first_threshold_crossed;
+    logic [15:0] sta_mean [4];
+    logic [15:0] lta_mean [4];
+    logic        sta_valid [4];
+    logic        lta_valid [4];
 
     logic signed [15:0] mic_pcm [4];
     assign mic_pcm[0] = mic_pcm_0;
@@ -37,6 +57,26 @@ module tdoa(
     assign hit_time2 = hit_time[1];
     assign hit_time3 = hit_time[2];
     assign hit_time4 = hit_time[3];
+
+    assign sta_mean_1 = sta_mean[0];
+    assign sta_mean_2 = sta_mean[1];
+    assign sta_mean_3 = sta_mean[2];
+    assign sta_mean_4 = sta_mean[3];
+
+    assign lta_mean_1 = lta_mean[0];
+    assign lta_mean_2 = lta_mean[1];
+    assign lta_mean_3 = lta_mean[2];
+    assign lta_mean_4 = lta_mean[3];
+
+    assign sta_valid_1 = sta_valid[0];
+    assign sta_valid_2 = sta_valid[1];
+    assign sta_valid_3 = sta_valid[2];
+    assign sta_valid_4 = sta_valid[3];
+
+    assign lta_valid_1 = lta_valid[0];
+    assign lta_valid_2 = lta_valid[1];
+    assign lta_valid_3 = lta_valid[2];
+    assign lta_valid_4 = lta_valid[3];
 
     mic_frame_sync
     #(
@@ -81,7 +121,12 @@ module tdoa(
         .threshold_valid(threshold_valid),
         .hit_time(hit_time),
         .event_done(event_done),
-        .begin_capture(first_threshold_crossed)
+        .begin_capture(first_threshold_crossed),
+        .sta_mean(sta_mean),
+        .lta_mean(lta_mean),
+        .sta_valid(sta_valid),
+        .lta_valid(lta_valid)
+
     );
 
     quadrant_classifier #(

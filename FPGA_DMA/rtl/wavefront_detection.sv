@@ -7,11 +7,15 @@ module wavefront_detection #(
     input logic rst_n,
     input logic [15:0] data_in,
     input logic data_valid,
-    output logic detection_out
+    output logic detection_out,
+    output logic [15:0] sta_mean,
+    output logic [15:0] lta_mean,
+    output logic sta_valid,
+    output logic lta_valid
 );
 
-  logic [15:0] sta_mean, lta_mean;
-  logic sta_valid, lta_valid;
+//   logic [15:0] sta_mean, lta_mean;
+//   logic sta_valid, lta_valid;
 
   window_mean #(
       .WINDOW_SIZE(STA_LEN)

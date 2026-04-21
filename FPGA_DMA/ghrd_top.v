@@ -390,6 +390,12 @@ module ghrd_top (
   //     .data_valid(data_valid_4)
   // );
 
+  wire pcm_fifo_write_en, data_fifo_write_en;
+  wire [127:0] pcm_fifo_write_data, data_fifo_write_data;
+
+  assign fifo_write_en = SW[7] ? data_fifo_write_en : pcm_fifo_write_en;
+  assign fifo_write_data = SW[7] ? data_fifo_write_data : pcm_fifo_write_data;
+
   pcm_to_mem pcm_to_mem_inst (
       .clk(CLOCK_50),
       .rst_n(~rst_i),
@@ -403,8 +409,31 @@ module ghrd_top (
       .pcm_neg_valid_2(SW[9] ? threshold_valid[3] : conv2_pcm_valid_neg),
       .ps_ready_for_data(ps_ready_for_data),
       .write_pending(fifo_waitreq),
-      .write_en(fifo_write_en),
-      .write_data(fifo_write_data)
+      .write_en(pcm_fifo_write_en),
+      .write_data(pcm_fifo_write_data)
+  );
+
+  dma_fifo_write dma_fifo_write_inst (
+      .clk(CLOCK_50),
+      .rst_n(~rst_i),
+      .input0_valid(sta_valid_1),
+      .input0_data(sta_mean_1),
+      .input1_valid(lta_valid_1),
+      .input1_data(lta_mean_1),
+      .input2_valid(sta_valid_2),
+      .input2_data(sta_mean_2),
+      .input3_valid(lta_valid_2),
+      .input3_data(lta_mean_2),
+      .input4_valid(sta_valid_3),
+      .input4_data(sta_mean_3),
+      .input5_valid(lta_valid_3),
+      .input5_data(lta_mean_3),
+      .input6_valid(sta_valid_4),
+      .input6_data(sta_mean_4),
+      .input7_valid(lta_valid_4),
+      .input7_data(lta_mean_4),
+      .write_en(data_fifo_write_en),
+      .write_data(data_fifo_write_data)
   );
 
   // Source/Probe megawizard instance
@@ -567,6 +596,10 @@ module ghrd_top (
   reg [3:0]  prev_threshold_valid;
   wire [15:0] hit_time1, hit_time2, hit_time3, hit_time4;
   reg [15:0] prev_hit_time1, prev_hit_time2, prev_hit_time3, prev_hit_time4;
+  wire [15:0] sta_mean_1, sta_mean_2, sta_mean_3, sta_mean_4;
+  wire [15:0] lta_mean_1, lta_mean_2, lta_mean_3, lta_mean_4;
+  wire sta_valid_1, sta_valid_2, sta_valid_3, sta_valid_4;
+  wire lta_valid_1, lta_valid_2, lta_valid_3, lta_valid_4;
 
 
   tdoa tdoa_inst (
@@ -585,7 +618,23 @@ module ghrd_top (
     .hit_time3(hit_time3),
     .hit_time4(hit_time4),
     .threshold_valid(threshold_valid),
-    .event_done(event_done)
+    .event_done(event_done),
+    .sta_mean_1(sta_mean_1),
+    .sta_mean_2(sta_mean_2),
+    .sta_mean_3(sta_mean_3),
+    .sta_mean_4(sta_mean_4),
+    .lta_mean_1(lta_mean_1),
+    .lta_mean_2(lta_mean_2),
+    .lta_mean_3(lta_mean_3),
+    .lta_mean_4(lta_mean_4),
+    .sta_valid_1(sta_valid_1),
+    .sta_valid_2(sta_valid_2),
+    .sta_valid_3(sta_valid_3),
+    .sta_valid_4(sta_valid_4),
+    .lta_valid_1(lta_valid_1),
+    .lta_valid_2(lta_valid_2),
+    .lta_valid_3(lta_valid_3),
+    .lta_valid_4(lta_valid_4)
   );
 
   /////////////////////////////////

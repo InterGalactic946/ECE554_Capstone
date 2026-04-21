@@ -17,7 +17,11 @@ module event_capture #(
     output logic [3:0]                   threshold_valid,
     output logic [TSW-1:0]               hit_time [4],
     output logic                         event_done,
-    output logic                         begin_capture
+    output logic                         begin_capture,
+    output logic [15:0]                  sta_mean [4],
+    output logic [15:0]                  lta_mean [4],
+    output logic                         sta_valid [4],
+    output logic                         lta_valid [4]
 );
 
 
@@ -72,7 +76,11 @@ module event_capture #(
         .rst_n(rst_n),
         .data_in(abs_sample),
         .data_valid(sample_valid),
-        .detection_out(above_threshold)
+        .detection_out(above_threshold),
+        .sta_mean(sta_mean),
+        .lta_mean(lta_mean),
+        .sta_valid(sta_valid),
+        .lta_valid(lta_valid)
     );
 
     // assign above_threshold[0] = (abs_sample[0] >= THRESHOLD);
