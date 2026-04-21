@@ -211,11 +211,6 @@ wire               vid_v_sync ;
 wire               vid_h_sync ;
 wire               vid_datavalid;
 
-wire [9:0] ps_to_pl_data;
-wire [9:0] pl_to_ps_data;
-wire [15:0] data_from_pl;
-wire ready_for_data, data_valid;
-
 //=======================================================
 //  Structural coding
 //=======================================================      
@@ -244,25 +239,6 @@ vga_pll  vga_pll_inst(
 		   .rst(1'b0),      //   reset.reset
 		   .outclk_0(clk_65), // outclk0.clk
 		   .locked()    //  locked.export
-);
-
-pl_to_ps pl_to_ps_inst (
-    .clk(CLOCK_50),
-    .rst_n(~rst),
-    .data_from_ps(ps_to_pl_data),
-    .input_data(SW[7] ? data_from_pl : (SW[9] ? (SW[8] ? conv2_pcm_neg : conv2_pcm_pos) : (SW[8] ? conv1_pcm_neg : conv1_pcm_pos))),
-    .input_data_valid(SW[7] ? data_valid : (SW[9] ? (SW[8] ? conv2_pcm_valid_neg : conv2_pcm_valid_pos) : (SW[8] ? conv1_pcm_valid_neg : conv2_pcm_valid_pos))),
-    .data_to_ps(pl_to_ps_data),
-    .ready_for_data(ready_for_data),
-    .ps_ready_for_data(ps_ready_for_data)
-);
-
-mock_data mock_data_inst (
-    .clk(CLOCK_50),
-    .rst_n(~rst),
-    .ready_for_data(ps_ready_for_data && ready_for_data && (SW[9] ? (SW[8] ? conv2_pcm_valid_neg : conv2_pcm_valid_pos) : (SW[8] ? conv1_pcm_valid_neg : conv2_pcm_valid_pos)))), 
-    .data_out(data_from_pl),
-    .data_valid(data_valid),
 );
 
 //////////////////
@@ -353,6 +329,29 @@ mock_data mock_data_inst (
 
   // We don't care about the remaining GPIO pins.
   assign GPIO_0[35:3] = {33{1'bz}};
+
+  wire [9:0] ps_to_pl_data;
+  wire [9:0] pl_to_ps_data;
+  wire [15:0] data_from_pl;
+  wire ready_for_data, data_valid;
+
+  pl_to_ps pl_to_ps_inst (
+    .clk(clk_i),
+    .rst_n(~rst_i),
+    .data_from_ps(ps_to_pl_data),
+    .input_data(SW[7] ? data_from_pl : (SW[9] ? (SW[8] ? conv2_pcm_neg : conv2_pcm_pos) : (SW[8] ? conv1_pcm_neg : conv1_pcm_pos))),
+    .input_data_valid(SW[7] ? data_valid : (SW[9] ? (SW[8] ? conv2_pcm_valid_neg : conv2_pcm_valid_pos) : (SW[8] ? conv1_pcm_valid_neg : conv2_pcm_valid_pos))),
+    .data_to_ps(pl_to_ps_data),
+    .ready_for_data(ready_for_data),
+    .ps_ready_for_data(ps_ready_for_data)
+);
+
+mock_data mock_data_inst (
+    .clk(clk_i),
+    .rst_n(~rst_i),
+    .data_out(data_from_pl),
+    .data_valid(data_valid),
+);
 
   //////////////////////////
   // Submodule instances //
