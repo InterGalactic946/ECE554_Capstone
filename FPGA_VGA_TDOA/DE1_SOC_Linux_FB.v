@@ -256,23 +256,10 @@ vga_pll  vga_pll_inst(
   wire mic_data_val;
   wire [1:0] curr_mode;
   wire [2:0] freq_sel;
+  wire ps_ready_for_data;
 
   assign LEDR[0] = rst_i;  // Show reset state on LEDR[0]
   assign LEDR[1] = ps_ready_for_data;
-
-  reg ps_data_rdy_int, ps_data_rdy_stable;
-  wire ps_ready_for_data;
-  assign ps_ready_for_data = ps_data_rdy_stable;  // Using bit 0 as the trigger
-
-  always @(posedge CLOCK_50) begin
-    if (rst_i) begin
-      ps_data_rdy_int <= 1'b0;
-      ps_data_rdy_stable <= 1'b0;
-    end else begin
-      ps_data_rdy_int <= data_cntrl[0];
-      ps_data_rdy_stable <= ps_data_rdy_int;
-    end
-  end
 
   /////////////////////////////////////////////////
   // Declare PCM converter interface signals    //

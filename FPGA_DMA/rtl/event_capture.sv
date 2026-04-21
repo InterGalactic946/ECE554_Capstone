@@ -71,7 +71,7 @@ module event_capture #(
         .LTA_LEN(LTA_LEN),
         .THRESHOLD(THRESHOLD)
     )
-    wavefront_det [1:NUM_MICS] (
+    wavefront_det [NUM_MICS-1:0] (
         .clk(clk),
         .rst_n(rst_n),
         .data_in(abs_sample),
