@@ -201,7 +201,7 @@ module DE1_SOC_Linux_FB(
 //  REG/WIRE declarations
 //=======================================================
 // internal wires and registers declaration
-wire  [1:0]  fpga_debounced_buttons;
+wire  [3:0]  fpga_debounced_buttons;
 wire  [3:0]  fpga_led_internal;
 wire         hps_fpga_reset_n;
  
