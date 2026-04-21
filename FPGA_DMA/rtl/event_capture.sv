@@ -71,7 +71,7 @@ module event_capture #(
         .clk(clk),
         .rst_n(rst_n),
         .data_in(abs_sample),
-        .data_valid(frame_sample_valid),
+        .data_valid(sample_valid),
         .detection_out(above_threshold)
     );
 
