@@ -10,10 +10,10 @@ module tdoa(
     output logic quadrant_valid,
     output logic [2:0] quadrant_code,
     output logic collect_sample,
-    output logic [TSW-1:0] hit_time1,
-    output logic [TSW-1:0] hit_time2,
-    output logic [TSW-1:0] hit_time3,
-    output logic [TSW-1:0] hit_time4,
+    output logic [15:0] hit_time1,
+    output logic [15:0] hit_time2,
+    output logic [15:0] hit_time3,
+    output logic [15:0] hit_time4,
     output logic [3:0]    threshold_valid,
     output logic event_done,
     output logic [15:0] sta_mean_1,
@@ -78,8 +78,7 @@ module tdoa(
     assign lta_valid_3 = lta_valid[2];
     assign lta_valid_4 = lta_valid[3];
 
-    mic_frame_sync
-    #(
+    mic_frame_sync #(
         .M(4),
         .DW(DW)
     ) u_sync (
@@ -92,8 +91,7 @@ module tdoa(
         .collect_sample(collect_sample)
     );
 
-    sample_time_gen
-    #(
+    sample_time_gen #(
         .TSW(TSW)
     )
      u_time (
@@ -104,8 +102,7 @@ module tdoa(
         .sample_time(sample_time)
     );
 
-    event_capture 
-    # (
+    event_capture # (
         .DW(DW),
         .TSW(TSW),
         .STA_LEN(16),
