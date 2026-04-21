@@ -86,22 +86,22 @@ module DE1_SOC_Linux_FB(
  
 
       ///////// HEX0 /////////
-      output   reg   [6:0]  HEX0,
+      output      [6:0]  HEX0,
 
       ///////// HEX1 /////////
-      output   reg   [6:0]  HEX1,
+      output      [6:0]  HEX1,
 
       ///////// HEX2 /////////
-      output   reg   [6:0]  HEX2,
+      output      [6:0]  HEX2,
 
       ///////// HEX3 /////////
-      output   reg   [6:0]  HEX3,
+      output      [6:0]  HEX3,
 
       ///////// HEX4 /////////
-      output   reg  [6:0]  HEX4,
+      output     [6:0]  HEX4,
 
       ///////// HEX5 /////////
-      output   reg   [6:0]  HEX5,
+      output      [6:0]  HEX5,
 
 `ifdef ENABLE_HPS
       ///////// HPS /////////
@@ -630,6 +630,12 @@ mock_data mock_data_inst (
       hex4_data = {3'b0, threshold_valid[3]};
       hex5_data = 4'd4;
     end else begin
+      hex0_data = 0;
+      hex1_data = 0;
+      hex2_data = 0;
+      hex3_data = 0;
+      hex4_data = 0;
+      hex5_data = 0;
       // Default to showing PCM sample and stream/mode info.
       next_page = 1'b1;
     end
