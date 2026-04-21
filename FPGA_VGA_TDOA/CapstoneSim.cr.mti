@@ -1,0 +1,22 @@
+/filespace/d/deapen/ECE554/DE1_SOC_Linux_FB/tests/pl_to_ps_tb.sv {1 {vlog -work work -vopt -sv -stats=none /filespace/d/deapen/ECE554/DE1_SOC_Linux_FB/tests/pl_to_ps_tb.sv
+QuestaSim vlog 2024.3_2 Compiler 2024.11 Nov 25 2024
+-- Compiling module pl_to_ps_tb
+
+Top level modules:
+	pl_to_ps_tb
+
+} {} {}} /filespace/d/deapen/ECE554/DE1_SOC_Linux_FB/rtl/mock_data.sv {1 {vlog -work work -vopt -sv -stats=none /filespace/d/deapen/ECE554/DE1_SOC_Linux_FB/rtl/mock_data.sv
+QuestaSim vlog 2024.3_2 Compiler 2024.11 Nov 25 2024
+-- Compiling module mock_data
+
+Top level modules:
+	mock_data
+
+} {} {}} /filespace/d/deapen/ECE554/DE1_SOC_Linux_FB/tests/onchip_mem_pcm_tb.sv {1 {vlog -work work -vopt -sv -stats=none /filespace/d/deapen/ECE554/DE1_SOC_Linux_FB/tests/onchip_mem_pcm_tb.sv
+QuestaSim vlog 2024.3_2 Compiler 2024.11 Nov 25 2024
+-- Compiling module onchip_mem_pcm_tb
+
+Top level modules:
+	onchip_mem_pcm_tb
+
+} {} {}}
