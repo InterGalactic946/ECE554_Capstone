@@ -228,7 +228,7 @@ debounce debounce_inst (
   .data_in                              (KEY),
   .data_out                             (fpga_debounced_buttons)
 );
- defparam debounce_inst.WIDTH = 2;
+ defparam debounce_inst.WIDTH = 4;
  defparam debounce_inst.POLARITY = "LOW";
  defparam debounce_inst.TIMEOUT = 50000;        // at 50Mhz this is a debounce time of 1ms
  defparam debounce_inst.TIMEOUT_WIDTH = 16;     // ceil(log2(TIMEOUT))
@@ -500,7 +500,7 @@ mock_data mock_data_inst (
 
   // Instantiate the PCM display FIFO.
   FIFO iPCM_DISPLAY_FIFO (
-      .clock(clk_i),
+      .clock(clk_i), 
       .data (fifo_data),
       .rdreq(fifo_rdreq),
       .sclr (rst_i),
@@ -561,20 +561,20 @@ mock_data mock_data_inst (
   reg [3:0] hex0_data, hex1_data, hex2_data, hex3_data, hex4_data, hex5_data;
   reg [2:0] page_sel;
   reg next_page;
-  reg prev_button_3;
+  reg prev_button_1;
 
   always @(posedge clk_i) begin
     if (rst_i) begin
-      prev_button_3 <= 1'b1;
+      prev_button_1 <= 1'b1;
     end else begin
-      prev_button_3 <= fpga_debounced_buttons[3];
+      prev_button_1 <= fpga_debounced_buttons[1];
     end
   end
 
   always @(posedge clk_i) begin
     if (rst_i) begin
       page_sel <= 3'b000;
-    end else if ((~fpga_debounced_buttons[3] && prev_button_3) || next_page) begin
+    end else if ((~fpga_debounced_buttons[1] && prev_button_1) || next_page) begin
       page_sel <= page_sel + 1'b1;
     end
   end
