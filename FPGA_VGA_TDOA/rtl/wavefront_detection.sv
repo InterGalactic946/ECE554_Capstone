@@ -20,6 +20,7 @@ module wavefront_detection #(
 
   logic detection_out_internal;
   logic above_mic_threshold;
+  logic [15:0] prev_data_in;
 
   window_mean #(
       .WINDOW_SIZE(STA_LEN)
@@ -53,7 +54,15 @@ module wavefront_detection #(
     end
   end
 
-  assign above_mic_threshold = data_in >= MIC_THRESHOLD;
+  always_ff @(posedge clk, negedge rst_n) begin
+    if (!rst_n) begin
+      prev_data_in <= 0;
+    end else if (data_valid) begin
+      prev_data_in <= data_in;
+    end
+  end
+
+  assign above_mic_threshold = prev_data_in >= MIC_THRESHOLD;
   assign detection_out = above_mic_threshold & detection_out_internal;
 
 endmodule
