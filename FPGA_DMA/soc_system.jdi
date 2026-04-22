@@ -1,11 +1,11 @@
 <sld_project_info>
   <project>
-    <hash md5_digest_80b="43f99219d1ca3ac5d921"/>
+    <hash md5_digest_80b="d1886511d41b3daa17ba"/>
   </project>
   <file_info>
-    <file device="5CSEMA5F31C6" path="soc_system.sof" usercode="0xFFFFFFFF"/>
+    <file device="5CSEMA5F31C6" path="soc_system_time_limited.sof" usercode="0xFFFFFFFF"/>
   </file_info>
-  <hub_info hub_ir_width="4" ir_width="4" node_addr_width="1" node_count="1"/>
+  <hub_info hub_ir_width="5" ir_width="4" node_addr_width="2" node_count="2"/>
   <node_info>
     <node hpath="hps_reset:hps_reset_inst|altsource_probe:altsource_probe_component" instance_id="0" mfg_id="110" node_id="9" sld_node_info="0x486E00" version="0">
       <parameters>
@@ -52,11 +52,72 @@
         <port name="jtag.bp.hps_reset_inst_altsource_probe_component_tdo"/>
       </outputs>
     </node>
+    <node hpath="pzdyqx:nabboc" instance_id="0" mfg_id="110" node_id="1" sld_node_info="0x86E00" version="0"/>
   </node_info>
   <sld_infos>
+    <sld_info hpath="Audio_Front_End:iAUD_FRONT|ADC_Controller:iADC_CTRL" name="iADC_CTRL">
+      <assignment_values>
+        <assignment_value text="QSYS_NAME ADC_Controller HAS_SOPCINFO 1 GENERATION_ID 1776815981"/>
+      </assignment_values>
+      <parameters/>
+    </sld_info>
+    <sld_info hpath="Pdm_To_Pcm:iCONV_1|Cic_Decimator_192:iPOS_MIC_192" name="iPOS_MIC_192">
+      <assignment_values>
+        <assignment_value text="QSYS_NAME Cic_Decimator_192 HAS_SOPCINFO 1 GENERATION_ID 1776815968"/>
+      </assignment_values>
+      <parameters/>
+    </sld_info>
+    <sld_info hpath="Pdm_To_Pcm:iCONV_1|Cic_Decimator_192:iNEG_MIC_192" name="iNEG_MIC_192">
+      <assignment_values>
+        <assignment_value text="QSYS_NAME Cic_Decimator_192 HAS_SOPCINFO 1 GENERATION_ID 1776815968"/>
+      </assignment_values>
+      <parameters/>
+    </sld_info>
+    <sld_info hpath="Pdm_To_Pcm:iCONV_2|Cic_Decimator_192:iPOS_MIC_192" name="iPOS_MIC_192">
+      <assignment_values>
+        <assignment_value text="QSYS_NAME Cic_Decimator_192 HAS_SOPCINFO 1 GENERATION_ID 1776815968"/>
+      </assignment_values>
+      <parameters/>
+    </sld_info>
+    <sld_info hpath="Pdm_To_Pcm:iCONV_2|Cic_Decimator_192:iNEG_MIC_192" name="iNEG_MIC_192">
+      <assignment_values>
+        <assignment_value text="QSYS_NAME Cic_Decimator_192 HAS_SOPCINFO 1 GENERATION_ID 1776815968"/>
+      </assignment_values>
+      <parameters/>
+    </sld_info>
+    <sld_info hpath="Pdm_To_Pcm:iCONV_1|Cic_Decimator_48:iPOS_MIC_48" name="iPOS_MIC_48">
+      <assignment_values>
+        <assignment_value text="QSYS_NAME Cic_Decimator_48 HAS_SOPCINFO 1 GENERATION_ID 1776815974"/>
+      </assignment_values>
+      <parameters/>
+    </sld_info>
+    <sld_info hpath="Pdm_To_Pcm:iCONV_1|Cic_Decimator_48:iNEG_MIC_48" name="iNEG_MIC_48">
+      <assignment_values>
+        <assignment_value text="QSYS_NAME Cic_Decimator_48 HAS_SOPCINFO 1 GENERATION_ID 1776815974"/>
+      </assignment_values>
+      <parameters/>
+    </sld_info>
+    <sld_info hpath="Pdm_To_Pcm:iCONV_2|Cic_Decimator_48:iPOS_MIC_48" name="iPOS_MIC_48">
+      <assignment_values>
+        <assignment_value text="QSYS_NAME Cic_Decimator_48 HAS_SOPCINFO 1 GENERATION_ID 1776815974"/>
+      </assignment_values>
+      <parameters/>
+    </sld_info>
+    <sld_info hpath="Pdm_To_Pcm:iCONV_2|Cic_Decimator_48:iNEG_MIC_48" name="iNEG_MIC_48">
+      <assignment_values>
+        <assignment_value text="QSYS_NAME Cic_Decimator_48 HAS_SOPCINFO 1 GENERATION_ID 1776815974"/>
+      </assignment_values>
+      <parameters/>
+    </sld_info>
+    <sld_info hpath="Audio_Front_End:iAUD_FRONT|Mic_Clk_Gen:iCLK_GEN|Mic_Clk_Ctrl:iCLK_CTRL" name="iCLK_CTRL">
+      <assignment_values>
+        <assignment_value text="QSYS_NAME Mic_Clk_Ctrl HAS_SOPCINFO 1 GENERATION_ID 1776815962"/>
+      </assignment_values>
+      <parameters/>
+    </sld_info>
     <sld_info hpath="soc_system:u0" name="u0">
       <assignment_values>
-        <assignment_value text="QSYS_NAME soc_system HAS_SOPCINFO 1 GENERATION_ID 1776297678"/>
+        <assignment_value text="QSYS_NAME soc_system HAS_SOPCINFO 1 GENERATION_ID 1776815890"/>
       </assignment_values>
       <parameters/>
     </sld_info>
