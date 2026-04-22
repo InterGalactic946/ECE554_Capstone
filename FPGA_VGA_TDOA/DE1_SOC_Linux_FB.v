@@ -326,8 +326,8 @@ vga_pll  vga_pll_inst(
     .clk(clk_i),
     .rst_n(~rst_i),
     .data_from_ps(ps_to_pl_data),
-    .input_data(SW[7] ? data_from_pl : (SW[9] ? (SW[8] ? conv2_pcm_neg : conv2_pcm_pos) : (SW[8] ? conv1_pcm_neg : conv1_pcm_pos))),
-    .input_data_valid(SW[7] ? data_valid : (SW[9] ? (SW[8] ? conv2_pcm_valid_neg : conv2_pcm_valid_pos) : (SW[8] ? conv1_pcm_valid_neg : conv2_pcm_valid_pos))),
+    .input_data(quadrant_code),
+    .input_data_valid(quadrant_valid),
     .data_to_ps(pl_to_ps_data),
     .ready_for_data(ready_for_data),
     .ps_ready_for_data(ps_ready_for_data)
