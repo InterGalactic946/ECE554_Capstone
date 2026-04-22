@@ -70,7 +70,7 @@ module event_capture #(
     assign abs_sample[3] = abs_s(frame_sample[3]);
 
     wavefront_detection # (
-        .MIC_THRESHOLD(MIC_THRESHOLD_1)
+        .MIC_THRESHOLD(MIC_THRESHOLD_1),
         .STA_LEN(STA_LEN),
         .LTA_LEN(LTA_LEN),
         .THRESHOLD(THRESHOLD)
