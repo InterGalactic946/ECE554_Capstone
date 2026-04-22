@@ -93,8 +93,7 @@ module tdoa(
 
     sample_time_gen #(
         .TSW(TSW)
-    )
-     u_time (
+    ) u_time (
         .clk(clk),
         .rst_n(rst_n),
         .sample_tick(frame_sample_valid), // Increment time on each valid sample from frame sync
@@ -108,8 +107,7 @@ module tdoa(
         .STA_LEN(16),
         .LTA_LEN(1024),
         .THRESHOLD(4)
-    )
-    u_event (
+    ) u_event (
         .clk(clk),
         .rst_n(rst_n),
         .sample_valid(frame_sample_valid),
@@ -123,7 +121,6 @@ module tdoa(
         .lta_mean(lta_mean),
         .sta_valid(sta_valid),
         .lta_valid(lta_valid)
-
     );
 
     quadrant_classifier #(
