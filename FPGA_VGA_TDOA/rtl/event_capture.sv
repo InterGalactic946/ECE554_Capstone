@@ -26,7 +26,7 @@ module event_capture #(
 
     // Set the minimum wavefront detection thresholds for each of the individual microphones
     localparam int MIC_THRESHOLD_1 = 16'd800;
-    localparam int MIC_THRESHOLD_2 = 16'd800;
+    localparam int MIC_THRESHOLD_2 = 16'd500;
     localparam int MIC_THRESHOLD_3 = 16'd5000;
     localparam int MIC_THRESHOLD_4 = 16'd500;
 
