@@ -71,6 +71,9 @@ module event_capture #(
 
     wavefront_detection # (
         .MIC_THRESHOLD(MIC_THRESHOLD_1)
+        .STA_LEN(STA_LEN),
+        .LTA_LEN(LTA_LEN),
+        .THRESHOLD(THRESHOLD)
     ) det0 (
         .clk(clk),
         .rst_n(rst_n),
@@ -84,7 +87,10 @@ module event_capture #(
     );
 
     wavefront_detection # (
-        .MIC_THRESHOLD(MIC_THRESHOLD_2)
+        .MIC_THRESHOLD(MIC_THRESHOLD_2),
+        .STA_LEN(STA_LEN),
+        .LTA_LEN(LTA_LEN),
+        .THRESHOLD(THRESHOLD)
     ) det1 (
         .clk(clk),
         .rst_n(rst_n),
@@ -98,7 +104,10 @@ module event_capture #(
     );
 
     wavefront_detection # (
-        .MIC_THRESHOLD(MIC_THRESHOLD_3)
+        .MIC_THRESHOLD(MIC_THRESHOLD_3),
+        .STA_LEN(STA_LEN),
+        .LTA_LEN(LTA_LEN),
+        .THRESHOLD(THRESHOLD)
     ) det2 (
         .clk(clk),
         .rst_n(rst_n),
@@ -112,7 +121,10 @@ module event_capture #(
     );
 
     wavefront_detection # (
-        .MIC_THRESHOLD(MIC_THRESHOLD_4)
+        .MIC_THRESHOLD(MIC_THRESHOLD_4),
+        .STA_LEN(STA_LEN),
+        .LTA_LEN(LTA_LEN),
+        .THRESHOLD(THRESHOLD)
     ) det3 (
         .clk(clk),
         .rst_n(rst_n),

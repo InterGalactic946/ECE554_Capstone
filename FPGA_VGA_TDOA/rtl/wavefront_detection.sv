@@ -1,6 +1,6 @@
 module wavefront_detection #(
-    parameter int unsigned STA_LEN = 32,    // Short term average length (power of 2 between 8 and 2048)
-    parameter int unsigned LTA_LEN = 512,   // Long term average length (power of 2 between 8 and 2048)
+    parameter int unsigned STA_LEN = 16,    // Short term average length (power of 2 between 8 and 2048)
+    parameter int unsigned LTA_LEN = 1024,   // Long term average length (power of 2 between 8 and 2048)
     parameter int unsigned THRESHOLD = 4,    // How many times the STA must exceed the LTA to trigger a detection
     parameter int MIC_THRESHOLD = 16'd1000  // Minimum absolute sample value to consider for detection
 ) (

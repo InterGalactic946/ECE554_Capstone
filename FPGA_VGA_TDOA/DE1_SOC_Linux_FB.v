@@ -691,7 +691,7 @@ mock_data mock_data_inst (
 
 soc_system u0 (
         .clk_clk                               ( CLOCK_50),                          	 //             clk.clk
-        .reset_reset_n                         ( hps_fpga_reset_n),                      //           reset.reset_n
+        .reset_reset_n                         ( hps_fpga_reset_n & ~rst_i),                      //           reset.reset_n
         .memory_mem_a                          ( HPS_DDR3_ADDR),                          //          memory.mem_a
         .memory_mem_ba                         ( HPS_DDR3_BA),                         //                .mem_ba
         .memory_mem_ck                         ( HPS_DDR3_CK_P),                         //                .mem_ck
