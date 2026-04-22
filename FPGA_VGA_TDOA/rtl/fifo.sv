@@ -39,7 +39,7 @@ end
 always_ff @(posedge clk or negedge rst_n) begin
   if (!rst_n)
     wr_ptr <= '0;
-  else if (wren && !full)
+  else if (wren && (!full || rden)) // Simultaneous read/write when FIFO is full
     wr_ptr <= wr_ptr + 1;
 end
 

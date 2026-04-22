@@ -58,30 +58,73 @@ module event_capture #(
     logic [3:0]    already_hit;
     logic [3:0]    new_hits;
     logic          any_above;
-    logic          begin_capture_ff;
 
     assign abs_sample[0] = abs_s(frame_sample[0]);
     assign abs_sample[1] = abs_s(frame_sample[1]);
     assign abs_sample[2] = abs_s(frame_sample[2]);
     assign abs_sample[3] = abs_s(frame_sample[3]);
 
-    wavefront_detection 
-    # (
-        .STA_LEN(STA_LEN),
-        .LTA_LEN(LTA_LEN),
-        .THRESHOLD(THRESHOLD)
-    )
-    wavefront_det [1:NUM_MICS] (
+    wavefront_detection det0 (
         .clk(clk),
         .rst_n(rst_n),
-        .data_in(abs_sample),
+        .data_in(abs_sample[0]),
         .data_valid(sample_valid),
-        .detection_out(above_threshold),
-        .sta_mean(sta_mean),
-        .lta_mean(lta_mean),
-        .sta_valid(sta_valid),
-        .lta_valid(lta_valid)
+        .detection_out(above_threshold[0]),
+        .sta_mean(sta_mean[0]),
+        .lta_mean(lta_mean[0]),
+        .sta_valid(sta_valid[0]),
+        .lta_valid(lta_valid[0])
     );
+
+    wavefront_detection det1 (
+        .clk(clk),
+        .rst_n(rst_n),
+        .data_in(abs_sample[1]),
+        .data_valid(sample_valid),
+        .detection_out(above_threshold[1]),
+        .sta_mean(sta_mean[1]),
+        .lta_mean(lta_mean[1]),
+        .sta_valid(sta_valid[1]),
+        .lta_valid(lta_valid[1])
+    );
+
+    wavefront_detection det2 (
+        .clk(clk),
+        .rst_n(rst_n),
+        .data_in(abs_sample[2]),
+        .data_valid(sample_valid),
+        .detection_out(above_threshold[2]),
+        .sta_mean(sta_mean[2]),
+        .lta_mean(lta_mean[2]),
+        .sta_valid(sta_valid[2]),
+        .lta_valid(lta_valid[2])
+    );
+
+    wavefront_detection det3 (
+        .clk(clk),
+        .rst_n(rst_n),
+        .data_in(abs_sample[3]),
+        .data_valid(sample_valid),
+        .detection_out(above_threshold[3]),
+        .sta_mean(sta_mean[3]),
+        .lta_mean(lta_mean[3]),
+        .sta_valid(sta_valid[3]),
+        .lta_valid(lta_valid[3])
+    );
+
+    logic det_pipe_valid;
+    logic detect_valid;
+
+    // If logic breaks, check this logic first
+    // This assumes that all microphone lines and their means are synchoronized
+    assign det_pipe_valid = sta_valid[0] & lta_valid[0];
+
+    always_ff @(posedge clk, negedge rst_n) begin
+        if (!rst_n)
+            detect_valid <= 1'b0;
+        else
+            detect_valid <= det_pipe_valid;
+    end
 
     // assign above_threshold[0] = (abs_sample[0] >= THRESHOLD);
     // assign above_threshold[1] = (abs_sample[1] >= THRESHOLD);
@@ -138,7 +181,7 @@ module event_capture #(
     genvar g_time;
     generate
         for (g_time = 0; g_time < 4; g_time++) begin : GEN_HIT_TIME_CAPTURE
-            always_ff @(posedge clk or negedge rst_n) begin
+            always_ff @(posedge clk, negedge rst_n) begin
                 if (!rst_n)
                     hit_time[g_time] <= '0;
                 else if (begin_capture) begin
@@ -166,14 +209,14 @@ module event_capture #(
 
         case (state)
             IDLE : begin
-                if (sample_valid && any_above) begin
+                if (any_above && detect_valid) begin
                     begin_capture = 1'b1;
                     nxt_state = CAPTURE;
                 end
             end
 
             CAPTURE : begin
-                if (sample_valid) begin // Synchronize to sample clock, so gate this logic
+                if (detect_valid) begin
                     capturing = 1'b1;
 
                     if (|new_hits)
