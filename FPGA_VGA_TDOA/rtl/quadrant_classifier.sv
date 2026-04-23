@@ -19,8 +19,8 @@ module quadrant_classifier #(
     localparam logic [2:0] Q_SW      = 3'd3;
     localparam logic [2:0] Q_SE      = 3'd4;
 
-    logic [TSW:0] east_sum, west_sum, north_sum, south_sum;
-    logic         east_earlier, west_earlier, north_earlier, south_earlier;
+    // logic [TSW:0] east_sum, west_sum, north_sum, south_sum;
+    // logic         east_earlier, west_earlier, north_earlier, south_earlier;
 
     logic [1:0]     earliest_mic;
     logic [TSW-1:0] earliest_time;
@@ -29,15 +29,15 @@ module quadrant_classifier #(
     logic [2:0]     classify_code;
 
     // Adders for the border sums
-    assign east_sum  = {1'b0, hit_time[0]} + {1'b0, hit_time[3]}; // SE + NE
-    assign west_sum  = {1'b0, hit_time[1]} + {1'b0, hit_time[2]}; // SW + NW
-    assign north_sum = {1'b0, hit_time[2]} + {1'b0, hit_time[3]}; // NW + NE
-    assign south_sum = {1'b0, hit_time[0]} + {1'b0, hit_time[1]}; // SE + SW
+    // assign east_sum  = {1'b0, hit_time[0]} + {1'b0, hit_time[3]}; // SE + NE
+    // assign west_sum  = {1'b0, hit_time[1]} + {1'b0, hit_time[2]}; // SW + NW
+    // assign north_sum = {1'b0, hit_time[2]} + {1'b0, hit_time[3]}; // NW + NE
+    // assign south_sum = {1'b0, hit_time[0]} + {1'b0, hit_time[1]}; // SE + SW
 
-    assign east_earlier = (east_sum < west_sum);
-    assign west_earlier = (west_sum < east_sum);
-    assign north_earlier = (north_sum < south_sum);
-    assign south_earlier = (south_sum < north_sum);
+    // assign east_earlier = (east_sum < west_sum);
+    // assign west_earlier = (west_sum < east_sum);
+    // assign north_earlier = (north_sum < south_sum);
+    // assign south_earlier = (south_sum < north_sum);
 
     // Checks what is the "earliest microphone" for the fallback option if not all hits are valid
     always_comb begin
@@ -87,7 +87,7 @@ module quadrant_classifier #(
 
         // event_done guarantees the event is finished,
         // so solver always attempts classification then.
-        if (threshold_valid == 4'b1111) begin
+       /* if (threshold_valid == 4'b1111) begin
             if (east_earlier && north_earlier)
                 classify_code = Q_NE;
             else if (west_earlier && north_earlier)
@@ -106,7 +106,8 @@ module quadrant_classifier #(
                 endcase
             end
             classify_valid = 1'b1;
-        end else if (|threshold_valid) begin
+        end else */
+        if (|threshold_valid) begin
             case (earliest_mic)
                 2'd0: classify_code = Q_SE;
                 2'd1: classify_code = Q_SW;
