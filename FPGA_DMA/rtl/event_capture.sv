@@ -24,6 +24,11 @@ module event_capture #(
     output logic                         lta_valid [4]
 );
 
+    // Set the minimum wavefront detection thresholds for each of the individual microphones
+    localparam int MIC_THRESHOLD_1 = 16'd3000;
+    localparam int MIC_THRESHOLD_2 = 16'd2000;
+    localparam int MIC_THRESHOLD_3 = 16'd5000;
+    localparam int MIC_THRESHOLD_4 = 16'd3000;
 
     //////////////////////////////////////////////////
     // Helper
@@ -64,7 +69,12 @@ module event_capture #(
     assign abs_sample[2] = abs_s(frame_sample[2]);
     assign abs_sample[3] = abs_s(frame_sample[3]);
 
-    wavefront_detection det0 (
+    wavefront_detection # (
+        .MIC_THRESHOLD(MIC_THRESHOLD_1),
+        .STA_LEN(STA_LEN),
+        .LTA_LEN(LTA_LEN),
+        .THRESHOLD(THRESHOLD)
+    ) det0 (
         .clk(clk),
         .rst_n(rst_n),
         .data_in(abs_sample[0]),
@@ -76,7 +86,12 @@ module event_capture #(
         .lta_valid(lta_valid[0])
     );
 
-    wavefront_detection det1 (
+    wavefront_detection # (
+        .MIC_THRESHOLD(MIC_THRESHOLD_2),
+        .STA_LEN(STA_LEN),
+        .LTA_LEN(LTA_LEN),
+        .THRESHOLD(THRESHOLD)
+    ) det1 (
         .clk(clk),
         .rst_n(rst_n),
         .data_in(abs_sample[1]),
@@ -88,7 +103,12 @@ module event_capture #(
         .lta_valid(lta_valid[1])
     );
 
-    wavefront_detection det2 (
+    wavefront_detection # (
+        .MIC_THRESHOLD(MIC_THRESHOLD_3),
+        .STA_LEN(STA_LEN),
+        .LTA_LEN(LTA_LEN),
+        .THRESHOLD(THRESHOLD)
+    ) det2 (
         .clk(clk),
         .rst_n(rst_n),
         .data_in(abs_sample[2]),
@@ -100,7 +120,12 @@ module event_capture #(
         .lta_valid(lta_valid[2])
     );
 
-    wavefront_detection det3 (
+    wavefront_detection # (
+        .MIC_THRESHOLD(MIC_THRESHOLD_4),
+        .STA_LEN(STA_LEN),
+        .LTA_LEN(LTA_LEN),
+        .THRESHOLD(THRESHOLD)
+    ) det3 (
         .clk(clk),
         .rst_n(rst_n),
         .data_in(abs_sample[3]),
@@ -125,11 +150,6 @@ module event_capture #(
         else
             detect_valid <= det_pipe_valid;
     end
-
-    // assign above_threshold[0] = (abs_sample[0] >= THRESHOLD);
-    // assign above_threshold[1] = (abs_sample[1] >= THRESHOLD);
-    // assign above_threshold[2] = (abs_sample[2] >= THRESHOLD);
-    // assign above_threshold[3] = (abs_sample[3] >= THRESHOLD);
 
     assign any_above = |above_threshold;
 

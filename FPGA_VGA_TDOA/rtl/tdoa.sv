@@ -104,9 +104,9 @@ module tdoa(
     event_capture # (
         .DW(DW),
         .TSW(TSW),
-        .STA_LEN(32),
-        .LTA_LEN(1024),
-        .THRESHOLD(4)
+        .STA_LEN(8),
+        .LTA_LEN(512),
+        .THRESHOLD(16)
     ) u_event (
         .clk(clk),
         .rst_n(rst_n),
