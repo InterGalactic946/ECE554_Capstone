@@ -24,245 +24,115 @@ module event_capture #(
     output logic                         lta_valid [4]
 );
 
-    // Set the minimum wavefront detection thresholds for each of the individual microphones
-    localparam int MIC_THRESHOLD_1 = 16'd3000;
-    localparam int MIC_THRESHOLD_2 = 16'd2000;
-    localparam int MIC_THRESHOLD_3 = 16'd5000;
-    localparam int MIC_THRESHOLD_4 = 16'd3000;
+    logic [3:0] det_out;
+    localparam int MIC_THRESHOLD [4] = '{16'd3000, 16'd3000, 16'd3000, 16'd3000};
 
-    //////////////////////////////////////////////////
-    // Helper
-    //////////////////////////////////////////////////
-    function automatic logic [DW-1:0] abs_s(input logic signed [DW-1:0] v);
-        begin
-            if (v < 0)
-                abs_s = -v;
-            else
-                abs_s = v;
-        end
-    endfunction
-
-    typedef enum logic {
-        IDLE    = 1'b0, // Waiting for mic threshold crossing
-        CAPTURE = 1'b1  // Capture the time 
-    } state_t;
-
-    state_t state, nxt_state;
-
-    // localparam int CAPW = (CAPTURE_WINDOW > 1) ? $clog2(CAPTURE_WINDOW) : 1;
-
-    logic capturing;
-    logic pulse_event_done;
-    logic latch_new_hits;
-
-    //////////////////////////////////////////////////
-    // Per-channel threshold checks
-    //////////////////////////////////////////////////
-    logic [DW-1:0] abs_sample [4];
-    logic [3:0]    prev_above_threshold;
-    logic [3:0]    above_threshold;
-    logic [3:0]    above_threshold_rise;
-    logic [3:0]    already_hit;
-    logic [3:0]    new_hits;
-    logic          any_above;
-
-    assign abs_sample[0] = abs_s(frame_sample[0]);
-    assign abs_sample[1] = abs_s(frame_sample[1]);
-    assign abs_sample[2] = abs_s(frame_sample[2]);
-    assign abs_sample[3] = abs_s(frame_sample[3]);
-
-    wavefront_detection # (
-        .MIC_THRESHOLD(MIC_THRESHOLD_1),
-        .STA_LEN(STA_LEN),
-        .LTA_LEN(LTA_LEN),
-        .THRESHOLD(THRESHOLD)
-    ) det0 (
-        .clk(clk),
-        .rst_n(rst_n),
-        .data_in(abs_sample[0]),
-        .data_valid(sample_valid),
-        .detection_out(above_threshold[0]),
-        .sta_mean(sta_mean[0]),
-        .lta_mean(lta_mean[0]),
-        .sta_valid(sta_valid[0]),
-        .lta_valid(lta_valid[0])
-    );
-
-    wavefront_detection # (
-        .MIC_THRESHOLD(MIC_THRESHOLD_2),
-        .STA_LEN(STA_LEN),
-        .LTA_LEN(LTA_LEN),
-        .THRESHOLD(THRESHOLD)
-    ) det1 (
-        .clk(clk),
-        .rst_n(rst_n),
-        .data_in(abs_sample[1]),
-        .data_valid(sample_valid),
-        .detection_out(above_threshold[1]),
-        .sta_mean(sta_mean[1]),
-        .lta_mean(lta_mean[1]),
-        .sta_valid(sta_valid[1]),
-        .lta_valid(lta_valid[1])
-    );
-
-    wavefront_detection # (
-        .MIC_THRESHOLD(MIC_THRESHOLD_3),
-        .STA_LEN(STA_LEN),
-        .LTA_LEN(LTA_LEN),
-        .THRESHOLD(THRESHOLD)
-    ) det2 (
-        .clk(clk),
-        .rst_n(rst_n),
-        .data_in(abs_sample[2]),
-        .data_valid(sample_valid),
-        .detection_out(above_threshold[2]),
-        .sta_mean(sta_mean[2]),
-        .lta_mean(lta_mean[2]),
-        .sta_valid(sta_valid[2]),
-        .lta_valid(lta_valid[2])
-    );
-
-    wavefront_detection # (
-        .MIC_THRESHOLD(MIC_THRESHOLD_4),
-        .STA_LEN(STA_LEN),
-        .LTA_LEN(LTA_LEN),
-        .THRESHOLD(THRESHOLD)
-    ) det3 (
-        .clk(clk),
-        .rst_n(rst_n),
-        .data_in(abs_sample[3]),
-        .data_valid(sample_valid),
-        .detection_out(above_threshold[3]),
-        .sta_mean(sta_mean[3]),
-        .lta_mean(lta_mean[3]),
-        .sta_valid(sta_valid[3]),
-        .lta_valid(lta_valid[3])
-    );
-
-    always_ff @(posedge clk, negedge rst_n)
-      if (!rst_n) begin
-        prev_above_threshold <= 4'h0;
-      end else begin
-        prev_above_threshold <= above_threshold;
-      end
-
-    assign above_threshold_rise = ~prev_above_threshold & above_threshold;
-
-    // logic det_pipe_valid;
-    // logic detect_valid;
-
-    // If logic breaks, check this logic first
-    // This assumes that all microphone lines and their means are synchoronized
-    // assign det_pipe_valid = sta_valid[0] & lta_valid[0];
-
-    // always_ff @(posedge clk, negedge rst_n) begin
-    //     if (!rst_n)
-    //         detect_valid <= 1'b0;
-    //     else
-    //         detect_valid <= det_pipe_valid;
-    // end
-
-    assign any_above = |above_threshold_rise;
-
-    assign threshold_valid = already_hit;
-
-    // New hits are when we are above the threshold, but haven't already hit it
-    // already_hit goes high for a microphone after its first capture.
-    assign new_hits[3:0] = above_threshold_rise[3:0] & ~already_hit[3:0];
-
-    // Logic for the "capture window" after the first threshold crossing
-    logic capture_done;
-    // logic [CAPW-1:0] capture_cnt;
-
-    // always_ff @(posedge clk, negedge rst_n) begin
-    //     if (!rst_n)
-    //         capture_cnt <= '0;
-    //     else if (begin_capture)
-    //         capture_cnt <= '0;
-    //     else if (capturing)
-    //         capture_cnt <= capture_cnt + 1;
-    // end
-
-    // assign capture_done = (capture_cnt == CAPTURE_WINDOW - 1);
-    assign capture_done = &sample_time; 
-
-    // One cycle delay to event valid to synchronize with capturing of data
-    always_ff @(posedge clk, negedge rst_n) begin
-        if (!rst_n)
-            event_done <= 1'b0;
-        else if (pulse_event_done)
-            event_done <= 1'b1;
-        else 
-            event_done <= 1'b0;
-    end
-
-    // Indicator that we have already captured for a mic threshold
-    always_ff @(posedge clk, negedge rst_n) begin
-        if (!rst_n)
-            already_hit[3:0] <= 4'b0000;
-        else if (begin_capture)
-            already_hit[3:0] <= above_threshold_rise[3:0];
-        else if (latch_new_hits)
-            // When getting a new hit that we want to capture, we 
-            // want to mark that the one that is above the threshold is the one we are hitting
-            already_hit[3:0] <= already_hit[3:0] | above_threshold_rise[3:0];
-    end
-
-    // Capture hit time flops
-    genvar g_time;
+    // Instantiate the 4 detectors
+    genvar i;
     generate
-        for (g_time = 0; g_time < 4; g_time++) begin : GEN_HIT_TIME_CAPTURE
-            always_ff @(posedge clk, negedge rst_n) begin
-                if (!rst_n)
-                    hit_time[g_time] <= '0;
-                else if (begin_capture) begin
-                    hit_time[g_time] <= '0;
-                end else if (latch_new_hits && new_hits[g_time]) begin
-                    hit_time[g_time] <= sample_time;
-                end
-            end
+        for (i = 0; i < 4; i++) begin : GEN_WAVEFRONT
+            wavefront_detection #(
+                .STA_LEN(STA_LEN),
+                .LTA_LEN(LTA_LEN),
+                .THRESHOLD(THRESHOLD),
+                .MIC_THRESHOLD(MIC_THRESHOLD[i])
+            ) det_inst (
+                .clk(clk),
+                .rst_n(rst_n),
+                .data_in(frame_sample[i]),
+                .data_valid(sample_valid),
+                .detection_out(det_out[i]),
+                .sta_mean(sta_mean[i]),
+                .lta_mean(lta_mean[i]),
+                .sta_valid(sta_valid[i]),
+                .lta_valid(lta_valid[i])
+            );
         end
     endgenerate
 
+    assign threshold_valid = det_out;
+
+    // --- State Machine ---
+    typedef enum logic {IDLE, CAPTURE} state_t;
+    state_t state, nxt_state;
+
+    logic [3:0] hit_mask, nxt_hit_mask;
+    logic [15:0] timeout_ctr, nxt_timeout_ctr;
+
     always_ff @(posedge clk, negedge rst_n) begin
-        if (!rst_n)
+        if (!rst_n) begin
             state <= IDLE;
-        else
+            hit_mask <= '0;
+            timeout_ctr <= '0;
+        end else begin
             state <= nxt_state;
+            hit_mask <= nxt_hit_mask;
+            timeout_ctr <= nxt_timeout_ctr;
+        end
     end
 
+    // --- Hit Time Latching Logic ---
+    always_ff @(posedge clk, negedge rst_n) begin
+        if (!rst_n) begin
+            hit_time[0] <= '0; hit_time[1] <= '0; hit_time[2] <= '0; hit_time[3] <= '0;
+        end else begin
+            if (state == IDLE && (|det_out)) begin
+                // The exact cycle the FIRST mic(s) hit. 
+                // We hardcode 0 because the external timer is 1 cycle behind on clearing.
+                for (int j = 0; j < 4; j++) begin
+                    if (det_out[j]) hit_time[j] <= '0;
+                end
+            end else if (state == CAPTURE) begin
+                // For subsequent mics, grab the external timer only on the FIRST cycle they go high
+                for (int j = 0; j < 4; j++) begin
+                    if (det_out[j] && !hit_mask[j]) hit_time[j] <= sample_time;
+                end
+            end
+        end
+    end
+
+    // --- Next State Logic ---
     always_comb begin
         nxt_state = state;
+        nxt_hit_mask = hit_mask;
+        nxt_timeout_ctr = timeout_ctr;
+
         begin_capture = 1'b0;
-        pulse_event_done = 1'b0;
-        latch_new_hits = 1'b0;
+        event_done = 1'b0;
 
         case (state)
-            IDLE : begin
-                if (any_above) begin
-                    begin_capture = 1'b1;
+            IDLE: begin
+                if (|det_out) begin
+                    begin_capture = 1'b1;     // Pulse high to clear external sample timer
+                    nxt_hit_mask = det_out;   // Record which mic(s) triggered
+                    nxt_timeout_ctr = '0;
                     nxt_state = CAPTURE;
                 end
             end
 
-            CAPTURE : begin
-                if (|new_hits)
-                    latch_new_hits = 1'b1;
+            CAPTURE: begin
+                // Continuously track which mics have crossed the threshold
+                nxt_hit_mask = hit_mask | det_out;
 
-                if (&(already_hit | above_threshold_rise)) begin
-                    pulse_event_done = 1'b1;
-                    nxt_state = IDLE;
-                end else if (capture_done) begin
-                    nxt_state = IDLE;
+                // Increment timeout counter every new audio sample
+                if (sample_valid) begin
+                    nxt_timeout_ctr = timeout_ctr + 1'b1;
                 end
-            end
 
-            default : begin
-                nxt_state = IDLE;
+                // Condition 1: All 4 mics have successfully triggered
+                if (&nxt_hit_mask) begin
+                    event_done = 1'b1;       // Tell top level we have valid TDOA data!
+                    nxt_hit_mask = '0;       // Clear mask
+                    nxt_state = IDLE;        // Go back to waiting
+                end
+                // Condition 2: Not all mics triggered, and we ran out of time
+                else if (&sample_time) begin
+                    nxt_hit_mask = '0;       // Clear mask
+                    nxt_state = IDLE;        // Abort silently (event_done stays 0)
+                end
             end
         endcase
     end
-
 
 endmodule
 
