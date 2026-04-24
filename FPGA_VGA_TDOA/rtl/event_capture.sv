@@ -138,18 +138,18 @@ module event_capture #(
     );
 
     logic det_pipe_valid;
-    logic detect_valid;
+    // logic detect_valid;
 
     // If logic breaks, check this logic first
     // This assumes that all microphone lines and their means are synchoronized
-    assign det_pipe_valid = sta_valid[0] & lta_valid[0];
+    // assign det_pipe_valid = sta_valid[0] & lta_valid[0];
 
-    always_ff @(posedge clk, negedge rst_n) begin
-        if (!rst_n)
-            detect_valid <= 1'b0;
-        else
-            detect_valid <= det_pipe_valid;
-    end
+    // always_ff @(posedge clk, negedge rst_n) begin
+    //     if (!rst_n)
+    //         detect_valid <= 1'b0;
+    //     else
+    //         detect_valid <= det_pipe_valid;
+    // end
 
     assign any_above = |above_threshold;
 
@@ -223,33 +223,25 @@ module event_capture #(
     always_comb begin
         nxt_state = state;
         begin_capture = 1'b0;
-        capturing = 1'b0;
         pulse_event_done = 1'b0;
         latch_new_hits = 1'b0;
 
         case (state)
             IDLE : begin
-                if (any_above && detect_valid) begin
+                if (any_above) begin
                     begin_capture = 1'b1;
                     nxt_state = CAPTURE;
                 end
             end
 
             CAPTURE : begin
-                capturing = 1'b1;
+                if (|new_hits)
+                    latch_new_hits = 1'b1;
 
-                if (detect_valid) begin
-
-                    if (|new_hits)
-                        latch_new_hits = 1'b1;
-
-                    if (&(already_hit | above_threshold)) begin
-                        pulse_event_done = 1'b1;
-                        nxt_state = IDLE;
-                    end
-                end
-
-                if (capture_done) begin
+                if (&(already_hit | above_threshold)) begin
+                    pulse_event_done = 1'b1;
+                    nxt_state = IDLE;
+                end else if (capture_done) begin
                     nxt_state = IDLE;
                 end
             end

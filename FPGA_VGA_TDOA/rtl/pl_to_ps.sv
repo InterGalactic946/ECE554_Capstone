@@ -10,7 +10,7 @@ module pl_to_ps (
 );
 
 
-    logic req_clk, flop_req_clk, flop_ps_ready, prev_req_clk, active_req, /*prev_active_req*/, out_valid;
+    logic req_clk, flop_req_clk, flop_ps_ready, prev_req_clk, active_req, out_valid;
 
     // logic [15:0] data_out;
     logic [7:0] data_out;
@@ -19,7 +19,7 @@ module pl_to_ps (
     assign data_to_ps[0] = out_valid; // Indicate to PS that data is valid
     assign data_to_ps[1] = prev_req_clk; // Ack to PS that data read signal has been registered
     // assign data_to_ps[9:2] = (rd_upper_byte) ? data_out[15:8] : lower_buf;
-    data_to_ps[9:2] = data_out;
+    assign data_to_ps[9:2] = data_out;
 
     assign ready_for_data = ~out_valid; 
     // FIFO #(
