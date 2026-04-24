@@ -168,7 +168,7 @@ module event_capture #(
 
     // New hits are when we are above the threshold, but haven't already hit it
     // already_hit goes high for a microphone after its first capture.
-    assign new_hits[3:0] = above_threshold[3:0] & ~already_hit[3:0];
+    assign new_hits[3:0] = above_threshold_rise[3:0] & ~already_hit[3:0];
 
     // Logic for the "capture window" after the first threshold crossing
     logic capture_done;
@@ -201,11 +201,11 @@ module event_capture #(
         if (!rst_n)
             already_hit[3:0] <= 4'b0000;
         else if (begin_capture)
-            already_hit[3:0] <= above_threshold[3:0];
+            already_hit[3:0] <= above_threshold_rise[3:0];
         else if (latch_new_hits)
             // When getting a new hit that we want to capture, we 
             // want to mark that the one that is above the threshold is the one we are hitting
-            already_hit[3:0] <= already_hit[3:0] | above_threshold[3:0];
+            already_hit[3:0] <= already_hit[3:0] | above_threshold_rise[3:0];
     end
 
     // Capture hit time flops
@@ -249,7 +249,7 @@ module event_capture #(
                 if (|new_hits)
                     latch_new_hits = 1'b1;
 
-                if (&(already_hit | above_threshold)) begin
+                if (&(already_hit | above_threshold_rise)) begin
                     pulse_event_done = 1'b1;
                     nxt_state = IDLE;
                 end else if (capture_done) begin
