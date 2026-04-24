@@ -264,6 +264,8 @@ vga_pll  vga_pll_inst(
       latch_event_done <= 1'b0;
     end else if (event_done) begin
       latch_event_done <= 1'b1;
+    end if (~KEY[2]) begin
+      latch_event_done <= 1'b0;
     end
   end
 
