@@ -64,14 +64,6 @@ module hit_time_to_ps (
 
     always_ff @( posedge clk, negedge rst_n ) begin
         if ( !rst_n ) begin
-            data_out <= '0;
-        end else if (input_data_valid) begin
-            data_out <= input_data;
-        end
-    end
-
-    always_ff @( posedge clk, negedge rst_n ) begin
-        if ( !rst_n ) begin
             reg_valid <= 1'b0;
         end else if (input_data_valid) begin
             reg_valid <= 1'b1;
