@@ -23,10 +23,13 @@ module quadrant_classifier #(
     // logic         east_earlier, west_earlier, north_earlier, south_earlier;
 
     logic [1:0]     earliest_mic;
-    logic [TSW-1:0] earliest_time;
 
     logic           classify_valid;
     logic [2:0]     classify_code;
+
+    logic [2:0]     quadrant_count;
+    logic [2:0]     prev_classify_code;
+    logic           prev_classify_valid;
 
     // Adders for the border sums
     // assign east_sum  = {1'b0, hit_time[0]} + {1'b0, hit_time[3]}; // SE + NE
@@ -42,27 +45,30 @@ module quadrant_classifier #(
     // Checks what is the "earliest microphone" for the fallback option if not all hits are valid
     always_comb begin
         earliest_mic  = 2'd0;
-        earliest_time = {TSW{1'b1}};
 
-        if (threshold_valid[0]) begin
+        if ((hit_time[0] < hit_time[1]) && (hit_time[0] < hit_time[2]) && (hit_time[0] < hit_time[3])) begin
             earliest_mic  = 2'd0;
-            earliest_time = hit_time[0];
         end
 
-        if (threshold_valid[1] && (hit_time[1] < earliest_time)) begin
+        else if ((hit_time[1] < hit_time[0]) && (hit_time[1] < hit_time[2]) && (hit_time[1] < hit_time[3])) begin
             earliest_mic  = 2'd1;
-            earliest_time = hit_time[1];
         end
 
-        if (threshold_valid[2] && (hit_time[2] < earliest_time)) begin
+        else if ((hit_time[2] < hit_time[0]) && (hit_time[2] < hit_time[1]) && (hit_time[2] < hit_time[3])) begin
             earliest_mic  = 2'd2;
-            earliest_time = hit_time[2];
         end
 
-        if (threshold_valid[3] && (hit_time[3] < earliest_time)) begin
+        else begin
             earliest_mic  = 2'd3;
-            earliest_time = hit_time[3];
         end
+
+        case (earliest_mic)
+                2'd0: classify_code = Q_SE;
+                2'd1: classify_code = Q_SW;
+                2'd2: classify_code = Q_NW;
+                2'd3: classify_code = Q_NE;
+                default: classify_code = Q_UNKNOWN;
+        endcase
     end
 
     // Captures quadrant code a clock after the event done signal
@@ -71,14 +77,42 @@ module quadrant_classifier #(
         if (!rst_n) begin
             quadrant_valid <= 1'b0;
             quadrant_code  <= Q_UNKNOWN;
-        end else if (event_done) begin
-                quadrant_valid <= classify_valid;
+        end else if (prev_classify_valid && (quadrant_count == 3'b011)) begin
+                quadrant_valid <= 1'b1;
                 quadrant_code  <= classify_code;
         end
         else begin
             quadrant_valid <= 1'b0;
         end
     end
+
+    always_ff @(posedge clk, negedge rst_n) begin
+        if (!rst_n) begin
+            prev_classify_code <= Q_UNKNOWN;
+        end else if (event_done) begin
+            prev_classify_code <= classify_code;
+        end
+    end
+
+    always_ff @(posedge clk, negedge rst_n) begin
+        if (!rst_n) begin
+            prev_classify_valid <= 1'b0;
+        end else begin
+            prev_classify_valid <= event_done;
+        end
+    end
+
+    always_ff @(posedge clk, negedge rst_n) begin
+        if (!rst_n) begin
+            quadrant_count <= 3'b0;
+        end else if (prev_classify_valid && (classify_code == prev_classify_code)) begin
+            quadrant_count <= quadrant_count + 1;
+        end else begin
+            quadrant_count <= 3'b0;
+        end
+    end
+
+    /*
 
     // Logic that checks what quadrant it is depending on the sums
     always_comb begin
@@ -106,8 +140,8 @@ module quadrant_classifier #(
                 endcase
             end
             classify_valid = 1'b1;
-        end else */
-        if (|threshold_valid) begin
+        end else 
+        if (&threshold_valid) begin
             case (earliest_mic)
                 2'd0: classify_code = Q_SE;
                 2'd1: classify_code = Q_SW;
@@ -118,5 +152,9 @@ module quadrant_classifier #(
             classify_valid = 1'b1;
         end
     end
+
+    */
+
+    
 
 endmodule

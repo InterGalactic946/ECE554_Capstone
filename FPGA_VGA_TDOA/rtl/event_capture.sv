@@ -236,16 +236,21 @@ module event_capture #(
             end
 
             CAPTURE : begin
+                capturing = 1'b1;
+
                 if (detect_valid) begin
-                    capturing = 1'b1;
 
                     if (|new_hits)
                         latch_new_hits = 1'b1;
 
-                    if (&(already_hit | above_threshold) || capture_done) begin
+                    if (&(already_hit | above_threshold)) begin
                         pulse_event_done = 1'b1;
                         nxt_state = IDLE;
                     end
+                end
+
+                if (capture_done) begin
+                    nxt_state = IDLE;
                 end
             end
 
