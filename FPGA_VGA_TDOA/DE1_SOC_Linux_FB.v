@@ -322,15 +322,30 @@ vga_pll  vga_pll_inst(
   wire [15:0] data_from_pl;
   wire ready_for_data, data_valid;
 
+  assign pl_to_ps_data = SW[9] ? pl_to_ps_data_time : pl_to_ps_data_quadrant;
+  assign ready_for_data = SW[9] ? ready_for_data_time : ready_for_data_quadrant;
+  assign ps_ready_for_data = SW[9] ? ps_ready_for_data_time : ps_ready_for_data_quadrant;
+
+ hit_time_to_ps hit_time_to_ps_inst (
+    .clk(clk_i),
+    .rst_n(~rst_i),
+    .data_from_ps(ps_to_pl_data),
+    .input_data_valid(event_done),
+    .input_data({hit_time1, hit_time2, hit_time3, hit_time4}),
+    .data_to_ps(pl_to_ps_data_time),
+    .ready_for_data(ready_for_data_time),
+    .ps_ready_for_data(ps_ready_for_data_time)
+  );
+
   pl_to_ps pl_to_ps_inst (
     .clk(clk_i),
     .rst_n(~rst_i),
     .data_from_ps(ps_to_pl_data),
     .input_data(quadrant_code),
     .input_data_valid(quadrant_valid),
-    .data_to_ps(pl_to_ps_data),
-    .ready_for_data(ready_for_data),
-    .ps_ready_for_data(ps_ready_for_data)
+    .data_to_ps(pl_to_ps_data_quadrant),
+    .ready_for_data(ready_for_data_quadrant),
+    .ps_ready_for_data(ps_ready_for_data_quadrant)
 );
 
 mock_data mock_data_inst (
