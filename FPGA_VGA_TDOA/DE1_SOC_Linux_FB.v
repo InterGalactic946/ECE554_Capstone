@@ -257,9 +257,19 @@ vga_pll  vga_pll_inst(
   wire [1:0] curr_mode;
   wire [2:0] freq_sel;
   wire ps_ready_for_data;
+  reg latch_event_done;
+
+  always @(posedge clk_i) begin
+    if (rst_i) begin
+      latch_event_done <= 1'b0;
+    end else if (event_done) begin
+      latch_event_done <= 1'b1;
+    end
+  end
 
   assign LEDR[0] = rst_i;  // Show reset state on LEDR[0]
   assign LEDR[1] = ps_ready_for_data;
+  assign LEDR[2] = latch_event_done;
 
   /////////////////////////////////////////////////
   // Declare PCM converter interface signals    //
