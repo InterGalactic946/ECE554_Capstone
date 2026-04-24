@@ -143,10 +143,10 @@ module event_capture #(
       if (!rst_n)
         prev_above_threshold <= 4'h0
       else begin
-    prev_above_threshold <= above_threshold;
+        prev_above_threshold <= above_threshold;
       end
 
-    assign above_threshold_rise = prev_above_threshold & ~above_threshold;
+    assign above_threshold_rise = ~prev_above_threshold & above_threshold;
 
     // logic det_pipe_valid;
     // logic detect_valid;
