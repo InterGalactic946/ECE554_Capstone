@@ -59,7 +59,9 @@ module event_capture #(
     // Per-channel threshold checks
     //////////////////////////////////////////////////
     logic [DW-1:0] abs_sample [4];
+    logic [3:0]    prev_above_threshold;
     logic [3:0]    above_threshold;
+    logic [3:0]    above_threshold_rise;
     logic [3:0]    already_hit;
     logic [3:0]    new_hits;
     logic          any_above;
@@ -137,7 +139,16 @@ module event_capture #(
         .lta_valid(lta_valid[3])
     );
 
-    logic det_pipe_valid;
+    always_ff @(posedge clk, negedge rst_n)
+      if (rst_n)
+        prev_above_threshold <= 4'h0
+      else begin
+        prev_above_threshold <= above_threshold;
+      end
+
+    assign above_threshold_rise = prev_above_threshold & ~above_threshold;
+
+    // logic det_pipe_valid;
     // logic detect_valid;
 
     // If logic breaks, check this logic first
@@ -151,7 +162,7 @@ module event_capture #(
     //         detect_valid <= det_pipe_valid;
     // end
 
-    assign any_above = |above_threshold;
+    assign any_above = |above_threshold_rise;
 
     assign threshold_valid = already_hit;
 
@@ -181,7 +192,7 @@ module event_capture #(
             event_done <= 1'b0;
         else if (pulse_event_done)
             event_done <= 1'b1;
-        else
+        else 
             event_done <= 1'b0;
     end
 
