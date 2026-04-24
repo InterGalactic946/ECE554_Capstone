@@ -948,6 +948,24 @@ set_instance_assignment -name GLOBAL_SIGNAL OFF -to u0|hps_0|hps_io|border|hps_s
 set_instance_assignment -name ENABLE_BENEFICIAL_SKEW_OPTIMIZATION_FOR_NON_GLOBAL_CLOCKS ON -to u0|hps_0|hps_io|border|hps_sdram_inst -tag __hps_sdram_p0
 set_instance_assignment -name PLL_COMPENSATION_MODE DIRECT -to u0|hps_0|hps_io|border|hps_sdram_inst|pll0|fbout -tag __hps_sdram_p0
 
+set_global_assignment -name VERILOG_FILE ip/fifos/FIFO_8.v
+set_global_assignment -name QIP_FILE ip/fifos/FIFO_8.qip
+set_global_assignment -name VERILOG_FILE ip/fifos/FIFO_64.v
+set_global_assignment -name QIP_FILE ip/fifos/FIFO_64.qip
+set_global_assignment -name VERILOG_FILE ip/fifos/FIFO_512.v
+set_global_assignment -name QIP_FILE ip/fifos/FIFO_512.qip
+set_global_assignment -name VERILOG_FILE ip/fifos/FIFO_32.v
+set_global_assignment -name QIP_FILE ip/fifos/FIFO_32.qip
+set_global_assignment -name VERILOG_FILE ip/fifos/FIFO_256.v
+set_global_assignment -name QIP_FILE ip/fifos/FIFO_256.qip
+set_global_assignment -name VERILOG_FILE ip/fifos/FIFO_2048.v
+set_global_assignment -name QIP_FILE ip/fifos/FIFO_2048.qip
+set_global_assignment -name VERILOG_FILE ip/fifos/FIFO_16.v
+set_global_assignment -name QIP_FILE ip/fifos/FIFO_16.qip
+set_global_assignment -name VERILOG_FILE ip/fifos/FIFO_128.v
+set_global_assignment -name QIP_FILE ip/fifos/FIFO_128.qip
+set_global_assignment -name VERILOG_FILE ip/fifos/FIFO_1024.v
+set_global_assignment -name QIP_FILE ip/fifos/FIFO_1024.qip
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/window_mean.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/wavefront_detection.sv
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/tdoa_tb.sv
