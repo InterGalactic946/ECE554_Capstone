@@ -12,15 +12,28 @@ module window_mean
 );
 
     localparam DATA_WIDTH = 16;
-    logic fifo_rden;
-    logic fifo_wren;
+    logic fifo_rden, prev_fifo_rden;
+    logic fifo_wren, prev_fifo_wren;
     logic fifo_full;
+    logic [15:0] prev_data_in;
     logic [DATA_WIDTH-1:0] fifo_out;
 
     logic [$clog2(WINDOW_SIZE) + DATA_WIDTH -1:0] current_sum;
 
     assign fifo_rden = fifo_full && data_valid;
     assign fifo_wren = data_valid;
+
+    always_ff @(posedge clk, negedge rst_n) begin
+        if (!rst_n) begin
+            prev_fifo_rden <= 0;
+            prev_fifo_wren <= 0;
+            prev_data_in <= 0;
+        end else begin
+            prev_fifo_rden <= fifo_rden;
+            prev_fifo_wren <= fifo_wren;
+            prev_data_in <= data_in;
+        end
+    end
 
     // My_FIFO #(
     //     .DEPTH(WINDOW_SIZE),
@@ -130,11 +143,11 @@ module window_mean
             current_sum <= '0;
         end else if (fifo_wren && !fifo_rden) begin
             current_sum <= current_sum + data_in;
-        end else if (fifo_wren && fifo_rden) begin
-            current_sum <= current_sum + data_in - fifo_out;
+        end else if (prev_fifo_wren && prev_fifo_rden) begin
+            current_sum <= current_sum + prev_data_in - fifo_out;
         end
     end
 
     assign mean_out = current_sum >> $clog2(WINDOW_SIZE);
-    assign mean_valid = fifo_rden;
+    assign mean_valid = prev_fifo_rden;
 endmodule
