@@ -259,7 +259,7 @@ vga_pll  vga_pll_inst(
   wire ps_ready_for_data;
   reg latch_event_done;
 
-  always @(posedge clk_i) begin
+  always @(posedge clk_i, posedge rst_i) begin
     if (rst_i) begin
       latch_event_done <= 1'b0;
     end else if (event_done) begin

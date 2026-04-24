@@ -60,7 +60,7 @@ module hit_time_to_ps (
         end else if (active_req && reg_valid) begin
             active_req <= 1'b0;
         end
-    end
+    end 
 
     always_ff @( posedge clk, negedge rst_n ) begin
         if ( !rst_n ) begin
@@ -77,7 +77,7 @@ module hit_time_to_ps (
             out_valid <= 1'b0;
         end else if (active_req && reg_valid) begin
             out_valid <= 1'b1;
-        end else begin
+        end else if (active_req && !reg_valid) begin
             out_valid <= 1'b0;
         end
     end
