@@ -48,7 +48,7 @@ module wavefront_detection #(
     if (!rst_n) begin
       detection_out_internal <= 0;
     end else if (sta_valid && lta_valid) begin
-      detection_out_internal <= (sta_mean > (lta_mean << $clog2(THRESHOLD))) ? 1 : 0;
+      detection_out_internal <= (sta_mean > ({16'h0000, lta_mean} << $clog2(THRESHOLD))) ? 1 : 0;
     end else begin
       detection_out_internal <= 0;  // Clear detection when not valid
     end
