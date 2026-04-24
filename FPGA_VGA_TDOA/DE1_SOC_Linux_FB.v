@@ -334,6 +334,11 @@ vga_pll  vga_pll_inst(
   wire [15:0] data_from_pl;
   wire ready_for_data, data_valid;
 
+  wire ps_ready_for_data_time, ps_ready_for_data_quadrant;
+  wire ready_for_data_time, ready_for_data_quadrant;
+  wire [9:0] pl_to_ps_data_time, pl_to_ps_data_quadrant;
+
+
   assign pl_to_ps_data = SW[9] ? pl_to_ps_data_time : pl_to_ps_data_quadrant;
   assign ready_for_data = SW[9] ? ready_for_data_time : ready_for_data_quadrant;
   assign ps_ready_for_data = SW[9] ? ps_ready_for_data_time : ps_ready_for_data_quadrant;
