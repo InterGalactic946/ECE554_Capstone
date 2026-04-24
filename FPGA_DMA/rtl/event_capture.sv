@@ -139,10 +139,16 @@ module event_capture #(
 
     logic det_pipe_valid;
     logic detect_valid;
+    logic prev_sta_valid, prev_lta_valid;
 
     // If logic breaks, check this logic first
     // This assumes that all microphone lines and their means are synchoronized
-    assign det_pipe_valid = sta_valid[0] & lta_valid[0];
+    assign det_pipe_valid = prev_sta_valid & prev_lta_valid;
+
+    always_ff @( posedge clk ) begin
+        prev_sta_valid <= sta_valid[0];
+        prev_lta_valid <= lta_valid[0];
+    end
 
     always_ff @(posedge clk, negedge rst_n) begin
         if (!rst_n)
