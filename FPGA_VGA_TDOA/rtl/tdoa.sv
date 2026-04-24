@@ -34,7 +34,7 @@ module tdoa(
     output logic lta_valid_4
 );
 
-    localparam TSW = 16;
+    localparam TSW = 17;
     localparam DW = 16;
     
     logic [TSW-1:0] hit_time [4];

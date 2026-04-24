@@ -62,7 +62,9 @@ module wavefront_detection #(
     end
   end
 
-  assign above_mic_threshold = prev_data_in >= MIC_THRESHOLD;
-  assign detection_out = above_mic_threshold & detection_out_internal;
+  // assign above_mic_threshold = prev_data_in >= MIC_THRESHOLD;
+  // assign detection_out = above_mic_threshold & detection_out_internal;
+
+  assign detection_out = detection_out_internal;
 
 endmodule
