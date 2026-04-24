@@ -140,7 +140,7 @@ module event_capture #(
     );
 
     always_ff @(posedge clk, negedge rst_n)
-      if (rst_n) begin
+      if (!rst_n) begin
         prev_above_threshold <= 4'h0;
       end else begin
         prev_above_threshold <= above_threshold;
