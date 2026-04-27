@@ -413,25 +413,32 @@ module ghrd_top (
       .write_data(pcm_fifo_write_data)
   );
 
+  logic [15:0] hit_time_1_dma, hit_time_2_dma, hit_time_3_dma, hit_time_4_dma;
+
+  assign hit_time_1_dma = hit_time_1_valid ? hit_time_1 : 16'h0001;
+  assign hit_time_2_dma = hit_time_2_valid ? hit_time_2 : 16'h0002;
+  assign hit_time_3_dma = hit_time_3_valid ? hit_time_3 : 16'h0003;
+  assign hit_time_4_dma = hit_time_4_valid ? hit_time_4 : 16'h0004;
+
   dma_fifo_write dma_fifo_write_inst (
       .clk(CLOCK_50),
       .rst_n(~rst_i),
-      .input0_valid(hit_time_valid_1),
-      .input0(SW[9] ? 16'h0 : hit_time_1),
-      .input1_valid(hit_time_valid_2),
-      .input1(SW[9] ? 16'h1 : hit_time_2),
-      .input2_valid(hit_time_valid_3),
-      .input2(SW[9] ? 16'h2 : hit_time_3),
-      .input3_valid(hit_time_valid_4),
-      .input3(SW[9] ? 16'h3 : hit_time_4),
-      .input4_valid(1'b1),
-      .input4(SW[9] ? 16'h4 : 0),
-      .input5_valid(1'b1),
-      .input5(SW[9] ? 16'h5 : 0),
-      .input6_valid(1'b1),
-      .input6(SW[9] ? 16'h6 : 0),
-      .input7_valid(1'b1),
-      .input7(SW[9] ? 16'h7 : 0),
+      .input0_valid(1'b1),
+      .input0(SW[9] ? {15'h0000, threshold_valid[0]} : hit_time_1_dma),
+      .input1_valid(1'b1),
+      .input1(SW[9] ? {15'h0000, threshold_valid[1]} : hit_time_2_dma),
+      .input2_valid(1'b1),
+      .input2(SW[9] ? {15'h0000, threshold_valid[2]} : hit_time_3_dma),
+      .input3_valid(1'b1),
+      .input3(SW[9] ? {15'h0000, threshold_valid[3]} : hit_time_4_dma),
+      .input4_valid(conv1_pcm_valid_pos),
+      .input4(conv1_pcm_pos),
+      .input5_valid(conv1_pcm_valid_neg),
+      .input5(conv1_pcm_neg),
+      .input6_valid(conv2_pcm_valid_pos),
+      .input6(conv2_pcm_pos),
+      .input7_valid(conv2_pcm_valid_neg),
+      .input7(conv2_pcm_neg),
       .write_en(data_fifo_write_en),
       .write_data(data_fifo_write_data)
   );
