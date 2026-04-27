@@ -414,11 +414,12 @@ module ghrd_top (
   );
 
   wire [15:0] hit_time_1_dma, hit_time_2_dma, hit_time_3_dma, hit_time_4_dma;
+  wire [3:0] det_out;
 
-  assign hit_time_1_dma = threshold_valid[0] ? hit_time_1 : 16'h0001;
-  assign hit_time_2_dma = threshold_valid[1] ? hit_time_2 : 16'h0002;
-  assign hit_time_3_dma = threshold_valid[2] ? hit_time_3 : 16'h0003;
-  assign hit_time_4_dma = threshold_valid[3] ? hit_time_4 : 16'h0004;
+  assign hit_time_1_dma = det_out[0] ? hit_time_1 : 16'h0001;
+  assign hit_time_2_dma = det_out[1] ? hit_time_2 : 16'h0002;
+  assign hit_time_3_dma = det_out[2] ? hit_time_3 : 16'h0003;
+  assign hit_time_4_dma = det_out[3] ? hit_time_4 : 16'h0004;
 
   dma_fifo_write dma_fifo_write_inst (
       .clk(CLOCK_50),
@@ -627,6 +628,7 @@ module ghrd_top (
     .hit_time3(hit_time_3),
     .hit_time4(hit_time_4),
     .threshold_valid(threshold_valid),
+    .det_out(det_out),
     .event_done(event_done),
     .sta_mean_1(sta_mean_1),
     .sta_mean_2(sta_mean_2),

@@ -15,6 +15,7 @@ module event_capture #(
     input  logic [TSW-1:0]               sample_time, // Generated from custom clock
 
     output logic [3:0]                   threshold_valid,
+    output logic [3:0]                   det_out,
     output logic [TSW-1:0]               hit_time [4],
     output logic                         event_done,
     output logic                         begin_capture,
@@ -24,7 +25,7 @@ module event_capture #(
     output logic                         lta_valid [4]
 );
 
-    logic [3:0] det_out;
+    // logic [3:0] det_out;
     logic capturing;
     logic start_cooldown;
     localparam int MIC_THRESHOLD [4] = '{16'd3000, 16'd3000, 16'd3000, 16'd3000};
