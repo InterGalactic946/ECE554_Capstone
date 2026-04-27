@@ -439,6 +439,7 @@ module ghrd_top (
       .input6(conv2_pcm_pos),
       .input7_valid(conv2_pcm_valid_neg),
       .input7(conv2_pcm_neg),
+      .write_pending(fifo_waitreq),
       .write_en(data_fifo_write_en),
       .write_data(data_fifo_write_data)
   );
