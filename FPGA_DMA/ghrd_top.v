@@ -467,8 +467,20 @@ module ghrd_top (
   wire mic_data_val;
   wire [1:0] curr_mode;
   wire [2:0] freq_sel;
+  reg latch_event_done;
 
   assign LEDR[0] = rst_i;  // Show reset state on LEDR[0]
+  assign LEDR[3] = latch_event_done;
+
+  always @(posedge clk_i) begin
+    if (rst_i) begin
+      latch_event_done <= 1'b0;
+    end else if (event_done) begin
+      latch_event_done <= 1'b1;
+    end if (~fpga_debounced_buttons[2]) begin
+      latch_event_done <= 1'b0;
+    end
+  end
 
   always @(posedge CLOCK_50) begin
     if (rst_i) begin
