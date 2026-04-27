@@ -1,3 +1,5 @@
+`default_nettype none
+
 module dma_fifo_write (
     input logic clk,
     input logic rst_n,
@@ -81,3 +83,5 @@ module dma_fifo_write (
     end
   end
 endmodule
+
+`default_nettype wire
