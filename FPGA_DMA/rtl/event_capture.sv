@@ -15,7 +15,6 @@ module event_capture #(
     input  logic [TSW-1:0]               sample_time, // Generated from custom clock
 
     output logic [3:0]                   threshold_valid,
-    output logic [3:0]                   det_out,
     output logic [TSW-1:0]               hit_time [4],
     output logic                         event_done,
     output logic                         begin_capture,
@@ -25,10 +24,30 @@ module event_capture #(
     output logic                         lta_valid [4]
 );
 
-    // logic [3:0] det_out;
+    logic [3:0] det_out;
+    logic [DW-1:0] abs_sample [4];
     logic capturing;
     logic start_cooldown;
+    logic [DW-1:0] abs_sample [4];
     localparam int MIC_THRESHOLD [4] = '{16'd3000, 16'd3000, 16'd3000, 16'd3000};
+
+
+    //////////////////////////////////////////////////
+    // Helper
+    //////////////////////////////////////////////////
+    function automatic logic [DW-1:0] abs_s(input logic signed [DW-1:0] v);
+        begin
+            if (v < 0)
+                abs_s = -v;
+            else
+                abs_s = v;
+        end
+    endfunction
+
+    assign abs_sample[0] = abs_s(frame_sample[0]);
+    assign abs_sample[1] = abs_s(frame_sample[1]);
+    assign abs_sample[2] = abs_s(frame_sample[2]);
+    assign abs_sample[3] = abs_s(frame_sample[3]);
 
     // Instantiate the 4 detectors
     genvar i;
@@ -42,7 +61,7 @@ module event_capture #(
             ) det_inst (
                 .clk(clk),
                 .rst_n(rst_n),
-                .data_in(frame_sample[i]),
+                .data_in(abs_sample[i]),
                 .data_valid(sample_valid),
                 .detection_out(det_out[i]),
                 .sta_mean(sta_mean[i]),
