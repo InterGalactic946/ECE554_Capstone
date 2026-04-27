@@ -413,24 +413,24 @@ module ghrd_top (
       .write_data(pcm_fifo_write_data)
   );
 
-  logic [15:0] hit_time_1_dma, hit_time_2_dma, hit_time_3_dma, hit_time_4_dma;
+  wire [15:0] hit_time_1_dma, hit_time_2_dma, hit_time_3_dma, hit_time_4_dma;
 
-  assign hit_time_1_dma = hit_time_1_valid ? hit_time_1 : 16'h0001;
-  assign hit_time_2_dma = hit_time_2_valid ? hit_time_2 : 16'h0002;
-  assign hit_time_3_dma = hit_time_3_valid ? hit_time_3 : 16'h0003;
-  assign hit_time_4_dma = hit_time_4_valid ? hit_time_4 : 16'h0004;
+  assign hit_time_1_dma = threshold_valid[0] ? hit_time_1 : 16'h0001;
+  assign hit_time_2_dma = threshold_valid[1] ? hit_time_2 : 16'h0002;
+  assign hit_time_3_dma = threshold_valid[2] ? hit_time_3 : 16'h0003;
+  assign hit_time_4_dma = threshold_valid[3] ? hit_time_4 : 16'h0004;
 
   dma_fifo_write dma_fifo_write_inst (
       .clk(CLOCK_50),
       .rst_n(~rst_i),
       .input0_valid(1'b1),
-      .input0(SW[9] ? {15'h0000, threshold_valid[0]} : hit_time_1_dma),
+      .input0(hit_time_1_dma),
       .input1_valid(1'b1),
-      .input1(SW[9] ? {15'h0000, threshold_valid[1]} : hit_time_2_dma),
+      .input1(hit_time_2_dma),
       .input2_valid(1'b1),
-      .input2(SW[9] ? {15'h0000, threshold_valid[2]} : hit_time_3_dma),
+      .input2(hit_time_3_dma),
       .input3_valid(1'b1),
-      .input3(SW[9] ? {15'h0000, threshold_valid[3]} : hit_time_4_dma),
+      .input3(hit_time_4_dma),
       .input4_valid(conv1_pcm_valid_pos),
       .input4(conv1_pcm_pos),
       .input5_valid(conv1_pcm_valid_neg),
@@ -601,8 +601,8 @@ module ghrd_top (
   wire quadrant_valid, event_done;
   wire [3:0]  threshold_valid;
   reg [3:0]  prev_threshold_valid;
-  wire [15:0] hit_time1, hit_time2, hit_time3, hit_time4;
-  reg [15:0] prev_hit_time1, prev_hit_time2, prev_hit_time3, prev_hit_time4;
+  wire [15:0] hit_time_1, hit_time_2, hit_time_3, hit_time_4;
+  reg [15:0] prev_hit_time_1, prev_hit_time_2, prev_hit_time_3, prev_hit_time_4;
   wire [15:0] sta_mean_1, sta_mean_2, sta_mean_3, sta_mean_4;
   wire [15:0] lta_mean_1, lta_mean_2, lta_mean_3, lta_mean_4;
   wire sta_valid_1, sta_valid_2, sta_valid_3, sta_valid_4;
@@ -620,10 +620,10 @@ module ghrd_top (
     .quadrant_valid(quadrant_valid),
     .quadrant_code(quadrant_code),
     .collect_sample(collect_sample),
-    .hit_time1(hit_time1),
-    .hit_time2(hit_time2),
-    .hit_time3(hit_time3),
-    .hit_time4(hit_time4),
+    .hit_time1(hit_time_1),
+    .hit_time2(hit_time_2),
+    .hit_time3(hit_time_3),
+    .hit_time4(hit_time_4),
     .threshold_valid(threshold_valid),
     .event_done(event_done),
     .sta_mean_1(sta_mean_1),
@@ -721,16 +721,16 @@ module ghrd_top (
 
   always @(posedge clk_i) begin
     if (rst_i) begin
-      prev_hit_time1 <= 16'h0;
-      prev_hit_time2 <= 16'h0;
-      prev_hit_time3 <= 16'h0;
-      prev_hit_time4 <= 16'h0;
+      prev_hit_time_1 <= 16'h0;
+      prev_hit_time_2 <= 16'h0;
+      prev_hit_time_3 <= 16'h0;
+      prev_hit_time_4 <= 16'h0;
       prev_threshold_valid <= 4'h0;
     end else if (event_done && ~SW[8]) begin
-      prev_hit_time1 <= hit_time1;
-      prev_hit_time2 <= hit_time2;
-      prev_hit_time3 <= hit_time3;
-      prev_hit_time4 <= hit_time4;
+      prev_hit_time_1 <= hit_time_1;
+      prev_hit_time_2 <= hit_time_2;
+      prev_hit_time_3 <= hit_time_3;
+      prev_hit_time_4 <= hit_time_4;
       prev_threshold_valid <= threshold_valid;
     end
   end
@@ -792,35 +792,35 @@ module ghrd_top (
       hex5_data = 0;
     end else if (page_sel == 2) begin
       // Show hit times and their validity.
-      hex0_data = prev_hit_time1[3:0];
-      hex1_data = prev_hit_time1[7:4];
-      hex2_data = prev_hit_time1[11:8];
-      hex3_data = prev_hit_time1[15:12];
-      hex4_data = {3'b0, threshold_valid[0]};
+      hex0_data = prev_hit_time_1[3:0];
+      hex1_data = prev_hit_time_1[7:4];
+      hex2_data = prev_hit_time_1[11:8];
+      hex3_data = prev_hit_time_1[15:12];
+      hex4_data = {3'b0, prev_threshold_valid[0]};
       hex5_data = 4'd1;
     end else if (page_sel == 3) begin
       // Show hit times and their validity.
-      hex0_data = prev_hit_time2[3:0];
-      hex1_data = prev_hit_time2[7:4];
-      hex2_data = prev_hit_time2[11:8];
-      hex3_data = prev_hit_time2[15:12];
-      hex4_data = {3'b0, threshold_valid[1]};
+      hex0_data = prev_hit_time_2[3:0];
+      hex1_data = prev_hit_time_2[7:4];
+      hex2_data = prev_hit_time_2[11:8];
+      hex3_data = prev_hit_time_2[15:12];
+      hex4_data = {3'b0, prev_threshold_valid[1]};
       hex5_data = 4'd2;
     end else if (page_sel == 4) begin
       // Show hit times and their validity.
-      hex0_data = prev_hit_time3[3:0];
-      hex1_data = prev_hit_time3[7:4];
-      hex2_data = prev_hit_time3[11:8];
-      hex3_data = prev_hit_time3[15:12];
-      hex4_data = {3'b0, threshold_valid[2]};
+      hex0_data = prev_hit_time_3[3:0];
+      hex1_data = prev_hit_time_3[7:4];
+      hex2_data = prev_hit_time_3[11:8];
+      hex3_data = prev_hit_time_3[15:12];
+      hex4_data = {3'b0, prev_threshold_valid[2]};
       hex5_data = 4'd3;
     end else if (page_sel == 5) begin
       // Show hit times and their validity.
-      hex0_data = prev_hit_time4[3:0];
-      hex1_data = prev_hit_time4[7:4];
-      hex2_data = prev_hit_time4[11:8];
-      hex3_data = prev_hit_time4[15:12];
-      hex4_data = {3'b0, threshold_valid[3]};
+      hex0_data = prev_hit_time_4[3:0];
+      hex1_data = prev_hit_time_4[7:4];
+      hex2_data = prev_hit_time_4[11:8];
+      hex3_data = prev_hit_time_4[15:12];
+      hex4_data = {3'b0, prev_threshold_valid[3]};
       hex5_data = 4'd4;
     end else begin
       // Default to showing PCM sample and stream/mode info.
