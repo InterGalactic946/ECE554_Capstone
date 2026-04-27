@@ -416,21 +416,25 @@ module ghrd_top (
   wire [15:0] hit_time_1_dma, hit_time_2_dma, hit_time_3_dma, hit_time_4_dma;
   wire [3:0] det_out;
 
-  assign hit_time_1_dma = det_out[0] ? hit_time_1 : 16'h0001;
-  assign hit_time_2_dma = det_out[1] ? hit_time_2 : 16'h0002;
-  assign hit_time_3_dma = det_out[2] ? hit_time_3 : 16'h0003;
-  assign hit_time_4_dma = det_out[3] ? hit_time_4 : 16'h0004;
+// (det_out[0] ? hit_time_1 : 16'h0001)
+// (det_out[1] ? hit_time_2 : 16'h0002)
+// (det_out[2] ? hit_time_3 : 16'h0003)
+// (det_out[3] ? hit_time_4 : 16'h0004)
+  assign hit_time_1_dma = SW[9] ? lta_mean_1 : lta_mean_3;
+  assign hit_time_2_dma = SW[9] ? lta_mean_2 : lta_mean_4;
+  assign hit_time_3_dma = SW[9] ? sta_mean_1 : sta_mean_3;
+  assign hit_time_4_dma = SW[9] ? sta_mean_2 : sta_mean_4;
 
   dma_fifo_write dma_fifo_write_inst (
       .clk(CLOCK_50),
       .rst_n(~rst_i),
-      .input0_valid(1'b1),
+      .input0_valid(SW[9] ? lta_valid_1 : lta_valid_3),
       .input0(hit_time_1_dma),
-      .input1_valid(1'b1),
+      .input1_valid(SW[9] ? lta_valid_2 : lta_valid_4),
       .input1(hit_time_2_dma),
-      .input2_valid(1'b1),
+      .input2_valid(SW[9] ? sta_valid_1 : sta_valid_3),
       .input2(hit_time_3_dma),
-      .input3_valid(1'b1),
+      .input3_valid(SW[9] ? sta_valid_2 : sta_valid_4),
       .input3(hit_time_4_dma),
       .input4_valid(conv1_pcm_valid_pos),
       .input4(conv1_pcm_pos),
