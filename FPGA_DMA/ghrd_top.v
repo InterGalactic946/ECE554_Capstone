@@ -414,7 +414,7 @@ module ghrd_top (
   );
 
   wire [15:0] hit_time_1_dma, hit_time_2_dma, hit_time_3_dma, hit_time_4_dma;
-  wire [3:0] det_out;
+  // wire [3:0] det_out;
 
 // (det_out[0] ? hit_time_1 : 16'h0001)
 // (det_out[1] ? hit_time_2 : 16'h0002)
@@ -644,7 +644,7 @@ module ghrd_top (
     .hit_time3(hit_time_3),
     .hit_time4(hit_time_4),
     .threshold_valid(threshold_valid),
-    .det_out(det_out),
+    // .det_out(det_out),
     .event_done(event_done),
     .sta_mean_1(sta_mean_1),
     .sta_mean_2(sta_mean_2),
