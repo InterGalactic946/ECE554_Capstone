@@ -77,30 +77,42 @@ always_comb begin
             end
     end
 
-    if (pulse_gen_count == 16'd3550 || pulse_gen_count == 16'd3551 || // Event 1
+    if (pulse_gen_count == 16'd3550 || pulse_gen_count == 16'd3551 || // Event 1 (SE)
         pulse_gen_count == 16'd4550 || pulse_gen_count == 16'd4551 || // Event 2
-        pulse_gen_count == 16'd5550 || pulse_gen_count == 16'd5551) begin // Event 3
+        pulse_gen_count == 16'd5550 || pulse_gen_count == 16'd5551 || // Event 3
+        pulse_gen_count == 16'd6850 || pulse_gen_count == 16'd6851 || // Event 4 (NW)
+        pulse_gen_count == 16'd7850 || pulse_gen_count == 16'd7851 || // Event 5
+        pulse_gen_count == 16'd8850 || pulse_gen_count == 16'd8851) begin  // Event 6
         mic_pcm_0 = 16'sd6000;
         pulse_high = 1'b1;
     end
 
     if (pulse_gen_count == 16'd3650 || pulse_gen_count == 16'd3651 ||
         pulse_gen_count == 16'd4650 || pulse_gen_count == 16'd4651 ||
-        pulse_gen_count == 16'd5650 || pulse_gen_count == 16'd5651) begin
+        pulse_gen_count == 16'd5650 || pulse_gen_count == 16'd5651 ||
+        pulse_gen_count == 16'd6640 || pulse_gen_count == 16'd6641 ||
+        pulse_gen_count == 16'd7640 || pulse_gen_count == 16'd7641 ||
+        pulse_gen_count == 16'd8640 || pulse_gen_count == 16'd8641) begin
         mic_pcm_1 = 16'sd6000;
         pulse_high = 1'b1;
     end
 
     if (pulse_gen_count == 16'd3850 || pulse_gen_count == 16'd3851 ||
         pulse_gen_count == 16'd4850 || pulse_gen_count == 16'd4851 ||
-        pulse_gen_count == 16'd5850 || pulse_gen_count == 16'd5851) begin
+        pulse_gen_count == 16'd5850 || pulse_gen_count == 16'd5851 ||
+        pulse_gen_count == 16'd6550 || pulse_gen_count == 16'd6551 || 
+        pulse_gen_count == 16'd7550 || pulse_gen_count == 16'd7551 ||
+        pulse_gen_count == 16'd8550 || pulse_gen_count == 16'd8551) begin
         mic_pcm_2 = 16'sd6000;
         pulse_high = 1'b1;
     end
 
     if (pulse_gen_count == 16'd3640 || pulse_gen_count == 16'd3641 ||
         pulse_gen_count == 16'd4640 || pulse_gen_count == 16'd4641 ||
-        pulse_gen_count == 16'd5640 || pulse_gen_count == 16'd5641) begin
+        pulse_gen_count == 16'd5640 || pulse_gen_count == 16'd5641 ||
+        pulse_gen_count == 16'd6650 || pulse_gen_count == 16'd6651 ||
+        pulse_gen_count == 16'd7650 || pulse_gen_count == 16'd7651 ||
+        pulse_gen_count == 16'd8650 || pulse_gen_count == 16'd8651) begin
         mic_pcm_3 = 16'sd6000;
         pulse_high = 1'b1;
     end
@@ -120,6 +132,14 @@ initial begin
         $display("Quadrant SE detected correctly.");
     else
         $display("Quadrant SE detection failed. Detected code: %b", quadrant_code);
+    
+    @(posedge quadrant_valid);
+    if (quadrant_code == 3'd2)
+        $display("Quadrant NW detected correctly.");
+    else
+        $display("Quadrant NW detection failed. Detected code: %b", quadrant_code);
+
+    $display("YAHOO! All tests passed.");
 
     $stop();
 end
