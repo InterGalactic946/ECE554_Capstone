@@ -28,7 +28,6 @@ module event_capture #(
     logic [DW-1:0] abs_sample [4];
     logic capturing;
     logic start_cooldown;
-    logic [DW-1:0] abs_sample [4];
     localparam int MIC_THRESHOLD [4] = '{16'd3000, 16'd3000, 16'd3000, 16'd3000};
 
 
