@@ -23,8 +23,8 @@ module quadrant_classifier #(
 
     logic [2:0]     classify_code;
 
-    logic [2:0]     quadrant_count;
-    logic [2:0]     prev_classify_code;
+    //logic [2:0]     quadrant_count;
+    //logic [2:0]     prev_classify_code;
 
     logic [TSW-1:0] earliest_time;
 
@@ -74,14 +74,16 @@ module quadrant_classifier #(
             quadrant_valid <= 1'b0;
             quadrant_code  <= Q_UNKNOWN;
         // Checks if the quadrant stays the same for the 3 consecutive events after the classification
-        end else if (event_done && (quadrant_count == 3'b010)) begin
+        end else if (event_done) begin
                 quadrant_valid <= 1'b1;
-                quadrant_code  <= prev_classify_code;
+                quadrant_code  <= classify_code;
         end
         else begin
             quadrant_valid <= 1'b0;
         end
     end
+
+    /*
 
     always_ff @(posedge clk, negedge rst_n) begin
         if (!rst_n) begin
@@ -90,6 +92,7 @@ module quadrant_classifier #(
             prev_classify_code <= classify_code;
         end
     end
+2
 
     always_ff @(posedge clk, negedge rst_n) begin
         if (!rst_n) begin
@@ -100,5 +103,7 @@ module quadrant_classifier #(
             quadrant_count <= 3'b0;
         end
     end
+
+    */
 
 endmodule

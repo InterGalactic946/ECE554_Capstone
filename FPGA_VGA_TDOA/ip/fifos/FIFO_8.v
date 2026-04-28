@@ -43,7 +43,8 @@ module FIFO_8 (
 	rdreq,
 	wrreq,
 	full,
-	q);
+	q,
+	usedw);
 
 	input	  clock;
 	input	[15:0]  data;
@@ -51,11 +52,14 @@ module FIFO_8 (
 	input	  wrreq;
 	output	  full;
 	output	[15:0]  q;
+	output	[2:0]  usedw;
 
 	wire  sub_wire0;
 	wire [15:0] sub_wire1;
+	wire [2:0] sub_wire2;
 	wire  full = sub_wire0;
 	wire [15:0] q = sub_wire1[15:0];
+	wire [2:0] usedw = sub_wire2[2:0];
 
 	scfifo	scfifo_component (
 				.clock (clock),
@@ -64,13 +68,13 @@ module FIFO_8 (
 				.wrreq (wrreq),
 				.full (sub_wire0),
 				.q (sub_wire1),
+				.usedw (sub_wire2),
 				.aclr (),
 				.almost_empty (),
 				.almost_full (),
 				.eccstatus (),
 				.empty (),
-				.sclr (),
-				.usedw ());
+				.sclr ());
 	defparam
 		scfifo_component.add_ram_output_register = "OFF",
 		scfifo_component.intended_device_family = "Cyclone V",
@@ -107,7 +111,7 @@ endmodule
 // Retrieval info: PRIVATE: RAM_BLOCK_TYPE NUMERIC "0"
 // Retrieval info: PRIVATE: SYNTH_WRAPPER_GEN_POSTFIX STRING "0"
 // Retrieval info: PRIVATE: UNDERFLOW_CHECKING NUMERIC "1"
-// Retrieval info: PRIVATE: UsedW NUMERIC "0"
+// Retrieval info: PRIVATE: UsedW NUMERIC "1"
 // Retrieval info: PRIVATE: Width NUMERIC "16"
 // Retrieval info: PRIVATE: dc_aclr NUMERIC "0"
 // Retrieval info: PRIVATE: diff_widths NUMERIC "0"
@@ -137,6 +141,7 @@ endmodule
 // Retrieval info: USED_PORT: full 0 0 0 0 OUTPUT NODEFVAL "full"
 // Retrieval info: USED_PORT: q 0 0 16 0 OUTPUT NODEFVAL "q[15..0]"
 // Retrieval info: USED_PORT: rdreq 0 0 0 0 INPUT NODEFVAL "rdreq"
+// Retrieval info: USED_PORT: usedw 0 0 3 0 OUTPUT NODEFVAL "usedw[2..0]"
 // Retrieval info: USED_PORT: wrreq 0 0 0 0 INPUT NODEFVAL "wrreq"
 // Retrieval info: CONNECT: @clock 0 0 0 0 clock 0 0 0 0
 // Retrieval info: CONNECT: @data 0 0 16 0 data 0 0 16 0
@@ -144,6 +149,7 @@ endmodule
 // Retrieval info: CONNECT: @wrreq 0 0 0 0 wrreq 0 0 0 0
 // Retrieval info: CONNECT: full 0 0 0 0 @full 0 0 0 0
 // Retrieval info: CONNECT: q 0 0 16 0 @q 0 0 16 0
+// Retrieval info: CONNECT: usedw 0 0 3 0 @usedw 0 0 3 0
 // Retrieval info: GEN_FILE: TYPE_NORMAL FIFO_8.v TRUE
 // Retrieval info: GEN_FILE: TYPE_NORMAL FIFO_8.inc FALSE
 // Retrieval info: GEN_FILE: TYPE_NORMAL FIFO_8.cmp FALSE

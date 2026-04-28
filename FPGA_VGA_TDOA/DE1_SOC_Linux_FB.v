@@ -247,6 +247,9 @@ vga_pll  vga_pll_inst(
   // 50 MHz / 5,000,000 = 10 Hz refresh rate per sample.
   localparam integer DISPLAY_UPDATE_DIV = 5000000;
 
+  localparam integer PULSE_LENGTH_MS = 100;
+  localparam integer PULSE_GAP_MS = 500;
+
   /////////////////////////////////////////////////////
   // Declare clock, reset, and mode control signals //
   ///////////////////////////////////////////////////
@@ -369,7 +372,7 @@ mock_data mock_data_inst (
     .clk(clk_i),
     .rst_n(~rst_i),
     .data_out(data_from_pl),
-    .data_valid(data_valid),
+    .data_valid(data_valid)
 );
 
   //////////////////////////
@@ -427,7 +430,7 @@ mock_data mock_data_inst (
 
   wire pulse;
 
-  pulse_gen #(.PULSE_LENGTH_MS(100), .PULSE_GAP_MS(500)) pulse_gen_inst (
+  pulse_gen #(.PULSE_LENGTH_MS(PULSE_LENGTH_MS), .PULSE_GAP_MS(PULSE_GAP_MS)) pulse_gen_inst (
     .clk(clk_i),
     .rst_n(~rst_i),
     .freq_sel(2'b10),
@@ -448,7 +451,7 @@ mock_data mock_data_inst (
   wire lta_valid_1, lta_valid_2, lta_valid_3, lta_valid_4;
 
 
-  tdoa tdoa_inst (
+  tdoa #(.PULSE_GAP_MS(PULSE_GAP_MS)) tdoa_inst (
     .clk(clk_i),
     .rst_n(~rst_i),
     .mic_valid({conv1_pcm_valid_pos, conv1_pcm_valid_neg, conv2_pcm_valid_pos, conv2_pcm_valid_neg}),
@@ -456,6 +459,7 @@ mock_data mock_data_inst (
     .mic_pcm_1(conv1_pcm_neg),
     .mic_pcm_2(conv2_pcm_pos),
     .mic_pcm_3(conv2_pcm_neg),
+    .audible(freq_sel[2]),
     .quadrant_valid(quadrant_valid),
     .quadrant_code(quadrant_code),
     .collect_sample(collect_sample),
@@ -821,7 +825,7 @@ soc_system u0 (
         .alt_vip_itc_0_clocked_video_vid_h_sync      (vid_h_sync),      					 //                .vid_h_sync
         .alt_vip_itc_0_clocked_video_vid_f           (),           							 //                .vid_f
         .alt_vip_itc_0_clocked_video_vid_h           (),           							 //                .vid_h
-        .alt_vip_itc_0_clocked_video_vid_v           (),            		
+        .alt_vip_itc_0_clocked_video_vid_v           ()            		
 		  
     );
 endmodule

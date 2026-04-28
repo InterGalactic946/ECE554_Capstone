@@ -1,4 +1,6 @@
-module tdoa(
+module tdoa #(
+    parameter int unsigned PULSE_GAP_MS = 200
+) (
     input logic clk,
     input logic rst_n,
     input logic [3:0] mic_valid,
@@ -6,6 +8,7 @@ module tdoa(
     input logic signed [15:0] mic_pcm_1,
     input logic signed [15:0] mic_pcm_2,
     input logic signed [15:0] mic_pcm_3,
+    input logic audible,
 
     output logic quadrant_valid,
     output logic [2:0] quadrant_code,
@@ -111,13 +114,15 @@ module tdoa(
         .TSW(TSW),
         .STA_LEN(8),
         .LTA_LEN(512),
-        .THRESHOLD(16)
+        .THRESHOLD(16),
+        .PULSE_GAP_MS(PULSE_GAP_MS)
     ) u_event (
         .clk(clk),
         .rst_n(rst_n),
         .sample_valid(frame_sample_valid),
         .frame_sample(frame_sample),
         .sample_time(sample_time),
+        .audible(audible),
         .threshold_valid(threshold_valid),
         .hit_time(hit_time),
         .event_done(event_done),
