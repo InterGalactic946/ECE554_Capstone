@@ -103,7 +103,10 @@ module event_capture #(
     end
 
     logic all_quiet;
-    assign all_quiet = (det_out == 4'b0000);
+    assign all_quiet = (abs_sample[0] < MIC_ZERO_THRESHOLD[0]) &&
+                       (abs_sample[1] < MIC_ZERO_THRESHOLD[1]) &&
+                       (abs_sample[2] < MIC_ZERO_THRESHOLD[2]) &&
+                       (abs_sample[3] < MIC_ZERO_THRESHOLD[3]);
 
     // Cooldown counter in between valid events to prevent multiple captures of the same event
     logic [15:0] cooldown_ctr;
