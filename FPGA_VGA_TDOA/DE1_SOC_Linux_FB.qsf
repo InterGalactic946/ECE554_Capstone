@@ -945,7 +945,6 @@ set_global_assignment -name VERILOG_FILE ip/fifos/FIFO_8.v
 set_global_assignment -name QIP_FILE ip/fifos/FIFO_8.qip
 set_global_assignment -name VERILOG_FILE ip/fifos/FIFO_64.v
 set_global_assignment -name QIP_FILE ip/fifos/FIFO_64.qip
-set_global_assignment -name VERILOG_FILE ip/fifos/FIFO_512.v
 set_global_assignment -name QIP_FILE ip/fifos/FIFO_512.qip
 set_global_assignment -name VERILOG_FILE ip/fifos/FIFO_32.v
 set_global_assignment -name QIP_FILE ip/fifos/FIFO_32.qip
