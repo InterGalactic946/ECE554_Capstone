@@ -5,7 +5,8 @@ module event_capture #(
     // parameter int CAPTURE_WINDOW = 200,
     parameter int NUM_MICS       = 4,
     parameter int unsigned STA_LEN = 16,
-    parameter int unsigned LTA_LEN = 1024
+    parameter int unsigned LTA_LEN = 1024,
+    parameter int unsigned PULSE_GAP_MS = 200
 ) (
     input  logic                         clk,
     input  logic                         rst_n,
@@ -13,6 +14,7 @@ module event_capture #(
     input  logic                         sample_valid,
     input  logic signed [DW-1:0]         frame_sample [4],
     input  logic [TSW-1:0]               sample_time, // Generated from custom clock
+    input  logic                         audible,
 
     output logic [3:0]                   threshold_valid,
     output logic [TSW-1:0]               hit_time [4],
@@ -28,10 +30,13 @@ module event_capture #(
     logic [DW-1:0] abs_sample [4];
     logic capturing;
     logic start_cooldown;
+    logic [15:0] cooldown_samples;
+
     localparam int MIC_THRESHOLD [4] = '{16'd3000, 16'd3000, 16'd3000, 16'd3000};
     localparam int MIC_ZERO_THRESHOLD [4] = '{16'd200, 16'd200, 16'd200, 16'd200};
-    localparam int QUIET_SAMPLES_FOR_COOLDOWN = 16'h1388; // 5000 samples at 16kHz is ~0.3 seconds of silence before we can trigger again
 
+    localparam int QUIET_SAMPLES_FOR_COOLDOWN_192 = (PULSE_GAP_MS / 10) * 192;
+    localparam int QUIET_SAMPLES_FOR_COOLDOWN_48 = (PULSE_GAP_MS / 10) * 48;
 
     //////////////////////////////////////////////////
     // Helper
@@ -44,6 +49,8 @@ module event_capture #(
                 abs_s = v;
         end
     endfunction
+
+    assign cooldown_samples = audible ? QUIET_SAMPLES_FOR_COOLDOWN_48 : QUIET_SAMPLES_FOR_COOLDOWN_192;
 
     assign abs_sample[0] = abs_s(frame_sample[0]);
     assign abs_sample[1] = abs_s(frame_sample[1]);
@@ -114,11 +121,11 @@ module event_capture #(
         if (!rst_n) begin
             cooldown_ctr <= '0;
         end else if (start_cooldown) begin
-            cooldown_ctr <= QUIET_SAMPLES_FOR_COOLDOWN[15:0];
+            cooldown_ctr <= cooldown_samples;
         end else if (cooldown_ctr != 0) begin 
             // Only when the cooldown counter has began (all 4 crossed threshold) do we care about checking if det_out is all 0
             if (!all_quiet)
-                cooldown_ctr <= QUIET_SAMPLES_FOR_COOLDOWN[15:0];
+                cooldown_ctr <= cooldown_samples;
             else if (sample_valid)
                 cooldown_ctr <= cooldown_ctr - 1'b1;
         end
