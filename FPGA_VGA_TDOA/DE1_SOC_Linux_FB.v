@@ -337,16 +337,18 @@ vga_pll  vga_pll_inst(
   wire [15:0] data_from_pl;
   wire ready_for_data, data_valid;
 
-  wire ps_ready_for_data_time, ps_ready_for_data_quadrant;
-  wire ready_for_data_time, ready_for_data_quadrant;
-  wire [9:0] pl_to_ps_data_time, pl_to_ps_data_quadrant;
+  wire ps_ready_for_data_time, ps_ready_for_data_quadrant, ps_ready_for_data_loc;
+  wire ready_for_data_time, ready_for_data_quadrant, ready_for_data_loc;
+  wire [9:0] pl_to_ps_data_time, pl_to_ps_data_quadrant, pl_to_ps_data_loc;
 
+  wire loc_valid;
+  wire [15:0] x_proj_q15, y_proj_q15;
 
-  assign pl_to_ps_data = SW[9] ? pl_to_ps_data_time : pl_to_ps_data_quadrant;
-  assign ready_for_data = SW[9] ? ready_for_data_time : ready_for_data_quadrant;
-  assign ps_ready_for_data = SW[9] ? ps_ready_for_data_time : ps_ready_for_data_quadrant;
+  assign pl_to_ps_data = SW[9] ? (SW[8] ? pl_to_ps_data_loc : pl_to_ps_data_time) : pl_to_ps_data_quadrant;
+  assign ready_for_data = SW[9] ? (SW[8] ? ready_for_data_loc : ready_for_data_time) : ready_for_data_quadrant;
+  assign ps_ready_for_data = SW[9] ? (SW[8] ? ps_ready_for_data_loc : ps_ready_for_data_time) : ps_ready_for_data_quadrant;
 
- hit_time_to_ps hit_time_to_ps_inst (
+ data_to_ps #(.BUF_WIDTH(64)) hit_time_to_ps_inst (
     .clk(clk_i),
     .rst_n(~rst_i),
     .data_from_ps(ps_to_pl_data),
@@ -355,6 +357,17 @@ vga_pll  vga_pll_inst(
     .data_to_ps(pl_to_ps_data_time),
     .ready_for_data(ready_for_data_time),
     .ps_ready_for_data(ps_ready_for_data_time)
+  );
+
+   data_to_ps #(.BUF_WIDTH(32)) loc_to_ps_inst (
+    .clk(clk_i),
+    .rst_n(~rst_i),
+    .data_from_ps(ps_to_pl_data),
+    .input_data_valid(loc_valid),
+    .input_data({x_proj_q15, y_proj_q15}),
+    .data_to_ps(pl_to_ps_data_loc),
+    .ready_for_data(ready_for_data_loc),
+    .ps_ready_for_data(ps_ready_for_data_loc)
   );
 
   pl_to_ps pl_to_ps_inst (
@@ -484,7 +497,10 @@ mock_data mock_data_inst (
     .lta_valid_1(lta_valid_1),
     .lta_valid_2(lta_valid_2),
     .lta_valid_3(lta_valid_3),
-    .lta_valid_4(lta_valid_4)
+    .lta_valid_4(lta_valid_4),
+    .loc_valid(loc_valid),
+    .x_proj_q15(x_proj_q15),
+    .y_proj_q15(y_proj_q15)
   );
 
   /////////////////////////////////
@@ -569,7 +585,7 @@ mock_data mock_data_inst (
       prev_hit_time3 <= 16'h0;
       prev_hit_time4 <= 16'h0;
       prev_threshold_valid <= 4'h0;
-    end else if (event_done && ~SW[8]) begin
+    end else if (event_done) begin
       prev_hit_time1 <= hit_time1;
       prev_hit_time2 <= hit_time2;
       prev_hit_time3 <= hit_time3;

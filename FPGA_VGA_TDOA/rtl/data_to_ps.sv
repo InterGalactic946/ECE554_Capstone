@@ -1,8 +1,11 @@
-module hit_time_to_ps (
+module data_to_ps
+# (
+    parameter int unsigned BUF_WIDTH = 64
+) (
     input logic clk,
     input logic rst_n,
     input logic [9:0] data_from_ps,
-    input logic [63:0] input_data,
+    input logic [BUF_WIDTH-1:0] input_data,
     input logic input_data_valid,
     output logic [9:0] data_to_ps,
     output logic ready_for_data,
@@ -12,9 +15,9 @@ module hit_time_to_ps (
 
     logic req_clk, flop_req_clk, flop_ps_ready, prev_req_clk, active_req, out_valid, reg_valid;
 
-    logic [63:0] shift_reg;
+    logic [BUF_WIDTH-1:0] shift_reg;
     logic [7:0] data_out;
-    logic [3:0] bytes_sent;
+    logic [$clog2(BUF_WIDTH/8):0] bytes_sent;
 
     assign data_to_ps[0] = out_valid; // Indicate to PS that data is valid
     assign data_to_ps[1] = prev_req_clk; // Ack to PS that data read signal has been registered
@@ -67,7 +70,7 @@ module hit_time_to_ps (
             reg_valid <= 1'b0;
         end else if (input_data_valid) begin
             reg_valid <= 1'b1;
-        end else if (bytes_sent == 4'd8) begin
+        end else if (bytes_sent == $clog2(BUF_WIDTH/8)) begin
             reg_valid <= 1'b0; // Clear valid after data has been read
         end
     end
@@ -85,7 +88,7 @@ module hit_time_to_ps (
     always_ff @( posedge clk, negedge rst_n ) begin
         if ( !rst_n ) begin
             bytes_sent <= 0;
-        end else if (bytes_sent == 4'd8) begin
+        end else if (bytes_sent == $clog2(BUF_WIDTH/8)) begin
             bytes_sent <= 0; // Reset byte counter after all bytes have been sent
         end else if (active_req && reg_valid) begin
            bytes_sent <= bytes_sent + 1;
