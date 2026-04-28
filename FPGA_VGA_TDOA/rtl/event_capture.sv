@@ -103,20 +103,21 @@ module event_capture #(
     end
 
     logic all_quiet;
-    assign all_quiet = (abs_sample[0] < MIC_ZERO_THRESHOLD[0]) &&
-                       (abs_sample[1] < MIC_ZERO_THRESHOLD[1]) &&
-                       (abs_sample[2] < MIC_ZERO_THRESHOLD[2]) &&
-                       (abs_sample[3] < MIC_ZERO_THRESHOLD[3]);
+    assign all_quiet = (det_out == 4'b0000);
 
     // Cooldown counter in between valid events to prevent multiple captures of the same event
     logic [15:0] cooldown_ctr;
     always_ff @(posedge clk, negedge rst_n) begin
         if (!rst_n) begin
             cooldown_ctr <= '0;
-        end else if (start_cooldown || !all_quiet) begin
-            cooldown_ctr <= QUIET_SAMPLES_FOR_COOLDOWN[15:0]; // Wait for all mic's to be zero for 5000 samples
-        end else if (sample_valid && cooldown_ctr != 0 && all_quiet) begin
-            cooldown_ctr <= cooldown_ctr - 1'b1;
+        end else if (start_cooldown) begin
+            cooldown_ctr <= QUIET_SAMPLES_FOR_COOLDOWN[15:0];
+        end else if (cooldown_ctr != 0) begin 
+            // Only when the cooldown counter has began (all 4 crossed threshold) do we care about checking if det_out is all 0
+            if (!all_quiet)
+                cooldown_ctr <= QUIET_SAMPLES_FOR_COOLDOWN[15:0];
+            else if (sample_valid)
+                cooldown_ctr <= cooldown_ctr - 1'b1;
         end
     end
 
