@@ -28,8 +28,9 @@ module event_capture #(
     logic [DW-1:0] abs_sample [4];
     logic capturing;
     logic start_cooldown;
-    logic [DW-1:0] abs_sample [4];
     localparam int MIC_THRESHOLD [4] = '{16'd3000, 16'd3000, 16'd3000, 16'd3000};
+    localparam int MIC_ZERO_THRESHOLD [4] = '{16'd200, 16'd200, 16'd200, 16'd200};
+    localparam int QUIET_SAMPLES_FOR_COOLDOWN = 16'h1388; // 5000 samples at 16kHz is ~0.3 seconds of silence before we can trigger again
 
 
     //////////////////////////////////////////////////
@@ -101,14 +102,20 @@ module event_capture #(
         end
     end
 
+    logic all_quiet;
+    assign all_quiet = (abs_sample[0] < MIC_ZERO_THRESHOLD[0]) &&
+                       (abs_sample[1] < MIC_ZERO_THRESHOLD[1]) &&
+                       (abs_sample[2] < MIC_ZERO_THRESHOLD[2]) &&
+                       (abs_sample[3] < MIC_ZERO_THRESHOLD[3]);
+
     // Cooldown counter in between valid events to prevent multiple captures of the same event
-    logic [7:0] cooldown_ctr;
+    logic [15:0] cooldown_ctr;
     always_ff @(posedge clk, negedge rst_n) begin
         if (!rst_n) begin
             cooldown_ctr <= '0;
-        end else if (start_cooldown) begin
-            cooldown_ctr <= 8'h7F;
-        end else if (sample_valid && cooldown_ctr != 0) begin
+        end else if (start_cooldown || !all_quiet) begin
+            cooldown_ctr <= QUIET_SAMPLES_FOR_COOLDOWN[15:0]; // Wait for all mic's to be zero for 5000 samples
+        end else if (sample_valid && cooldown_ctr != 0 && all_quiet) begin
             cooldown_ctr <= cooldown_ctr - 1'b1;
         end
     end
