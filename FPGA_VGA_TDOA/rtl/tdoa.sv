@@ -31,7 +31,12 @@ module tdoa(
     output logic lta_valid_1,
     output logic lta_valid_2,
     output logic lta_valid_3,
-    output logic lta_valid_4
+    output logic lta_valid_4,
+
+    // Location outputs
+    output logic loc_valid,
+    output logic signed [15:0] x_proj_q15,
+    output logic signed [15:0] y_proj_q15
 );
 
     localparam TSW = 17;
@@ -121,6 +126,18 @@ module tdoa(
         .lta_mean(lta_mean),
         .sta_valid(sta_valid),
         .lta_valid(lta_valid)
+    );
+
+    loc_classifier #(
+        .TSW(TSW)
+    ) u_loc (
+        .clk(clk),
+        .rst_n(rst_n),
+        .event_done(event_done),
+        .hit_time(hit_time),
+        .loc_valid(loc_valid),
+        .x_proj_q15(x_proj_q15),
+        .y_proj_q15(y_proj_q15)
     );
 
     quadrant_classifier #(
