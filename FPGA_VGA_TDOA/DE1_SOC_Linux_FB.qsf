@@ -940,21 +940,15 @@ set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
 set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
 set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
 set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
-set_global_assignment -name SYSTEMVERILOG_FILE rtl/hit_time_to_ps.sv
-set_global_assignment -name VERILOG_FILE ip/fifos/FIFO_8.v
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/loc_classifier.sv
+set_global_assignment -name SYSTEMVERILOG_FILE rtl/data_to_ps.sv
 set_global_assignment -name QIP_FILE ip/fifos/FIFO_8.qip
-set_global_assignment -name VERILOG_FILE ip/fifos/FIFO_64.v
 set_global_assignment -name QIP_FILE ip/fifos/FIFO_64.qip
 set_global_assignment -name QIP_FILE ip/fifos/FIFO_512.qip
-set_global_assignment -name VERILOG_FILE ip/fifos/FIFO_32.v
 set_global_assignment -name QIP_FILE ip/fifos/FIFO_32.qip
-set_global_assignment -name VERILOG_FILE ip/fifos/FIFO_256.v
 set_global_assignment -name QIP_FILE ip/fifos/FIFO_256.qip
-set_global_assignment -name VERILOG_FILE ip/fifos/FIFO_2048.v
 set_global_assignment -name QIP_FILE ip/fifos/FIFO_2048.qip
-set_global_assignment -name VERILOG_FILE ip/fifos/FIFO_16.v
 set_global_assignment -name QIP_FILE ip/fifos/FIFO_16.qip
-set_global_assignment -name VERILOG_FILE ip/fifos/FIFO_128.v
 set_global_assignment -name QIP_FILE ip/fifos/FIFO_128.qip
 set_global_assignment -name QIP_FILE ip/fifos/FIFO_1024.qip
 set_global_assignment -name SYSTEMVERILOG_FILE rtl/window_mean.sv
