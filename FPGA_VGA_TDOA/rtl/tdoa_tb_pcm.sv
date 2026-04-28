@@ -93,7 +93,6 @@ initial begin
     mic_valid = 4'b0000;
     csv_done = 1'b0;
     sample_count = 0;
-    observed_count = 0;
     mic_pcm_0 = 16'sd0;
     mic_pcm_1 = 16'sd0;
     mic_pcm_2 = 16'sd0;
