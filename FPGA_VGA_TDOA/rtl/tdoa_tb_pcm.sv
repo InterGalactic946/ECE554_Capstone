@@ -1,4 +1,4 @@
-module tdoa_tb();
+module tdoa_tb_pcm();
 
 logic clk, rst_n;
 logic [3:0] mic_valid;
