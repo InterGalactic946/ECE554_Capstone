@@ -35,8 +35,8 @@ module event_capture #(
     localparam int MIC_THRESHOLD [4] = '{16'd3000, 16'd3000, 16'd3000, 16'd3000};
     localparam int MIC_ZERO_THRESHOLD [4] = '{16'd200, 16'd200, 16'd200, 16'd200};
 
-    localparam int QUIET_SAMPLES_FOR_COOLDOWN_192 = (PULSE_GAP_MS / 10) * 192;
-    localparam int QUIET_SAMPLES_FOR_COOLDOWN_48 = (PULSE_GAP_MS / 10) * 48;
+    localparam int QUIET_SAMPLES_FOR_COOLDOWN_192 = (PULSE_GAP_MS / 20) * 192;
+    localparam int QUIET_SAMPLES_FOR_COOLDOWN_48 = (PULSE_GAP_MS / 20) * 48;
 
     //////////////////////////////////////////////////
     // Helper
