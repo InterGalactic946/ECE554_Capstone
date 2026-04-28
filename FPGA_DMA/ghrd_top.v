@@ -420,10 +420,10 @@ module ghrd_top (
 // (det_out[1] ? hit_time_2 : 16'h0002)
 // (det_out[2] ? hit_time_3 : 16'h0003)
 // (det_out[3] ? hit_time_4 : 16'h0004)
-  assign hit_time_1_dma = SW[9] ? lta_mean_1 : (event_done ? hit_time_1 : 16'h0001);
-  assign hit_time_2_dma = SW[9] ? lta_mean_2 : (event_done ? hit_time_2 : 16'h0002);
-  assign hit_time_3_dma = SW[9] ? sta_mean_1 : (event_done ? hit_time_3 : 16'h0003);
-  assign hit_time_4_dma = SW[9] ? sta_mean_2 : (event_done ? hit_time_4 : 16'h0004);
+  assign hit_time_1_dma = SW[9] ? lta_mean_1 : (prev_hit_time_1);
+  assign hit_time_2_dma = SW[9] ? lta_mean_2 : (prev_hit_time_2);
+  assign hit_time_3_dma = SW[9] ? sta_mean_1 : (prev_hit_time_3);
+  assign hit_time_4_dma = SW[9] ? sta_mean_2 : (prev_hit_time_4);
 
   dma_fifo_write dma_fifo_write_inst (
       .clk(CLOCK_50),
