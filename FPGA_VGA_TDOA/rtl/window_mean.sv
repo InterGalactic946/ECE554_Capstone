@@ -35,20 +35,21 @@ module window_mean
         end
     end
 
-    // My_FIFO #(
-    //     .DEPTH(WINDOW_SIZE),
-    //     .DATA_WIDTH(DATA_WIDTH)
-    // ) fifo (
-    //     .clk(clk),
-    //     .rst_n(rst_n),
-    //     .rden(fifo_rden),
-    //     .wren(fifo_wren),
-    //     .i_data(data_in),
-    //     .o_data(fifo_out),
-    //     .full(fifo_full),
-    //     .empty()
-    // );
+    My_FIFO #(
+        .DEPTH(WINDOW_SIZE),
+        .DATA_WIDTH(DATA_WIDTH)
+    ) fifo (
+        .clk(clk),
+        .rst_n(rst_n),
+        .rden(fifo_rden),
+        .wren(fifo_wren),
+        .i_data(data_in),
+        .o_data(fifo_out),
+        .full(fifo_full),
+        .empty()
+    );
 
+    /*
     generate
         if (WINDOW_SIZE == 8) begin
             FIFO_8 fifo_8 (
@@ -137,6 +138,7 @@ module window_mean
             end
         end
     endgenerate
+    */
 
     always_ff @( posedge clk, negedge rst_n ) begin
         if (!rst_n) begin
