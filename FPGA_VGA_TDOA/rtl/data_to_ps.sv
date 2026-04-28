@@ -70,7 +70,7 @@ module data_to_ps
             reg_valid <= 1'b0;
         end else if (input_data_valid) begin
             reg_valid <= 1'b1;
-        end else if (bytes_sent == $clog2(BUF_WIDTH/8)) begin
+        end else if (bytes_sent == (BUF_WIDTH/8)) begin
             reg_valid <= 1'b0; // Clear valid after data has been read
         end
     end
@@ -88,7 +88,7 @@ module data_to_ps
     always_ff @( posedge clk, negedge rst_n ) begin
         if ( !rst_n ) begin
             bytes_sent <= 0;
-        end else if (bytes_sent == $clog2(BUF_WIDTH/8)) begin
+        end else if (bytes_sent == (BUF_WIDTH/8)) begin
             bytes_sent <= 0; // Reset byte counter after all bytes have been sent
         end else if (active_req && reg_valid) begin
            bytes_sent <= bytes_sent + 1;
