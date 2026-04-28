@@ -19,8 +19,9 @@ module window_mean
     logic [DATA_WIDTH-1:0] fifo_out;
 
     logic [$clog2(WINDOW_SIZE) + DATA_WIDTH -1:0] current_sum;
+    logic [$clog2(WINDOW_SIZE)-1:0] count;
 
-    assign fifo_rden = fifo_full && data_valid;
+    assign fifo_rden = &count && data_valid;
     assign fifo_wren = data_valid;
 
     always_ff @(posedge clk, negedge rst_n) begin
@@ -35,30 +36,31 @@ module window_mean
         end
     end
 
-    My_FIFO #(
-        .DEPTH(WINDOW_SIZE),
-        .DATA_WIDTH(DATA_WIDTH)
-    ) fifo (
-        .clk(clk),
-        .rst_n(rst_n),
-        .rden(fifo_rden),
-        .wren(fifo_wren),
-        .i_data(data_in),
-        .o_data(fifo_out),
-        .full(fifo_full),
-        .empty()
-    );
+    // My_FIFO #(
+    //     .DEPTH(WINDOW_SIZE),
+    //     .DATA_WIDTH(DATA_WIDTH)
+    // ) fifo (
+    //     .clk(clk),
+    //     .rst_n(rst_n),
+    //     .rden(fifo_rden),
+    //     .wren(fifo_wren),
+    //     .i_data(data_in),
+    //     .o_data(fifo_out),
+    //     .full(fifo_full),
+    //     .empty()
+    // );
 
-    /*
+    
     generate
         if (WINDOW_SIZE == 8) begin
             FIFO_8 fifo_8 (
                 .clock(clk),
-                .data(data_in),
+                .data(prev_data_in),
                 .rdreq(fifo_rden),
                 .wrreq(fifo_wren),
                 .q(fifo_out),
-                .full(fifo_full)
+                .full(fifo_full),
+                .usedw(count)
             );
         end else if (WINDOW_SIZE == 16) begin
             FIFO_16 fifo_16 (
@@ -108,11 +110,12 @@ module window_mean
         end else if (WINDOW_SIZE == 512) begin
             FIFO_512 fifo_512 (
                 .clock(clk),
-                .data(data_in),
+                .data(prev_data_in),
                 .rdreq(fifo_rden),
                 .wrreq(fifo_wren),
                 .q(fifo_out),
-                .full(fifo_full)
+                .full(fifo_full),
+                .usedw(count)
             );
         end else if (WINDOW_SIZE == 1024) begin
                 FIFO_1024 fifo_1024 (
@@ -138,7 +141,7 @@ module window_mean
             end
         end
     endgenerate
-    */
+    
 
     always_ff @( posedge clk, negedge rst_n ) begin
         if (!rst_n) begin
