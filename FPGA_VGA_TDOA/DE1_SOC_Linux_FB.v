@@ -247,8 +247,8 @@ vga_pll  vga_pll_inst(
   // 50 MHz / 5,000,000 = 10 Hz refresh rate per sample.
   localparam integer DISPLAY_UPDATE_DIV = 5000000;
 
-  localparam integer PULSE_LENGTH_MS = 100;
-  localparam integer PULSE_GAP_MS = 500;
+  localparam integer PULSE_LENGTH_MS = 50;
+  localparam integer PULSE_GAP_MS = 250;
 
   /////////////////////////////////////////////////////
   // Declare clock, reset, and mode control signals //
