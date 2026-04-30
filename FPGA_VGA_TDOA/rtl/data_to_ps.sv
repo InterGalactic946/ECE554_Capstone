@@ -18,12 +18,23 @@ module data_to_ps
     logic [BUF_WIDTH-1:0] shift_reg;
     logic [7:0] data_out;
     logic [$clog2(BUF_WIDTH/8):0] bytes_sent;
+    logic [27:0] stale_timer;
 
     assign data_to_ps[0] = out_valid; // Indicate to PS that data is valid
     assign data_to_ps[1] = prev_req_clk; // Ack to PS that data read signal has been registered
     assign data_to_ps[9:2] = data_out;
 
     assign ready_for_data = ~reg_valid;
+
+    always_ff @(posedge clk, negedge rst_n) begin
+        if (!rst_n) begin
+            stale_timer <= '0;
+        end else if (active_req) begin
+            stale_timer <= '0;
+        end else begin
+            stale_timer <= stale_timer + 1;
+        end
+    end
 
     always_ff @( posedge clk, negedge rst_n ) begin
         if (!rst_n) begin
@@ -70,7 +81,7 @@ module data_to_ps
             reg_valid <= 1'b0;
         end else if (input_data_valid) begin
             reg_valid <= 1'b1;
-        end else if (bytes_sent == (BUF_WIDTH/8)) begin
+        end else if ((bytes_sent == (BUF_WIDTH/8)) || &stale_timer)  begin
             reg_valid <= 1'b0; // Clear valid after data has been read
         end
     end
