@@ -50,10 +50,10 @@ module loc_classifier #(
         input logic signed [MULW-1:0] value
     );
         begin
-            if (value > $signed(16'sh7FFF))
+            if (value > $signed({{(MULW-16){1'b0}}, 16'sh7FFF}))
                 sat_q15 = 16'sh7FFF;
-            else if (value < $signed(-16'sh8000))
-                sat_q15 = -16'sh8000;
+            else if (value < $signed({{(MULW-16){1'b1}}, 16'sh8000}))
+                sat_q15 = 16'sh8000;
             else
                 sat_q15 = value[15:0];
         end
@@ -80,12 +80,11 @@ module loc_classifier #(
         // loc.x_proj = -loc.x_proj;
         x_cycles_flipped = -dx_cycles;
 
-        x_prod_q30 = x_cycles_flipped * K_Q30;
-        y_prod_q30 = dy_cycles        * K_Q30;
+        x_prod_q30 = $signed(x_cycles_flipped) * $signed(K_Q30);
+        y_prod_q30 = $signed(dy_cycles)        * $signed(K_Q30);
 
-        // Convert from Q30 scale to Q15 output.
-        x_scaled_q15_full = x_prod_q30 >>> (CONST_Q - OUT_Q);
-        y_scaled_q15_full = y_prod_q30 >>> (CONST_Q - OUT_Q);
+        x_scaled_q15_full = $signed(x_prod_q30) >>> (CONST_Q - OUT_Q);
+        y_scaled_q15_full = $signed(y_prod_q30) >>> (CONST_Q - OUT_Q);
     end
 
     //////////////////////////////////////////////////
