@@ -247,8 +247,8 @@ vga_pll  vga_pll_inst(
   // 50 MHz / 5,000,000 = 10 Hz refresh rate per sample.
   localparam integer DISPLAY_UPDATE_DIV = 5000000;
 
-  localparam integer PULSE_LENGTH_MS = 50;
-  localparam integer PULSE_GAP_MS = 250;
+  localparam integer PULSE_LENGTH_MS = 20;
+  localparam integer PULSE_GAP_MS = 100;
 
   /////////////////////////////////////////////////////
   // Declare clock, reset, and mode control signals //
@@ -681,6 +681,58 @@ mock_data mock_data_inst (
       hex3_data = prev_hit_time4[15:12];
       hex4_data = {3'b0, threshold_valid[3]};
       hex5_data = 4'd4;
+    end else if (page_sel == 6) begin
+      // Show current frequency band
+      case(freq_sel)
+        3'b100: begin
+          hex0_data = 5'bz;
+          hex1_data = 5'b0;
+          hex2_data = 5'b1F;
+          hex3_data = 5'b1;
+          hex4_data = 5'b0;
+          hex5_data = 5'bz;
+        end 
+        3'b000: begin
+          hex0_data = 5'b1;
+          hex1_data = 5'b0;
+          hex2_data = 5'b1F;
+          hex3_data = 5'b1;
+          hex4_data = 5'b8;
+          hex5_data = 5'bz;
+        end 
+        3'b001: begin
+          hex0_data = 5'b1;
+          hex1_data = 5'b8;
+          hex2_data = 5'b1F;
+          hex3_data = 5'b2;
+          hex4_data = 5'b5;
+          hex5_data = 5'bz;
+        end 
+        3'b010: begin
+          hex0_data = 5'b2;
+          hex1_data = 5'b5;
+          hex2_data = 5'b1F;
+          hex3_data = 5'b3;
+          hex4_data = 5'b2;
+          hex5_data = 5'bz;
+        end 
+        3'b011: begin
+          hex0_data = 5'b3;
+          hex1_data = 5'b2;
+          hex2_data = 5'b1F;
+          hex3_data = 5'b4;
+          hex4_data = 5'b0;
+          hex5_data = 5'bz;
+        end 
+        default: begin
+          hex0_data = 0;
+          hex1_data = 0;
+          hex2_data = 0;
+          hex3_data = 0;
+          hex4_data = 0;
+          hex5_data = 0;
+        end 
+      endcase
     end else begin
       hex0_data = 0;
       hex1_data = 0;
