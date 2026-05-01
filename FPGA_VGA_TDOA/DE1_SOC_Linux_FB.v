@@ -687,42 +687,42 @@ mock_data mock_data_inst (
         3'b100: begin
           hex0_data = 5'h11;
           hex1_data = 5'h00;
-          hex2_data = 5'h1F;
-          hex3_data = 5'h01;
+          hex2_data = 5'h01;
+          hex3_data = 5'h1F;
           hex4_data = 5'h00;
           hex5_data = 5'h11;
         end 
         3'b000: begin
-          hex0_data = 5'h01;
-          hex1_data = 5'h00;
-          hex2_data = 5'h1F;
-          hex3_data = 5'h01;
-          hex4_data = 5'h08;
-          hex5_data = 5'h11;
+          hex0_data = 5'h11;
+          hex1_data = 5'h08;
+          hex2_data = 5'h01;
+          hex3_data = 5'h1F;
+          hex4_data = 5'h00;
+          hex5_data = 5'h01;
         end 
         3'b001: begin
-          hex0_data = 5'h01;
-          hex1_data = 5'h08;
-          hex2_data = 5'h1F;
-          hex3_data = 5'h02;
-          hex4_data = 5'h05;
-          hex5_data = 5'h11;
+          hex0_data = 5'h11;
+          hex1_data = 5'h05;
+          hex2_data = 5'h02;
+          hex3_data = 5'h1F;
+          hex4_data = 5'h08;
+          hex5_data = 5'h01;
         end 
         3'b010: begin
-          hex0_data = 5'h02;
-          hex1_data = 5'h05;
-          hex2_data = 5'h1F;
-          hex3_data = 5'h03;
-          hex4_data = 5'h02;
-          hex5_data = 5'h11;
+          hex0_data = 5'h11;
+          hex1_data = 5'h02;
+          hex2_data = 5'h03;
+          hex3_data = 5'h1F;
+          hex4_data = 5'h05;
+          hex5_data = 5'h02;
         end 
         3'b011: begin
-          hex0_data = 5'h03;
-          hex1_data = 5'h02;
-          hex2_data = 5'h1F;
-          hex3_data = 5'h04;
-          hex4_data = 5'h00;
-          hex5_data = 5'h11;
+          hex0_data = 5'h11;
+          hex1_data = 5'h00;
+          hex2_data = 5'h04;
+          hex3_data = 5'h1F;
+          hex4_data = 5'h02;
+          hex5_data = 5'h03;
         end 
         default: begin
           hex0_data = 5'h11;
