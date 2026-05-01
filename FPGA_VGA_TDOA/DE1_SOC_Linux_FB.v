@@ -685,44 +685,44 @@ mock_data mock_data_inst (
       // Show current frequency band
       case(freq_sel)
         3'b100: begin
-          hex0_data = 5'bz;
-          hex1_data = 5'b0;
-          hex2_data = 5'b1F;
-          hex3_data = 5'b1;
-          hex4_data = 5'b0;
-          hex5_data = 5'bz;
+          hex0_data = 5'hz;
+          hex1_data = 5'h0;
+          hex2_data = 5'h1F;
+          hex3_data = 5'h1;
+          hex4_data = 5'h0;
+          hex5_data = 5'hz;
         end 
         3'b000: begin
-          hex0_data = 5'b1;
-          hex1_data = 5'b0;
-          hex2_data = 5'b1F;
-          hex3_data = 5'b1;
-          hex4_data = 5'b8;
-          hex5_data = 5'bz;
+          hex0_data = 5'h1;
+          hex1_data = 5'h0;
+          hex2_data = 5'h1F;
+          hex3_data = 5'h1;
+          hex4_data = 5'h8;
+          hex5_data = 5'hz;
         end 
         3'b001: begin
-          hex0_data = 5'b1;
-          hex1_data = 5'b8;
-          hex2_data = 5'b1F;
-          hex3_data = 5'b2;
-          hex4_data = 5'b5;
-          hex5_data = 5'bz;
+          hex0_data = 5'h1;
+          hex1_data = 5'h8;
+          hex2_data = 5'h1F;
+          hex3_data = 5'h2;
+          hex4_data = 5'h5;
+          hex5_data = 5'hz;
         end 
         3'b010: begin
-          hex0_data = 5'b2;
-          hex1_data = 5'b5;
-          hex2_data = 5'b1F;
-          hex3_data = 5'b3;
-          hex4_data = 5'b2;
-          hex5_data = 5'bz;
+          hex0_data = 5'h2;
+          hex1_data = 5'h5;
+          hex2_data = 5'h1F;
+          hex3_data = 5'h3;
+          hex4_data = 5'h2;
+          hex5_data = 5'hz;
         end 
         3'b011: begin
-          hex0_data = 5'b3;
-          hex1_data = 5'b2;
-          hex2_data = 5'b1F;
-          hex3_data = 5'b4;
-          hex4_data = 5'b0;
-          hex5_data = 5'bz;
+          hex0_data = 5'h3;
+          hex1_data = 5'h2;
+          hex2_data = 5'h1F;
+          hex3_data = 5'h4;
+          hex4_data = 5'h0;
+          hex5_data = 5'hz;
         end 
         default: begin
           hex0_data = 0;
