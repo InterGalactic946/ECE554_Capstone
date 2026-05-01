@@ -610,7 +610,7 @@ mock_data mock_data_inst (
     end
   end
 
-  reg [3:0] hex0_data, hex1_data, hex2_data, hex3_data, hex4_data, hex5_data;
+  reg [4:0] hex0_data, hex1_data, hex2_data, hex3_data, hex4_data, hex5_data;
   reg [2:0] page_sel;
   reg next_page;
   reg prev_button_1;
@@ -685,52 +685,52 @@ mock_data mock_data_inst (
       // Show current frequency band
       case(freq_sel)
         3'b100: begin
-          hex0_data = 5'hz;
-          hex1_data = 5'h0;
+          hex0_data = 5'h11;
+          hex1_data = 5'h00;
           hex2_data = 5'h1F;
-          hex3_data = 5'h1;
-          hex4_data = 5'h0;
-          hex5_data = 5'hz;
+          hex3_data = 5'h01;
+          hex4_data = 5'h00;
+          hex5_data = 5'h11;
         end 
         3'b000: begin
-          hex0_data = 5'h1;
-          hex1_data = 5'h0;
+          hex0_data = 5'h01;
+          hex1_data = 5'h00;
           hex2_data = 5'h1F;
-          hex3_data = 5'h1;
-          hex4_data = 5'h8;
-          hex5_data = 5'hz;
+          hex3_data = 5'h01;
+          hex4_data = 5'h08;
+          hex5_data = 5'h11;
         end 
         3'b001: begin
-          hex0_data = 5'h1;
-          hex1_data = 5'h8;
+          hex0_data = 5'h01;
+          hex1_data = 5'h08;
           hex2_data = 5'h1F;
-          hex3_data = 5'h2;
-          hex4_data = 5'h5;
-          hex5_data = 5'hz;
+          hex3_data = 5'h02;
+          hex4_data = 5'h05;
+          hex5_data = 5'h11;
         end 
         3'b010: begin
-          hex0_data = 5'h2;
-          hex1_data = 5'h5;
+          hex0_data = 5'h02;
+          hex1_data = 5'h05;
           hex2_data = 5'h1F;
-          hex3_data = 5'h3;
-          hex4_data = 5'h2;
-          hex5_data = 5'hz;
+          hex3_data = 5'h03;
+          hex4_data = 5'h02;
+          hex5_data = 5'h11;
         end 
         3'b011: begin
-          hex0_data = 5'h3;
-          hex1_data = 5'h2;
+          hex0_data = 5'h03;
+          hex1_data = 5'h02;
           hex2_data = 5'h1F;
-          hex3_data = 5'h4;
-          hex4_data = 5'h0;
-          hex5_data = 5'hz;
+          hex3_data = 5'h04;
+          hex4_data = 5'h00;
+          hex5_data = 5'h11;
         end 
         default: begin
-          hex0_data = 0;
-          hex1_data = 0;
-          hex2_data = 0;
-          hex3_data = 0;
-          hex4_data = 0;
-          hex5_data = 0;
+          hex0_data = 5'h11;
+          hex1_data = 5'h11;
+          hex2_data = 5'h11;
+          hex3_data = 5'h11;
+          hex4_data = 5'h11;
+          hex5_data = 5'h11;
         end 
       endcase
     end else begin
